@@ -1,0 +1,98 @@
+{
+  "title": "System Management",
+  "dept": {
+    "name": "Department",
+    "title": "Department Management",
+    "deptName": "Department Name",
+    "status": "Status",
+    "createTime": "Created At",
+    "remark": "Remarks",
+    "operation": "Actions",
+    "parentDept": "Parent Department"
+  },
+  "menu": {
+    "title": "Menu Management",
+    "parent": "Parent Menu",
+    "menuTitle": "Menu Title",
+    "menuName": "Menu Name",
+    "name": "Menu",
+    "type": "Menu Type",
+    "typeCatalog": "Catalog",
+    "typeMenu": "Menu",
+    "typeButton": "Button",
+    "typeLink": "External Link",
+    "typeEmbedded": "Embedded Page",
+    "icon": "Icon",
+    "activeIcon": "Active Icon",
+    "activePath": "Active Path",
+    "path": "Route Path",
+    "component": "Component",
+    "status": "Status",
+    "authCode": "Permission Code",
+    "badge": "Badge",
+    "operation": "Actions",
+    "linkSrc": "Link URL",
+    "affixTab": "Pin Tab",
+    "keepAlive": "Keep Alive",
+    "hideInMenu": "Hide in Menu",
+    "hideInTab": "Hide in Tab Bar",
+    "hideChildrenInMenu": "Hide Children in Menu",
+    "hideInBreadcrumb": "Hide in Breadcrumb",
+    "advancedSettings": "Advanced Settings",
+    "activePathMustExist": "The path must correspond to a valid menu",
+    "activePathHelp": "When navigating to this route, if it doesn’t appear in the menu, you must specify the menu path that should be activated.",
+    "badgeType": {
+      "title": "Badge Type",
+      "dot": "Dot",
+      "normal": "Text",
+      "none": "None"
+    },
+    "badgeVariants": "Badge Style"
+  },
+  "role": {
+    "title": "Role Management",
+    "list": "Role List",
+    "name": "Role",
+    "roleName": "Role Name",
+    "id": "Role ID",
+    "status": "Status",
+    "remark": "Remarks",
+    "createTime": "Created At",
+    "operation": "Actions",
+    "permissions": "Permissions",
+    "setPermissions": "Configure Permissions"
+  },
+  "tenant": {
+    "name": "Tenant",
+    "contact_mobile": "Contact Mobile",
+    "website": "Website",
+    "package_id": "Package Name",
+    "expire_time": "Expiration Time",
+    "account_count": "Account Limit",
+    "tenantName": "Tenant Name"
+  },
+  "tenant_package": {
+    "name": "Tenant Package",
+    "contact_mobile": "Contact Mobile",
+    "website": "Website",
+    "package_id": "Package Name",
+    "expire_time": "Expiration Time",
+    "account_count": "Account Limit",
+    "tenantName": "Tenant Name"
+  },
+  "dict_type": {
+    "name": "Dictionary Name",
+    "title": "Dictionary Name",
+    "type": "Dictionary Type"
+  },
+  "dict_data": {
+    "name": "Dictionary Label",
+    "title": "Dictionary Data",
+    "type": "Dictionary Value"
+  },
+  "status": "Status",
+  "remark": "Remarks",
+  "createTime": "Created At",
+  "operation": "Actions",
+  "updateTime": "Updated At"
+}

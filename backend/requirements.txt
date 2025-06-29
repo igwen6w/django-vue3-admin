@@ -1,0 +1,13 @@
+Django==5.2.1
+djangorestframework==3.16.0
+django-filter==25.1
+django-cors-headers==4.7.0
+django-ckeditor==6.7.2
+openpyxl==3.1.5
+mysqlclient==2.2.7
+django-simpleui==2025.5.17
+requests==2.32.3
+celery==5.5.3
+redis==6.2.0
+eventlet==0.40.0
+goofish_api==0.0.6
