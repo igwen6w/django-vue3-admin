@@ -16,7 +16,7 @@ export namespace SystemDeptApi {
 /**
  * 获取部门列表数据
  */
-async function getDeptList(params: Recordable<any>) {
+async function getDeptList(params?: Recordable<any>) {
   return requestClient.get<Array<SystemDeptApi.SystemDept>>('/system/dept/', {
     params,
   });

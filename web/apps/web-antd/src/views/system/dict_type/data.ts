@@ -6,6 +6,7 @@ import type { SystemDictTypeApi } from '#/api/system/dict_type';
 
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
+import {format_datetime} from "#/utils/date";
 
 /**
  * 获取编辑表单的字段配置。如果没有使用多语言，可以直接export一个数组常量
@@ -113,6 +114,7 @@ export function useColumns(
       field: 'create_time',
       title: '创建时间',
       width: 180,
+      formatter: ({ cellValue }) => format_datetime(cellValue),
     },
     {
       align: 'right',

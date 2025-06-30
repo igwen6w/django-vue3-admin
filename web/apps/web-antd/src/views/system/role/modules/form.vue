@@ -70,6 +70,7 @@ async function loadPermissions() {
   loadingPermissions.value = true;
   try {
     const res = await getMenuList();
+    console.log(res, 'res')
     permissions.value = res.items as unknown as DataNode[];
   } finally {
     loadingPermissions.value = false;

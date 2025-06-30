@@ -94,7 +94,6 @@ class MenuViewSet(CustomModelViewSet):
         if name:
             queryset = queryset.filter(name=name)
         has_menu_name = queryset.exists()
-        print(has_menu_name, 'has_menu_name')
         return self._build_response(data=has_menu_name)
 
     @action(detail=False, methods=['get'], url_path='path-exists')
@@ -114,7 +113,6 @@ class MenuViewSet(CustomModelViewSet):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
-        headers = self.get_success_headers(serializer.data)
         return self._build_response(
             data=serializer.data,
             message="ok",

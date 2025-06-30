@@ -42,7 +42,7 @@ export function useColumns(
       width: 100,
     },
     {
-      field: 'authCode',
+      field: 'auth_code',
       title: $t('system.menu.authCode'),
       width: 200,
     },
