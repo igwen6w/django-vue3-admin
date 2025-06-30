@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from system.models import Menu, MenuMeta
 from utils.custom_model_viewSet import CustomModelViewSet
+from utils.serializers import CustomModelSerializer
 
 
 class MenuMetaSerializer(serializers.ModelSerializer):
@@ -14,7 +15,7 @@ class MenuMetaSerializer(serializers.ModelSerializer):
         model = MenuMeta
         fields = '__all__'
 
-class MenuSerializer(serializers.ModelSerializer):
+class MenuSerializer(CustomModelSerializer):
     """菜单序列化器"""
     parent = serializers.CharField(source='pid.name', read_only=True)
     meta = MenuMetaSerializer()
@@ -46,11 +47,13 @@ class MenuSerializer(serializers.ModelSerializer):
         """创建菜单及关联的元数据"""
         meta_data = validated_data.pop('meta')
         meta = MenuMeta.objects.create(**meta_data)
+        self.set_audit_user_fields(validated_data, is_create=True)
         menu = Menu.objects.create(meta=meta, **validated_data)
         return menu
 
     def update(self, instance, validated_data):
         """更新菜单及关联的元数据"""
+        self.set_audit_user_fields(validated_data, is_create=False)
         meta_data = validated_data.pop('meta', {})
         meta_serializer = self.fields['meta']
         meta_serializer.update(instance.meta, meta_data)

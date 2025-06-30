@@ -49,7 +49,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'name',
       label: $t('system.role.roleName'),
     },
-    { component: 'Input', fieldName: 'id', label: $t('system.role.id') },
     {
       component: 'Select',
       componentProps: {
@@ -61,16 +60,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
       },
       fieldName: 'status',
       label: $t('system.role.status'),
-    },
-    {
-      component: 'Input',
-      fieldName: 'remark',
-      label: $t('system.role.remark'),
-    },
-    {
-      component: 'RangePicker',
-      fieldName: 'createTime',
-      label: $t('system.role.createTime'),
     },
   ];
 }

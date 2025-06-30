@@ -9,15 +9,29 @@ from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
 
 
-class CustomModelSerializer(ModelSerializer):
+class AuditUserFieldsMixin:
     """
-    增强DRF的ModelSerializer,可自动更新模型的审计字段记录
-    (1)self.request能获取到rest_framework.request.Request对象
+    用于自动赋值 creator 和 modifier 字段的 Mixin
     """
     # 修改人的审计字段名称, 默认modifier, 继承使用时可自定义覆盖
     modifier_field_id = 'modifier'
     # 创建人的审计字段名称, 默认creator, 继承使用时可自定义覆盖
     creator_field_id = 'creator'
+
+    def set_audit_user_fields(self, validated_data, is_create=True):
+        username = self.get_request_username() if hasattr(self, 'get_request_username') else None
+        if getattr(self, 'request', None):
+            if self.modifier_field_id in self.fields:
+                validated_data[self.modifier_field_id] = username
+            if is_create and self.creator_field_id in self.fields:
+                validated_data[self.creator_field_id] = username
+
+
+class CustomModelSerializer(AuditUserFieldsMixin, ModelSerializer):
+    """
+    增强DRF的ModelSerializer,可自动更新模型的审计字段记录
+    (1)self.request能获取到rest_framework.request.Request对象
+    """
     # 添加默认时间返回格式
     create_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False, read_only=True)
     update_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False)
@@ -30,17 +44,11 @@ class CustomModelSerializer(ModelSerializer):
         return super().save(**kwargs)
 
     def create(self, validated_data):
-        if self.request:
-            if self.modifier_field_id in self.fields:
-                validated_data[self.modifier_field_id] = self.get_request_username()
-            if self.creator_field_id in self.fields:
-                validated_data[self.creator_field_id] = self.get_request_username()
+        self.set_audit_user_fields(validated_data, is_create=True)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        if self.request:
-            if hasattr(self.instance, self.modifier_field_id):
-                validated_data[self.modifier_field_id] = self.get_request_username()
+        self.set_audit_user_fields(validated_data, is_create=False)
         return super().update(instance, validated_data)
 
     def get_request_username(self):

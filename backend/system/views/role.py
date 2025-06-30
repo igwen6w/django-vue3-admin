@@ -7,9 +7,10 @@ from rest_framework.response import Response
 
 from system.models import RolePermission, Menu, Role
 from utils.custom_model_viewSet import CustomModelViewSet
+from utils.serializers import CustomModelSerializer
 
 
-class RoleSerializer(serializers.ModelSerializer):
+class RoleSerializer(CustomModelSerializer):
     """角色序列化器"""
     permissions = serializers.PrimaryKeyRelatedField(
         queryset=Menu.objects.all(),
@@ -34,7 +35,7 @@ class RoleViewSet(CustomModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status']
+    filterset_fields = ['status', 'name']
     search_fields = ['name']
     ordering_fields = ['create_time']
 

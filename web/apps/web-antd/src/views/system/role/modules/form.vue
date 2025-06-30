@@ -58,7 +58,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
       } else {
         id.value = undefined;
       }
-
       if (permissions.value.length === 0) {
         loadPermissions();
       }
@@ -70,8 +69,7 @@ async function loadPermissions() {
   loadingPermissions.value = true;
   try {
     const res = await getMenuList();
-    console.log(res, 'res')
-    permissions.value = res.items as unknown as DataNode[];
+    permissions.value = res as unknown as DataNode[];
   } finally {
     loadingPermissions.value = false;
   }
@@ -99,7 +97,7 @@ function getNodeClass(node: Recordable<any>) {
   <Drawer :title="getDrawerTitle">
     <Form>
       <template #permissions="slotProps">
-        <Spin :spinning="loadingPermissions" wrapper-class-name="w-full">
+        <Spin v-if="permissions.length" :spinning="loadingPermissions" wrapper-class-name="w-full">
           <VbenTree
             :tree-data="permissions"
             multiple
