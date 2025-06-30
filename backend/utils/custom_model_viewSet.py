@@ -38,19 +38,19 @@ class CustomModelViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         """重写列表视图，支持软删除过滤"""
         queryset = self.get_queryset()
-
         # 应用软删除过滤
         if self.enable_soft_delete:
             queryset = queryset.filter(**{self.soft_delete_field: False})
-
         # 应用搜索和过滤
         queryset = self.filter_queryset(queryset)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
+        # 判断是否传了 page 参数
+        if 'page' in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+        # 没有 page 参数，返回全部数据
         serializer = self.get_serializer(queryset, many=True)
         return self._build_response(
             data=serializer.data,

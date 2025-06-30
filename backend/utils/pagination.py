@@ -10,6 +10,7 @@ from django.core.paginator import InvalidPage
 
 class CustomPagination(PageNumberPagination):
     page_size = 20
+    page_query_param = 'page'  # 默认就是'page'，如果你用别的名字要改成对应的
     page_size_query_param = "pageSize"
     max_page_size = 999
     django_paginator_class = DjangoPaginator

@@ -102,8 +102,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     proxyConfig: {
       ajax: {
-        query: async (_params) => {
-          return await getDeptList();
+        query: async ({ page }, _params) => {
+          return await getDeptList({
+            page: page.currentPage,
+            pageSize: page.pageSize,
+          });
         },
       },
     },

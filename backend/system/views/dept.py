@@ -8,9 +8,10 @@ from rest_framework.response import Response
 
 from system.models import Dept
 from utils.custom_model_viewSet import CustomModelViewSet
+from utils.serializers import CustomModelSerializer
 
 
-class DeptSerializer(serializers.ModelSerializer):
+class DeptSerializer(CustomModelSerializer):
     """部门序列化器"""
     children = serializers.SerializerMethodField()
     status_text = serializers.SerializerMethodField()

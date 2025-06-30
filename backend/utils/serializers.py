@@ -8,8 +8,6 @@ from rest_framework.serializers import ModelSerializer
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
 
-from system.models import User
-
 
 class CustomModelSerializer(ModelSerializer):
     """
@@ -18,16 +16,6 @@ class CustomModelSerializer(ModelSerializer):
     """
     # 修改人的审计字段名称, 默认modifier, 继承使用时可自定义覆盖
     modifier_field_id = 'modifier'
-    modifier_name = serializers.SerializerMethodField(read_only=True)
-
-    def get_modifier_name(self, instance):
-        if not hasattr(instance, 'modifier'):
-            return None
-        queryset = User.objects.filter(id=instance.modifier).values_list('name', flat=True).first()
-        if queryset:
-            return queryset
-        return None
-
     # 创建人的审计字段名称, 默认creator, 继承使用时可自定义覆盖
     creator_field_id = 'creator'
     # 添加默认时间返回格式
@@ -43,16 +31,16 @@ class CustomModelSerializer(ModelSerializer):
 
     def create(self, validated_data):
         if self.request:
-            if self.modifier_field_id in self.fields.fields:
+            if self.modifier_field_id in self.fields:
                 validated_data[self.modifier_field_id] = self.get_request_username()
-            if self.creator_field_id in self.fields.fields:
+            if self.creator_field_id in self.fields:
                 validated_data[self.creator_field_id] = self.get_request_username()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         if self.request:
             if hasattr(self.instance, self.modifier_field_id):
-                self.instance.modifier = self.get_request_username()
+                validated_data[self.modifier_field_id] = self.get_request_username()
         return super().update(instance, validated_data)
 
     def get_request_username(self):
