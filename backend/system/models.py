@@ -274,3 +274,7 @@ class User(AbstractUser, CoreModel):
         verbose_name = '用户数据'
         verbose_name_plural = verbose_name
         db_table = 'system_users'
+
+    @property
+    def get_role_name(self):
+        return [role.name for role in self.role.all()]

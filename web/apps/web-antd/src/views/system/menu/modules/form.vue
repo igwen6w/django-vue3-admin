@@ -56,7 +56,11 @@ const schema: VbenFormSchema[] = [
       .max(30, $t('ui.formRules.maxLength', [$t('system.menu.menuName'), 30]))
       .refine(
         async (value: string) => {
-          return !(await isMenuSearchExists(value, formData.value?.id));
+          return !(await isMenuSearchExists(
+            value,
+            formData.value?.id,
+            formData.value?.pid,
+          ));
         },
         (value) => ({
           message: $t('ui.formRules.alreadyExists', [
@@ -252,7 +256,7 @@ const schema: VbenFormSchema[] = [
       triggerFields: ['type'],
     },
     fieldName: 'auth_code',
-    label: $t('system.menu.authCode'),
+    label: $t('system.menu.auth_code'),
   },
   {
     component: 'InputNumber',

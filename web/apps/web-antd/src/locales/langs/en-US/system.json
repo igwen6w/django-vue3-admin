@@ -29,7 +29,7 @@
     "component": "Component",
     "status": "Status",
     "sort": "sort",
-    "authCode": "Permission Code",
+    "auth_code": "Permission Code",
     "badge": "Badge",
     "operation": "Actions",
     "linkSrc": "Link URL",

@@ -25,7 +25,7 @@ export namespace SystemMenuApi {
   export interface SystemMenu {
     [key: string]: any;
     /** 后端权限标识 */
-    authCode: string;
+    auth_code: string;
     /** 子级 */
     children?: SystemMenu[];
     /** 组件 */
@@ -110,9 +110,10 @@ async function isMenuNameExists(
 async function isMenuSearchExists(
   name: string,
   id?: SystemMenuApi.SystemMenu['id'],
+  pid?: SystemMenuApi.SystemMenu['pid'],
 ) {
   return requestClient.get<boolean>('/system/menu/name-search', {
-    params: { name, id },
+    params: { name, id, pid },
   });
 }
 

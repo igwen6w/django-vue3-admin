@@ -20,7 +20,7 @@
     "activePathMustExist": "该路径未能找到有效的菜单",
     "advancedSettings": "其它设置",
     "affixTab": "固定在标签",
-    "authCode": "权限标识",
+    "auth_code": "权限标识",
     "badge": "徽章内容",
     "badgeVariants": "徽标样式",
     "badgeType": {

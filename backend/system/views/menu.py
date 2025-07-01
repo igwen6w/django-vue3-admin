@@ -69,7 +69,7 @@ class MenuMetaViewSet(viewsets.ModelViewSet):
 
 class MenuViewSet(CustomModelViewSet):
     """菜单管理视图集"""
-    queryset = Menu.objects.filter(pid__isnull=True).order_by('id', 'status')
+    queryset = Menu.objects.filter(pid__isnull=True).order_by('sort', 'id', 'status')
     serializer_class = MenuSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'type', 'pid', 'name']
@@ -91,7 +91,10 @@ class MenuViewSet(CustomModelViewSet):
     def name_search(self, request):
         name = request.GET.get('name')
         pk = request.GET.get('id', None)
+        pid = request.GET.get('pid', None)
         queryset = Menu.objects.all()
+        if pid:
+            queryset = queryset.filter(pid=pid)
         if pk:
             queryset = queryset.exclude(pk=pk)
         if name:

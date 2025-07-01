@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 
-from system.models import User
+from system.models import User, Menu
+from system.views.menu import MenuSerializer
 
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -68,10 +69,22 @@ class UserInfo(APIView):
         user = self.request.user
         user_data = UserSerializer(user).data
         if user.is_superuser:
-            user_data['roles'] = ['admin']
+            roles = ['admin']
+            menus = Menu.objects.filter(pid__isnull=True).order_by('sort')
+            permissions = Menu.objects.filter(type='button').order_by('sort').values_list('auth_code', flat=True)
+        else:
+            roles = user.get_role_name
+            menus = Menu.objects.filter(pid__isnull=True, role__users=user).order_by('sort').distinct()
+            permissions = Menu.objects.filter(type='button', role__users=user).order_by('sort').distinct().values_list('auth_code', flat=True)
+        menus_data = MenuSerializer(menus, many=True).data
         return Response({
             "code": 0,
-            "data": user_data,
+            "data": {
+                "menus": menus_data,
+                "permissions": permissions,
+                "roles": roles,
+                "user": user_data,
+            },
             "error": None,
             "message": "ok"
         })
