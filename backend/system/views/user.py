@@ -5,6 +5,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
+from rest_framework.permissions import IsAuthenticated
 
 from system.models import User, Menu
 from system.views.menu import MenuSerializer
@@ -70,21 +71,17 @@ class UserInfo(APIView):
         user_data = UserSerializer(user).data
         if user.is_superuser:
             roles = ['admin']
-            menus = Menu.objects.filter(pid__isnull=True).order_by('sort')
-            permissions = Menu.objects.filter(type='button').order_by('sort').values_list('auth_code', flat=True)
+            # menus = Menu.objects.filter(pid__isnull=True).order_by('sort')
+            # permissions = Menu.objects.filter(type='button').order_by('sort').values_list('auth_code', flat=True)
         else:
             roles = user.get_role_name
-            menus = Menu.objects.filter(pid__isnull=True, role__users=user).order_by('sort').distinct()
-            permissions = Menu.objects.filter(type='button', role__users=user).order_by('sort').distinct().values_list('auth_code', flat=True)
-        menus_data = MenuSerializer(menus, many=True).data
+            # menus = Menu.objects.filter(pid__isnull=True, role__users=user).order_by('sort').distinct()
+            # permissions = Menu.objects.filter(type='button', role__users=user).order_by('sort').distinct().values_list('auth_code', flat=True)
+        # menus_data = MenuSerializer(menus, many=True).data
+        user_data['roles'] = roles
         return Response({
             "code": 0,
-            "data": {
-                "menus": menus_data,
-                "permissions": permissions,
-                "roles": roles,
-                "user": user_data,
-            },
+            "data": user_data,
             "error": None,
             "message": "ok"
         })
@@ -119,4 +116,19 @@ class UserViewSet(CustomModelViewSet):
     search_fields = ['name']  # 根据实际字段调整
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
+
+
+class Logout(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        # user = request.user
+        # 删除用户的Token
+        # Token.objects.filter(user=user).delete()
+        return Response({
+            "code": 0,
+            "data": None,
+            "error": None,
+            "message": "登出成功"
+        })
 

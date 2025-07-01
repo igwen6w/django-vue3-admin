@@ -15,6 +15,7 @@ class MenuMetaSerializer(serializers.ModelSerializer):
         model = MenuMeta
         fields = '__all__'
 
+
 class MenuSerializer(CustomModelSerializer):
     """菜单序列化器"""
     parent = serializers.CharField(source='pid.name', read_only=True)
@@ -59,6 +60,13 @@ class MenuSerializer(CustomModelSerializer):
         meta_serializer.update(instance.meta, meta_data)
         return super().update(instance, validated_data)
 
+
+class MenuUserSerializer(MenuSerializer):
+    def get_children(self, obj):
+        children = obj.children.exclude(type='button')
+        if children:
+            return MenuUserSerializer(children, many=True).data
+        return []
 
 
 class MenuMetaViewSet(viewsets.ModelViewSet):
@@ -106,6 +114,16 @@ class MenuViewSet(CustomModelViewSet):
     def path_exists(self, request):
         return self._build_response()
 
+    @action(detail=False, methods=['get'], url_path='user_menu')
+    def user_menu(self, request):
+        user = self.request.user
+        if user.is_superuser:
+            menus = Menu.objects.filter(pid__isnull=True).exclude(type='button').order_by('sort')
+        else:
+            menus = Menu.objects.filter(pid__isnull=True,
+                                        role__users=user).exclude(type='button').order_by('sort').distinct()
+        menus_data = MenuUserSerializer(menus, many=True).data
+        return self._build_response(data=menus_data)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
