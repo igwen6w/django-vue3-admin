@@ -16,9 +16,9 @@ class PostViewSet(CustomModelViewSet):
     """
     岗位信息表 视图集
     """
-    queryset = Post.objects.filter(is_deleted=False).order_by('-id')
+    queryset = Post.objects.filter(is_deleted=False)
     serializer_class = PostSerializer
     filterset_fields = ['id', 'remark', 'creator', 'modifier', 'is_deleted', 'code', 'name', 'sort', 'status']
     search_fields = ['name']  # 根据实际字段调整
-    ordering_fields = ['create_time', 'id']
-    ordering = ['-create_time']
+    ordering_fields = ['create_time', 'id', 'sort']
+    ordering = ['sort']

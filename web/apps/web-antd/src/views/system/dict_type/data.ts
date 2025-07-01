@@ -42,8 +42,8 @@ export function useSchema(): VbenFormSchema[] {
       componentProps: {
         buttonStyle: 'solid',
         options: [
-          { label: '开启', value: true },
-          { label: '关闭', value: false },
+          { label: '开启', value: 1 },
+          { label: '关闭', value: 0 },
         ],
         optionType: 'button',
       },
@@ -97,10 +97,7 @@ export function useColumns(
     {
       cellRender: {
         name: 'CellTag',
-        options: [
-          { label: $t('common.enabled'), value: true },
-          { label: $t('common.disabled'), value: false },
-        ],
+
       },
       field: 'status',
       title: '状态',

@@ -5,6 +5,10 @@
 """
 from django.db import models
 
+class CommonStatus(models.IntegerChoices):
+    DISABLED = 0, '禁用'
+    ENABLED = 1, '启用'
+
 class CoreModel(models.Model):
     remark = models.CharField(max_length=256, db_comment="备注", null=True, blank=True, help_text="备注")
     creator = models.CharField(max_length=64, null=True, blank=True, help_text="创建人", db_comment="创建人")

@@ -76,12 +76,12 @@ export function useColumns(
       title: '岗位编码',
     },
     {
+      field: 'sort',
+      title: '排序',
+    },
+    {
       cellRender: {
         name: 'CellTag',
-        options: [
-          { label: $t('common.enabled'), value: true },
-          { label: $t('common.disabled'), value: false },
-        ],
       },
       field: 'status',
       title: '状态',
