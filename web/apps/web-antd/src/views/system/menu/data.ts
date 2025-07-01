@@ -43,7 +43,12 @@ export function useColumns(
     },
     {
       field: 'auth_code',
-      title: $t('system.menu.authCode'),
+      title: $t('system.menu.auth_code'),
+      width: 200,
+    },
+    {
+      field: 'sort',
+      title: $t('system.menu.sort'),
       width: 200,
     },
     {

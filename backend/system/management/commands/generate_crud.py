@@ -28,7 +28,7 @@ def camel_to_snake(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 def ensure_view_dirs(app_name, model_name_snake):
-    base_dir = f'web/apps/web-antd/src/views/{app_name.lower()}'
+    base_dir = f'../web/apps/web-antd/src/views/{app_name.lower()}'
     model_dir = os.path.join(base_dir, model_name_snake)
     if not os.path.exists(base_dir):
         os.makedirs(model_dir, exist_ok=True)
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             raise CommandError(f'模型 {app_name}.{model_name} 不存在')
 
         # 生成后端代码
-        self.generate_backend_code(app_name, model_name, model, model_name_snake)
+        # self.generate_backend_code(app_name, model_name, model, model_name_snake)
         
         if generate_frontend:
             # 生成前端代码
@@ -148,15 +148,29 @@ class Command(BaseCommand):
         self.stdout.write(f'生成前端列表页面: {list_path}')
 
     def generate_frontend_data(self, app_name, model_name, model, model_name_snake):
-        form_fields = []
+        CORE_FIELDS = ['create_time', 'update_time', 'creator', 'modifier', 'is_deleted', 'remark']
+        business_fields = []
+        core_fields = []
         for field in model._meta.fields:
-            if field.name in ['id', 'create_time', 'update_time', 'creator', 'modifier']:
-                continue
+            if field.name in CORE_FIELDS:
+                core_fields.append(field)
+            else:
+                business_fields.append(field)
+        # 生成 useSchema
+        form_fields = []
+        for field in business_fields + core_fields:
+            if field.name in ['id', 'create_time', 'update_time', 'creator', 'modifier', 'is_deleted']:
+                continue  # 这些一般不在表单里
             field_config = self.generate_form_field(field)
             if field_config:
                 form_fields.append(field_config)
+        # 生成 useColumns
+        columns = []
+        for field in business_fields + core_fields:
+            columns.append(f"    {{\n      field: '{field.name}',\n      title: '{getattr(field, 'verbose_name', field.name)}',\n    }},")
         context = get_context(app_name, model_name, model, model_name_snake)
         context['form_fields'] = '\n'.join(form_fields)
+        context['columns'] = '\n'.join(columns)
         data_path = f'../web/apps/web-antd/src/views/{app_name.lower()}/{model_name_snake}/data.ts'
         data_code = render_tpl('frontend_data.ts.tpl', context)
         with open(data_path, 'w', encoding='utf-8') as f:
@@ -196,55 +210,14 @@ class Command(BaseCommand):
         """生成表单字段配置"""
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
-        
+        col_props = ",\n      colProps: { span: 12 }"
         if isinstance(field, models.CharField):
-            return f'''    {{
-      component: 'Input',
-      fieldName: '{field_name}',
-      label: '{field_label}',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['{field_label}']))
-        .max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),
-    }},'''
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n      rules: z\n        .string()\n        .min(1, $t('ui.formRules.required', ['{field_label}']))\n        .max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),\n    }},'''
         elif isinstance(field, models.TextField):
-            return f'''    {{
-      component: 'Input',
-      componentProps: {{
-        rows: 3,
-        showCount: true,
-      }},
-      fieldName: '{field_name}',
-      label: '{field_label}',
-      rules: z
-        .string()
-        .max(500, $t('ui.formRules.maxLength', ['{field_label}', 500]))
-        .optional(),
-    }},'''
+            return f'''    {{\n      component: 'Input',\n      componentProps: {{\n        rows: 3,\n        showCount: true,\n      }},\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n      rules: z\n        .string()\n        .max(500, $t('ui.formRules.maxLength', ['{field_label}', 500]))\n        .optional(),\n    }},'''
         elif isinstance(field, models.IntegerField):
-            return f'''    {{
-      component: 'InputNumber',
-      fieldName: '{field_name}',
-      label: '{field_label}',
-    }},'''
+            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n    }},'''
         elif isinstance(field, models.BooleanField):
-            return f'''    {{
-      component: 'RadioGroup',
-      componentProps: {{
-        buttonStyle: 'solid',
-        options: [
-          {{ label: '开启', value: true }},
-          {{ label: '关闭', value: false }},
-        ],
-        optionType: 'button',
-      }},
-      defaultValue: true,
-      fieldName: '{field_name}',
-      label: '{field_label}',
-    }},'''
+            return f'''    {{\n      component: 'RadioGroup',\n      componentProps: {{\n        buttonStyle: 'solid',\n        options: [\n          {{ label: '开启', value: 1 }},\n          {{ label: '关闭', value: 0 }},\n        ],\n        optionType: 'button',\n      }},{col_props}\n      defaultValue: 1,\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
         else:
-            return f'''    {{
-      component: 'Input',
-      fieldName: '{field_name}',
-      label: '{field_label}',
-    }},''' 
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n    }},''' 

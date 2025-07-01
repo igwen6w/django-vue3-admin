@@ -255,6 +255,17 @@ const schema: VbenFormSchema[] = [
     label: $t('system.menu.authCode'),
   },
   {
+    component: 'InputNumber',
+    dependencies: {
+      rules: () => {
+        return 'required';
+      },
+      triggerFields: ['type'],
+    },
+    fieldName: 'sort',
+    label: $t('system.menu.sort'),
+  },
+  {
     component: 'RadioGroup',
     componentProps: {
       buttonStyle: 'solid',

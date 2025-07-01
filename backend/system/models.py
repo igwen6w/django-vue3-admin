@@ -97,6 +97,11 @@ class Menu(CoreModel):
     name = models.CharField(max_length=100, verbose_name='菜单名称')
     status = models.IntegerField(choices=CommonStatus.choices, default=CommonStatus.ENABLED, verbose_name='状态')
     type = models.CharField(choices=MenuType.choices, max_length=20, verbose_name='菜单类型')
+    sort = models.IntegerField(
+        default=0,
+        verbose_name="显示排序",
+        help_text="数值越小越靠前"
+    )
     path = models.CharField(max_length=200, blank=True, verbose_name='路由路径')
     component = models.CharField(max_length=200, blank=True, verbose_name='组件路径')
     auth_code = models.CharField(max_length=100, blank=True, verbose_name='权限编码')
@@ -244,10 +249,14 @@ class User(AbstractUser, CoreModel):
     city = models.CharField('城市', max_length=20, blank=True, null=True, db_comment="城市")
     province = models.CharField('省份', max_length=50, blank=True, null=True, db_comment="省份")
     country = models.CharField('国家', max_length=50, blank=True, null=True, db_comment="国家")
-    avatarUrl = models.URLField('头像', blank=True, null=True, db_comment="头像")
+    avatar_url = models.URLField('头像', blank=True, null=True, db_comment="头像")
 
     dept = models.ManyToManyField(
         'Dept', blank=True, verbose_name='部门', db_constraint=False,
+        related_name='users'
+    )
+    role = models.ManyToManyField(
+        'Role', blank=True, verbose_name='角色', db_constraint=False,
         related_name='users'
     )
     post = models.ManyToManyField(
@@ -259,7 +268,6 @@ class User(AbstractUser, CoreModel):
         default=CommonStatus.ENABLED,
         verbose_name='状态'
     )
-    login_date = models.DateTimeField("<最后登录时间>", blank=True, null=True, db_comment="最后登录时间")
     login_ip = models.GenericIPAddressField(blank=True, null=True, db_comment="最后登录IP")
 
     class Meta:

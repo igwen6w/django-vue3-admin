@@ -3,7 +3,7 @@ import type {
   OnActionClickParams,
   VxeTableGridOptions,
 } from '#/adapter/vxe-table';
-import type { ${app_name_camel}${model_name}Api } from '#/models/$app_name/${model_name_snake}';
+import type { SystemUserApi } from '#/models/system/user';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
@@ -11,13 +11,13 @@ import { Plus } from '@vben/icons';
 import { Button, message } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { $$t } from '#/locales';
-import { ${app_name_camel}${model_name}Model } from '#/models/${app_name}/${model_name_snake}';
+import { $t } from '#/locales';
+import { SystemUserModel } from '#/models/system/user';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
 
-const formModel = new ${app_name_camel}${model_name}Model();
+const formModel = new SystemUserModel();
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
@@ -25,25 +25,25 @@ const [FormModal, formModalApi] = useVbenModal({
 });
 
 /**
- * 编辑${verbose_name}
+ * 编辑用户数据
  */
-function onEdit(row: ${app_name_camel}${model_name}Api.${app_name_camel}${model_name}) {
+function onEdit(row: SystemUserApi.SystemUser) {
   formModalApi.setData(row).open();
 }
 
 /**
- * 创建新${verbose_name}
+ * 创建新用户数据
  */
 function onCreate() {
   formModalApi.setData(null).open();
 }
 
 /**
- * 删除${verbose_name}
+ * 删除用户数据
  */
-function onDelete(row: ${app_name_camel}${model_name}Api.${app_name_camel}${model_name}) {
+function onDelete(row: SystemUserApi.SystemUser) {
   const hideLoading = message.loading({
-    content: '删除${verbose_name}',
+    content: '删除用户数据',
     duration: 0,
     key: 'action_process_msg',
   });
@@ -67,7 +67,7 @@ function onDelete(row: ${app_name_camel}${model_name}Api.${app_name_camel}${mode
 function onActionClick({
   code,
   row,
-}: OnActionClickParams<${app_name_camel}${model_name}Api.${app_name_camel}${model_name}>) {
+}: OnActionClickParams<SystemUserApi.SystemUser>) {
   switch (code) {
     case 'delete': {
       onDelete(row);
@@ -120,11 +120,11 @@ function refreshGrid() {
 <template>
   <Page auto-content-height>
     <FormModal @success="refreshGrid" />
-    <Grid table-title="${verbose_name}">
+    <Grid table-title="用户数据">
       <template #toolbar-tools>
         <Button type="primary" @click="onCreate">
           <Plus class="size-5" />
-          {{ $$t('ui.actionTitle.create', [$$t('${app_name}.${model_name_snake}.name')]) }}
+          {{ $t('ui.actionTitle.create', [$t('system.user.name')]) }}
         </Button>
       </template>
     </Grid>

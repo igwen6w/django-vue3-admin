@@ -1,17 +1,42 @@
+from django.utils import timezone
+from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from django.contrib.auth.hashers import make_password
 
 from system.models import User
+
+from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
 
 
-class UserSerializer(CustomModelViewSet):
+class UserSerializer(CustomModelSerializer):
+    roles = serializers.SerializerMethodField()  # 新增字段
+    """
+    用户数据 序列化器
+    """
     class Meta:
         model = User
-        exclude = ('password',)
+        fields = '__all__'
+        read_only_fields = ['id', 'create_time', 'update_time']
+
+    def get_roles(self, obj):
+        """
+        返回用户所有角色的名称列表
+        """
+        return list(obj.role.values_list('name', flat=True))
+
+    def create(self, validated_data):
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data['password'])
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data['password'])
+        return super().update(instance, validated_data)
 
 
 class UserLogin(ObtainAuthToken):
@@ -22,18 +47,16 @@ class UserLogin(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        # 更新登录IP和登录时间
+        user.login_ip = request.META.get('REMOTE_ADDR')
+        user.last_login = timezone.now()
+        user.save(update_fields=['login_ip', 'last_login'])
+        user_data = UserSerializer(user).data
+        # 在序列化后的数据中加入 accessToken
+        user_data['accessToken'] = token.key
         return Response({
             "code": 0,
-            "data": {
-                "id": user.id,
-                "password": user.password,
-                "realName": user.nickname,
-                "roles": [
-                    "super"
-                ],
-                "username": user.username,
-                "accessToken": token.key
-            },
+            "data": user_data,
             "error": None,
             "message": "ok"
         })
@@ -43,16 +66,12 @@ class UserInfo(APIView):
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
+        user_data = UserSerializer(user).data
+        if user.is_superuser:
+            user_data['roles'] = ['admin']
         return Response({
             "code": 0,
-            "data": {
-                "id": user.id,
-                "realName": user.username,
-                "roles": [
-                    "super"
-                ],
-                "username": user.username,
-            },
+            "data": user_data,
             "error": None,
             "message": "ok"
         })
@@ -74,6 +93,17 @@ class Codes(APIView):
         })
 
 
-class UserViewSet(ModelViewSet):
-    queryset = User.objects.all().order_by('id')
+class UserViewSet(CustomModelViewSet):
+    """
+    用户数据 视图集
+    """
+    queryset = User.objects.filter(is_deleted=False).order_by('-id')
     serializer_class = UserSerializer
+    read_only_fields = ['id', 'create_time', 'update_time', 'login_ip']
+    filterset_fields = ['username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'remark', 'creator',
+                        'modifier', 'is_deleted', 'mobile', 'nickname', 'gender', 'language', 'city', 'province',
+                        'country', 'avatar_url', 'status']
+    search_fields = ['name']  # 根据实际字段调整
+    ordering_fields = ['create_time', 'id']
+    ordering = ['-create_time']
+

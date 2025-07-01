@@ -28,6 +28,7 @@
     "path": "Route Path",
     "component": "Component",
     "status": "Status",
+    "sort": "sort",
     "authCode": "Permission Code",
     "badge": "Badge",
     "operation": "Actions",
@@ -94,8 +95,14 @@
     "name": "Post",
     "title": "Post Management"
   },
+  "user": {
+    "name": "User",
+    "title": "User Management"
+  },
   "status": "Status",
   "remark": "Remarks",
+  "creator": "creator",
+  "modifier": "modifier",
   "createTime": "Created At",
   "operation": "Actions",
   "updateTime": "Updated At"

@@ -14,6 +14,7 @@
   "menu": {
     "list": "菜单列表",
     "activeIcon": "激活图标",
+    "sort": "排序",
     "activePath": "激活路径",
     "activePathHelp": "跳转到当前路由时，需要激活的菜单路径。\n当不在导航菜单中显示时，需要指定激活路径",
     "activePathMustExist": "该路径未能找到有效的菜单",
@@ -95,8 +96,14 @@
     "name": "岗位",
     "title": "岗位管理"
   },
+  "user": {
+    "name": "用户",
+    "title": "用户管理"
+  },
   "status": "状态",
   "remark": "备注",
+  "creator": "创建人",
+  "modifier": "修改人",
   "createTime": "创建时间",
   "operation": "操作",
   "updateTime": "更新时间"

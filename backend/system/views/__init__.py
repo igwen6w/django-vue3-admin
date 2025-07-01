@@ -6,6 +6,7 @@ __all__ = [
     'DictDataViewSet',
     'DictTypeViewSet',
     'PostViewSet',
+    'UserViewSet',
 ]
 
 from system.views.dict_data import DictDataViewSet
