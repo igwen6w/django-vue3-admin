@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django-vue',
+        'NAME': 'django_vue',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
