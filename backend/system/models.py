@@ -224,6 +224,21 @@ class DictData(CoreModel):
         return self.label
 
 
+class Post(CoreModel):
+    code = models.CharField(max_length=64, db_comment='岗位编码')
+    name = models.CharField(max_length=50, db_comment='岗位名称')
+    sort = models.IntegerField(default=0, db_comment='显示顺序')
+    status = models.BooleanField(default=False, db_comment='状态')
+
+    class Meta:
+        db_table = 'system_post'
+        verbose_name = '岗位信息表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser, CoreModel):
     mobile = models.CharField(max_length=11, null=True, validators=[validate_mobile], db_comment="手机号")
     nickname = models.CharField(max_length=50, blank=True, null=True, db_comment="昵称")
@@ -236,6 +251,10 @@ class User(AbstractUser, CoreModel):
 
     dept = models.ManyToManyField(
         'Dept', blank=True, verbose_name='部门', db_constraint=False,
+        related_name='users'
+    )
+    post = models.ManyToManyField(
+        'Post', blank=True, verbose_name='岗位', db_constraint=False,
         related_name='users'
     )
     status = models.BooleanField(default=False, verbose_name='<帐号状态>（1正常 0停用）', db_comment="帐号状态")

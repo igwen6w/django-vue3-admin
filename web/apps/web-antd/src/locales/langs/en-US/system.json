@@ -90,6 +90,10 @@
     "title": "Dictionary Data",
     "type": "Dictionary Value"
   },
+  "post": {
+    "name": "Post",
+    "title": "Post Management"
+  },
   "status": "Status",
   "remark": "Remarks",
   "createTime": "Created At",

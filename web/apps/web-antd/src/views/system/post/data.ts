@@ -2,40 +2,40 @@ import type { VxeTableGridOptions } from '@vben/plugins/vxe-table';
 
 import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn } from '#/adapter/vxe-table';
-import type { SystemDictTypeApi } from '#/api/system/dict_type';
+import type { SystemPostApi } from '#/models/system/post';
 
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
 import { format_datetime } from '#/utils/date';
 
 /**
- * 获取编辑表单的字段配置。如果没有使用多语言，可以直接export一个数组常量
+ * 获取编辑表单的字段配置
  */
 export function useSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
       fieldName: 'name',
-      label: '字典名称',
+      label: '名称',
       rules: z
         .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict_type.name'), 2]))
-        .max(
-          20,
-          $t('ui.formRules.maxLength', [$t('system.dict_type.name'), 20]),
-        ),
+        .min(1, $t('ui.formRules.required', ['名称']))
+        .max(100, $t('ui.formRules.maxLength', ['名称', 100])),
     },
     {
       component: 'Input',
-      fieldName: 'type',
-      label: '字典类型',
+      fieldName: 'code',
+      label: '编码',
       rules: z
         .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict_type.type'), 2]))
-        .max(
-          20,
-          $t('ui.formRules.maxLength', [$t('system.dict_type.type'), 20]),
-        ),
+        .min(1, $t('ui.formRules.required', ['编码']))
+        .max(100, $t('ui.formRules.maxLength', ['编码', 100])),
+    },
+    {
+      component: 'InputNumber',
+      fieldName: 'sort',
+      label: '排序',
+      rules: z.number(),
     },
     {
       component: 'RadioGroup',
@@ -47,52 +47,33 @@ export function useSchema(): VbenFormSchema[] {
         ],
         optionType: 'button',
       },
-      defaultValue: 1,
+      defaultValue: true,
       fieldName: 'status',
-      label: '状态',
+      label: '是否启用',
     },
     {
       component: 'Input',
-      componentProps: {
-        maxLength: 50,
-        rows: 3,
-        showCount: true,
-      },
       fieldName: 'remark',
       label: '备注',
-      rules: z
-        .string()
-        .max(50, $t('ui.formRules.maxLength', [$t('system.remark'), 50]))
-        .optional(),
     },
   ];
 }
 
-/**
- * 获取表格列配置
- * @description 使用函数的形式返回列数据而不是直接export一个Array常量，是为了响应语言切换时重新翻译表头
- * @param onActionClick 表格操作按钮点击事件
- */
 export function useColumns(
-  onActionClick?: OnActionClickFn<SystemDictTypeApi.SystemDictType>,
-): VxeTableGridOptions<SystemDictTypeApi.SystemDictType>['columns'] {
+  onActionClick?: OnActionClickFn<SystemPostApi.SystemPost>,
+): VxeTableGridOptions<SystemPostApi.SystemPost>['columns'] {
   return [
     {
-      align: 'left',
       field: 'id',
-      fixed: 'left',
-      title: '字典编号',
-      treeNode: true,
-      width: 150,
+      title: 'id',
     },
     {
       field: 'name',
-      title: '字典名称',
+      title: '岗位名称',
     },
     {
-      field: 'type',
-      title: '字典类型',
-      width: 180,
+      field: 'code',
+      title: '岗位编码',
     },
     {
       cellRender: {
@@ -121,21 +102,14 @@ export function useColumns(
       cellRender: {
         attrs: {
           nameField: 'name',
-          nameTitle: $t('system.dict_type.name'),
+          nameTitle: $t('system.{model_name_snake}.name'),
           onClick: onActionClick,
         },
         name: 'CellOperation',
         options: [
           'edit', // 默认的编辑按钮
           {
-            code: 'view', // 新增查看详情按钮（可自定义code）
-            text: '数据', // 按钮文本（国际化）
-          },
-          {
             code: 'delete', // 默认的删除按钮
-            disabled: (row: SystemDictTypeApi.SystemDictType) => {
-              return !!(row.children && row.children.length > 0);
-            },
           },
         ],
       },

@@ -5,6 +5,7 @@ __all__ = [
     'RoleViewSet',
     'DictDataViewSet',
     'DictTypeViewSet',
+    'PostViewSet',
 ]
 
 from system.views.dict_data import DictDataViewSet
@@ -13,4 +14,5 @@ from system.views.menu import MenuViewSet, MenuMetaViewSet
 from system.views.role import RoleViewSet
 
 from system.views.dept import DeptViewSet
+from system.views.post import PostViewSet
 from system.views.user import *

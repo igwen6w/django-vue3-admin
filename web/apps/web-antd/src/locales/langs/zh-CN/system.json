@@ -91,6 +91,10 @@
     "title": "字典数据",
     "type": "字典键值"
   },
+  "post": {
+    "name": "岗位",
+    "title": "岗位管理"
+  },
   "status": "状态",
   "remark": "备注",
   "createTime": "创建时间",
