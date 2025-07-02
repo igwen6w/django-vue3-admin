@@ -102,7 +102,7 @@ export function useColumns(
       cellRender: {
         attrs: {
           nameField: 'name',
-          nameTitle: $t('system.{model_name_snake}.name'),
+          nameTitle: $t('system.post.name'),
           onClick: onActionClick,
         },
         name: 'CellOperation',

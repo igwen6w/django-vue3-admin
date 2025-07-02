@@ -12,6 +12,7 @@ router.register(r'dict_data', views.DictDataViewSet)
 router.register(r'dict_type', views.DictTypeViewSet)
 router.register(r'post', views.PostViewSet)
 router.register(r'user', views.UserViewSet)
+router.register(r'login_log', views.LoginLogViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

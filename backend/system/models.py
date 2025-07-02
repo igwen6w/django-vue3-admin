@@ -273,7 +273,7 @@ class User(AbstractUser, CoreModel):
         verbose_name='状态'
     )
     login_ip = models.GenericIPAddressField(blank=True, null=True, db_comment="最后登录IP")
-
+    
     class Meta:
         verbose_name = '用户数据'
         verbose_name_plural = verbose_name
@@ -282,3 +282,25 @@ class User(AbstractUser, CoreModel):
     @property
     def get_role_name(self):
         return [role.name for role in self.role.all()]
+
+
+class LoginLog(CoreModel):
+    """
+    系统访问记录
+    """
+    class LoginResult(models.IntegerChoices):
+        FAILED = 0, '失败'
+        SUCCESS = 1, '成功'
+    username = models.CharField(max_length=50, default='', db_comment='用户账号')
+    result = models.IntegerField(choices=LoginResult.choices, default=LoginResult.SUCCESS, db_comment='登录结果')
+    user_ip = models.CharField(max_length=50, db_comment='用户 IP')
+    user_agent = models.CharField(max_length=512, db_comment='浏览器 UA')
+
+    class Meta:
+        db_table = 'system_login_log'
+        verbose_name = '系统访问记录'
+        verbose_name_plural = verbose_name
+        ordering = ['-id']
+
+    def __str__(self):
+        return f"{self.username} - {self.user_ip}"

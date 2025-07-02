@@ -66,7 +66,6 @@ class MenuSerializer(CustomModelSerializer):
         """更新菜单及关联的元数据"""
         self.set_audit_user_fields(validated_data, is_create=False)
         meta_data = validated_data.pop('meta', {})
-        print(self.fields['meta'], "self.fields['meta']")
         meta_serializer = self.fields['meta']
         meta_serializer.update(instance.meta, meta_data)
         return super().update(instance, validated_data)
@@ -74,9 +73,13 @@ class MenuSerializer(CustomModelSerializer):
 
 class MenuUserSerializer(MenuSerializer):
     def get_children(self, obj):
-        children = obj.children.exclude(type='button').order_by('sort')
-        if children:
-            return MenuUserSerializer(children, many=True).data
+        request = self.context.get('request')
+        children_qs = obj.children.exclude(type='button').order_by('sort')
+        if request and hasattr(request, 'user') and request.user.is_authenticated and not request.user.is_superuser:
+            role_ids = request.user.role.values_list('id', flat=True)
+            children_qs = children_qs.filter(role__id__in=role_ids).distinct()
+        if children_qs:
+            return MenuUserSerializer(children_qs, many=True, context=self.context).data
         return []
 
 
@@ -131,9 +134,11 @@ class MenuViewSet(CustomModelViewSet):
         if user.is_superuser:
             menus = Menu.objects.filter(pid__isnull=True).exclude(type='button').order_by('sort')
         else:
+            role_ids = user.role.values_list('id', flat=True)
             menus = Menu.objects.filter(pid__isnull=True,
-                                        role__users=user).exclude(type='button').order_by('sort').distinct()
-        menus_data = MenuUserSerializer(menus, many=True).data
+                                        role__id__in=role_ids
+                                        ).exclude(type='button').order_by('sort').distinct()
+        menus_data = MenuUserSerializer(menus, many=True, context={'request': request}).data
         return self._build_response(data=menus_data)
 
     def update(self, request, *args, **kwargs):

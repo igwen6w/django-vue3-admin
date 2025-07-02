@@ -100,6 +100,10 @@
     "name": "用户",
     "title": "用户管理"
   },
+  "login_log": {
+    "name": "登录日志",
+    "title": "登录日志"
+  },
   "status": "状态",
   "remark": "备注",
   "creator": "创建人",

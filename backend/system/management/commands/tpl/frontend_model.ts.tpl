@@ -8,6 +8,6 @@ $interface_fields
 
 export class ${app_name_camel}${model_name}Model extends BaseModel<${app_name_camel}${model_name}Api.${app_name_camel}${model_name}> {
   constructor() {
-    super('/$app_name/${model_name_lower}/');
+    super('/$app_name/${model_name_snake}/');
   }
 }

@@ -77,7 +77,7 @@ class Command(BaseCommand):
             raise CommandError(f'模型 {app_name}.{model_name} 不存在')
 
         # 生成后端代码
-        # self.generate_backend_code(app_name, model_name, model, model_name_snake)
+        self.generate_backend_code(app_name, model_name, model, model_name_snake)
         
         if generate_frontend:
             # 生成前端代码
@@ -210,14 +210,13 @@ class Command(BaseCommand):
         """生成表单字段配置"""
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
-        col_props = ",\n      colProps: { span: 12 }"
         if isinstance(field, models.CharField):
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n      rules: z\n        .string()\n        .min(1, $t('ui.formRules.required', ['{field_label}']))\n        .max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),\n    }},'''
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n      rules: z\n        .string()\n        .min(1, $t('ui.formRules.required', ['{field_label}']))\n        .max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),\n    }},'''
         elif isinstance(field, models.TextField):
-            return f'''    {{\n      component: 'Input',\n      componentProps: {{\n        rows: 3,\n        showCount: true,\n      }},\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n      rules: z\n        .string()\n        .max(500, $t('ui.formRules.maxLength', ['{field_label}', 500]))\n        .optional(),\n    }},'''
+            return f'''    {{\n      component: 'Input',\n      componentProps: {{\n        rows: 3,\n        showCount: true,\n      }},\n      fieldName: '{field_name}',\n      label: '{field_label}',\n      rules: z\n        .string()\n        .max(500, $t('ui.formRules.maxLength', ['{field_label}', 500]))\n        .optional(),\n    }},'''
         elif isinstance(field, models.IntegerField):
-            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n    }},'''
+            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
         elif isinstance(field, models.BooleanField):
-            return f'''    {{\n      component: 'RadioGroup',\n      componentProps: {{\n        buttonStyle: 'solid',\n        options: [\n          {{ label: '开启', value: 1 }},\n          {{ label: '关闭', value: 0 }},\n        ],\n        optionType: 'button',\n      }},{col_props}\n      defaultValue: 1,\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f'''    {{\n      component: 'RadioGroup',\n      componentProps: {{\n        buttonStyle: 'solid',\n        options: [\n          {{ label: '开启', value: 1 }},\n          {{ label: '关闭', value: 0 }},\n        ],\n        optionType: 'button',\n      }},\n      defaultValue: 1,\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
         else:
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',{col_props}\n    }},''' 
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},''' 

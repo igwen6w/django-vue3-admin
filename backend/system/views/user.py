@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 
-from system.models import User, Menu
+from system.models import User, Menu, LoginLog
 from system.views.menu import MenuSerializer
 
 from utils.serializers import CustomModelSerializer
@@ -54,6 +54,13 @@ class UserLogin(ObtainAuthToken):
         user.last_login = timezone.now()
         user.save(update_fields=['login_ip', 'last_login'])
         user_data = UserSerializer(user).data
+        # 记录登录日志
+        LoginLog.objects.create(
+            username=user.username,
+            result=LoginLog.LoginResult.SUCCESS,
+            user_ip=request.META.get('REMOTE_ADDR', ''),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
         # 在序列化后的数据中加入 accessToken
         user_data['accessToken'] = token.key
         return Response({

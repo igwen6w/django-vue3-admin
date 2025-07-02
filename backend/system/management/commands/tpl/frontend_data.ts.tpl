@@ -32,7 +32,7 @@ ${columns}
       cellRender: {
         attrs: {
           nameField: 'name',
-          nameTitle: $t('${app_name}.${model_name_snake}.name'),
+          nameTitle: $$t('${app_name}.${model_name_snake}.name'),
           onClick: onActionClick,
         },
         name: 'CellOperation',
