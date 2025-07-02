@@ -16,15 +16,17 @@ class MenuType(models.TextChoices):
 
 # 菜单元数据模型（单独存储元数据，避免 JSONField）
 class MenuMeta(CoreModel):
-    title = models.CharField(max_length=200, verbose_name='标题')
-    icon = models.CharField(max_length=100, blank=True, verbose_name='图标')
-    order = models.IntegerField(default=0, verbose_name='排序')
-    affix_tab = models.BooleanField(default=False, verbose_name='固定标签页')
-    badge = models.CharField(max_length=50, blank=True, verbose_name='徽章文本')
-    badge_type = models.CharField(max_length=20, blank=True, verbose_name='徽章类型')
-    badge_variants = models.CharField(max_length=20, blank=True, verbose_name='徽章样式')
-    iframe_src = models.URLField(blank=True, verbose_name='内嵌页面URL')
-    link = models.URLField(blank=True, verbose_name='外部链接')
+    title = models.CharField(max_length=200, db_comment='标题')
+    icon = models.CharField(max_length=100, blank=True, db_comment='图标')
+    sort = models.IntegerField(default=0, db_comment='排序')
+    affix_tab = models.BooleanField(default=False, db_comment='固定标签页')
+    badge = models.CharField(max_length=50, blank=True, db_comment='徽章文本')
+    badge_type = models.CharField(max_length=20, blank=True, db_comment='徽章类型')
+    badge_variants = models.CharField(max_length=20, blank=True, db_comment='徽章样式')
+    iframe_src = models.URLField(blank=True, db_comment='内嵌页面URL')
+    link = models.URLField(blank=True, db_comment='外部链接')
+    hide_in_menu = models.BooleanField(default=False, db_comment='隐藏菜单')
+    hide_children_in_menu = models.BooleanField(default=False, db_comment='隐藏子菜单')
 
     def __str__(self):
         return self.title
@@ -33,6 +35,8 @@ class MenuMeta(CoreModel):
         db_table = 'system_menu_meta'
         verbose_name = '菜单元数据'
         verbose_name_plural = '菜单元数据'
+
+
 
 class Dept(CoreModel):
     pid = models.ForeignKey(
@@ -113,7 +117,7 @@ class Menu(CoreModel):
     class Meta:
         verbose_name = '菜单'
         verbose_name_plural = '菜单管理'
-        ordering = ['meta__order', 'id']
+        ordering = ['meta__sort', 'id']
 
 class Role(CoreModel):
     name = models.CharField(

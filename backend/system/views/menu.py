@@ -10,10 +10,20 @@ from utils.serializers import CustomModelSerializer
 
 
 class MenuMetaSerializer(serializers.ModelSerializer):
+
     """菜单元数据序列化器"""
+    hideChildrenInMenu = serializers.SerializerMethodField()
+    hideInMenu = serializers.SerializerMethodField()
+
     class Meta:
         model = MenuMeta
         fields = '__all__'
+
+    def get_hideChildrenInMenu(self, obj):
+        return getattr(obj, 'hide_children_in_menu', None)
+
+    def get_hideInMenu(self, obj):
+        return getattr(obj, 'hide_in_menu', None)
 
 
 class MenuSerializer(CustomModelSerializer):
@@ -31,7 +41,7 @@ class MenuSerializer(CustomModelSerializer):
 
     def get_children(self, obj):
         """获取子菜单"""
-        children = obj.children.all()
+        children = obj.children.all().order_by('sort')
         if children:
             return MenuSerializer(children, many=True).data
         return []
@@ -56,6 +66,7 @@ class MenuSerializer(CustomModelSerializer):
         """更新菜单及关联的元数据"""
         self.set_audit_user_fields(validated_data, is_create=False)
         meta_data = validated_data.pop('meta', {})
+        print(self.fields['meta'], "self.fields['meta']")
         meta_serializer = self.fields['meta']
         meta_serializer.update(instance.meta, meta_data)
         return super().update(instance, validated_data)
@@ -63,7 +74,7 @@ class MenuSerializer(CustomModelSerializer):
 
 class MenuUserSerializer(MenuSerializer):
     def get_children(self, obj):
-        children = obj.children.exclude(type='button')
+        children = obj.children.exclude(type='button').order_by('sort')
         if children:
             return MenuUserSerializer(children, many=True).data
         return []
@@ -82,7 +93,7 @@ class MenuViewSet(CustomModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'type', 'pid', 'name']
     search_fields = ['name', 'path', 'auth_code']
-    ordering_fields = ['meta__order', 'create_time']
+    ordering_fields = ['meta__sort', 'create_time']
 
     @action(detail=False, methods=['get'])
     def tree(self, request):

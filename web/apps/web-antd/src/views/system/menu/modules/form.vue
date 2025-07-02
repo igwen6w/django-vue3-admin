@@ -395,7 +395,7 @@ const schema: VbenFormSchema[] = [
       },
       triggerFields: ['type'],
     },
-    fieldName: 'meta.hideInMenu',
+    fieldName: 'meta.hide_in_menu',
     renderComponentContent() {
       return {
         default: () => $t('system.menu.hideInMenu'),
@@ -410,7 +410,7 @@ const schema: VbenFormSchema[] = [
       },
       triggerFields: ['type'],
     },
-    fieldName: 'meta.hideChildrenInMenu',
+    fieldName: 'meta.hide_children_in_menu',
     renderComponentContent() {
       return {
         default: () => $t('system.menu.hideChildrenInMenu'),
