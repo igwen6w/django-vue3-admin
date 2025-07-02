@@ -2,6 +2,7 @@ from system.models import LoginLog
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
 from rest_framework import serializers
+from utils.permissions import HasButtonPermission
 
 class LoginLogSerializer(CustomModelSerializer):
     """
@@ -28,3 +29,4 @@ class LoginLogViewSet(CustomModelViewSet):
     search_fields = ['name']  # 根据实际字段调整
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
+    permission_classes = [HasButtonPermission]

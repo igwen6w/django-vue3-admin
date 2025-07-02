@@ -8,7 +8,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 
 from system.models import User, Menu, LoginLog
-from system.views.menu import MenuSerializer
 
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -79,13 +78,14 @@ class UserInfo(APIView):
         if user.is_superuser:
             roles = ['admin']
             # menus = Menu.objects.filter(pid__isnull=True).order_by('sort')
-            # permissions = Menu.objects.filter(type='button').order_by('sort').values_list('auth_code', flat=True)
+            permissions = Menu.objects.filter(type='button').order_by('auth_code').values_list('auth_code', flat=True)
         else:
             roles = user.get_role_name
             # menus = Menu.objects.filter(pid__isnull=True, role__users=user).order_by('sort').distinct()
-            # permissions = Menu.objects.filter(type='button', role__users=user).order_by('sort').distinct().values_list('auth_code', flat=True)
+            permissions = Menu.objects.filter(type='button', role__users=user).order_by('auth_code').distinct().values_list('auth_code', flat=True)
         # menus_data = MenuSerializer(menus, many=True).data
         user_data['roles'] = roles
+        user_data['permissions'] = permissions
         return Response({
             "code": 0,
             "data": user_data,

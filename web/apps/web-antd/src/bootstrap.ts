@@ -15,6 +15,7 @@ import { initComponentAdapter } from './adapter/component';
 import { initSetupVbenForm } from './adapter/form';
 import App from './app.vue';
 import { router } from './router';
+import { registerPermissionDirective } from './utils/permission';
 
 async function bootstrap(namespace: string) {
   // 初始化组件适配器
@@ -48,6 +49,8 @@ async function bootstrap(namespace: string) {
 
   // 安装权限指令
   registerAccessDirective(app);
+  // 注册自定义v-permission指令
+  registerPermissionDirective(app);
 
   // 初始化 tippy
   const { initTippy } = await import('@vben/common-ui/es/tippy');

@@ -13,9 +13,12 @@ import { defineStore } from 'pinia';
 import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
 import { $t } from '#/locales';
 
+import { usePermissionStore } from './permission';
+
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
   const userStore = useUserStore();
+  const permissionStore = usePermissionStore();
   const router = useRouter();
 
   const loginLoading = ref(false);
@@ -62,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         if (userInfo?.realName) {
           notification.success({
-            description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
+            description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.username}`,
             duration: 3,
             message: $t('authentication.loginSuccess'),
           });
@@ -101,6 +104,11 @@ export const useAuthStore = defineStore('auth', () => {
     let userInfo: null | UserInfo = null;
     userInfo = await getUserInfoApi();
     userStore.setUserInfo(userInfo);
+    // 设置权限
+    if (userInfo && Array.isArray(userInfo.permissions)) {
+      permissionStore.setPermissions(userInfo.permissions);
+    }
+
     return userInfo;
   }
 

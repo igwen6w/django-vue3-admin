@@ -20,6 +20,38 @@ class CustomModelViewSet(viewsets.ModelViewSet):
     # 是否支持软删除
     enable_soft_delete = False
 
+    def get_required_permission(self):
+        # 约定：system:menu:create
+        app_label = self.queryset.model._meta.app_label
+        model_name = self.queryset.model._meta.model_name
+        action = self.action  # 'create', 'update', 'destroy', 'list', 'retrieve'
+        # 只对增删改查等操作做权限控制
+        action_map = {
+            'create': 'create',
+            'update': 'edit',
+            'partial_update': 'edit',
+            'destroy': 'delete',
+            'list': 'query',
+            'retrieve': 'query',
+        }
+        if action in action_map:
+            perm_action = action_map[action]
+        else:
+            perm_action = action  # 如 sync、import、export
+        return f"{app_label}:{model_name}:{perm_action}"
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        required_code = self.get_required_permission()
+        if required_code:
+            from utils.permissions import HasButtonPermission
+            perm = HasButtonPermission()
+            # 动态设置 required_permission
+            perm.required_permission = required_code
+            permissions.append(perm)
+        return permissions
+
+
     def get_serializer_class(self):
         """根据当前动作获取序列化器类"""
         return self.action_serializers.get(
@@ -27,13 +59,6 @@ class CustomModelViewSet(viewsets.ModelViewSet):
             super().get_serializer_class()
         )
 
-    def get_permissions(self):
-        """根据当前动作获取权限类"""
-        permissions = self.action_permissions.get(
-            self.action,
-            self.permission_classes
-        )
-        return [permission() for permission in permissions]
 
     def list(self, request, *args, **kwargs):
         """重写列表视图，支持软删除过滤"""
