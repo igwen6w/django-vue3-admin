@@ -180,7 +180,7 @@ class RolePermission(CoreModel):
 class DictType(CoreModel):
     """字典类型表"""
     name = models.CharField(max_length=100, default='', verbose_name='字典名称')
-    type = models.CharField(max_length=100, default='', verbose_name='字典类型', db_index=True)
+    value = models.CharField(max_length=100, default='', verbose_name='字典类型', db_index=True)
     status = models.IntegerField(
         choices=CommonStatus.choices,
         default=CommonStatus.ENABLED,

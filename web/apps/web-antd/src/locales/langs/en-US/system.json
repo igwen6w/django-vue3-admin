@@ -85,12 +85,12 @@
   "dict_type": {
     "name": "Dictionary Name",
     "title": "Dictionary Name",
-    "type": "Dictionary Type"
+    "value": "Dictionary Type"
   },
   "dict_data": {
     "name": "Dictionary Label",
     "title": "Dictionary Data",
-    "type": "Dictionary Value"
+    "value": "Dictionary Value"
   },
   "post": {
     "name": "Post",

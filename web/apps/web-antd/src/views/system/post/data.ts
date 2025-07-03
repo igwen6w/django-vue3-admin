@@ -122,3 +122,32 @@ export function useColumns(
     },
   ];
 }
+
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'name',
+      label: '岗位名称',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'Input',
+      fieldName: 'code',
+      label: '岗位编码',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'Select',
+      fieldName: 'status',
+      label: '状态',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
+    },
+  ];
+}

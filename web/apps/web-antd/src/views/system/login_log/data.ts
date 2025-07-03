@@ -93,3 +93,24 @@ export function useColumns(): VxeTableGridOptions<SystemLoginLogApi.SystemLoginL
     },
   ];
 }
+
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'username',
+      label: '用户名',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'RangePicker',
+      fieldName: 'create_time',
+      label: '创建时间',
+      componentProps: {
+        allowClear: true,
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD',
+      },
+    },
+  ];
+}

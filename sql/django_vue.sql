@@ -11,7 +11,7 @@
  Target Server Version : 90300 (9.3.0)
  File Encoding         : 65001
 
- Date: 03/07/2025 11:45:13
+ Date: 03/07/2025 16:53:14
 */
 
 SET NAMES utf8mb4;
@@ -241,35 +241,35 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of django_migrations
 -- ----------------------------
 BEGIN;
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (56, 'contenttypes', '0001_initial', '2025-07-03 03:44:52.908813');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (57, 'contenttypes', '0002_remove_content_type_name', '2025-07-03 03:44:52.911127');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (58, 'auth', '0001_initial', '2025-07-03 03:44:52.912623');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (59, 'auth', '0002_alter_permission_name_max_length', '2025-07-03 03:44:52.914061');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (60, 'auth', '0003_alter_user_email_max_length', '2025-07-03 03:44:52.915784');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (61, 'auth', '0004_alter_user_username_opts', '2025-07-03 03:44:52.917590');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (62, 'auth', '0005_alter_user_last_login_null', '2025-07-03 03:44:52.919017');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (63, 'auth', '0006_require_contenttypes_0002', '2025-07-03 03:44:52.920316');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (64, 'auth', '0007_alter_validators_add_error_messages', '2025-07-03 03:44:52.922403');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (65, 'auth', '0008_alter_user_username_max_length', '2025-07-03 03:44:52.924155');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (66, 'auth', '0009_alter_user_last_name_max_length', '2025-07-03 03:44:52.925595');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (67, 'auth', '0010_alter_group_name_max_length', '2025-07-03 03:44:52.927191');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (68, 'auth', '0011_update_proxy_permissions', '2025-07-03 03:44:52.928422');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (69, 'auth', '0012_alter_user_first_name_max_length', '2025-07-03 03:44:52.929767');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (70, 'system', '0001_initial', '2025-07-03 03:44:52.931096');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (71, 'admin', '0001_initial', '2025-07-03 03:44:52.932402');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (72, 'admin', '0002_logentry_remove_auto_add', '2025-07-03 03:44:52.933654');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (73, 'admin', '0003_logentry_add_action_flag_choices', '2025-07-03 03:44:52.934944');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (74, 'authtoken', '0001_initial', '2025-07-03 03:44:52.936279');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (75, 'authtoken', '0002_auto_20160226_1747', '2025-07-03 03:44:52.937883');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (76, 'authtoken', '0003_tokenproxy', '2025-07-03 03:44:52.939255');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (77, 'authtoken', '0004_alter_tokenproxy_options', '2025-07-03 03:44:52.940515');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (78, 'sessions', '0001_initial', '2025-07-03 03:44:52.941917');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (80, 'contenttypes', '0001_initial', '2025-07-03 08:43:50.800575');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (81, 'contenttypes', '0002_remove_content_type_name', '2025-07-03 08:43:50.802755');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (82, 'auth', '0001_initial', '2025-07-03 08:43:50.804008');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (83, 'auth', '0002_alter_permission_name_max_length', '2025-07-03 08:43:50.805150');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (84, 'auth', '0003_alter_user_email_max_length', '2025-07-03 08:43:50.806629');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (85, 'auth', '0004_alter_user_username_opts', '2025-07-03 08:43:50.807732');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (86, 'auth', '0005_alter_user_last_login_null', '2025-07-03 08:43:50.808717');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (87, 'auth', '0006_require_contenttypes_0002', '2025-07-03 08:43:50.809664');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (88, 'auth', '0007_alter_validators_add_error_messages', '2025-07-03 08:43:50.810639');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (89, 'auth', '0008_alter_user_username_max_length', '2025-07-03 08:43:50.811612');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (90, 'auth', '0009_alter_user_last_name_max_length', '2025-07-03 08:43:50.812666');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (91, 'auth', '0010_alter_group_name_max_length', '2025-07-03 08:43:50.813459');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (92, 'auth', '0011_update_proxy_permissions', '2025-07-03 08:43:50.814294');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (93, 'auth', '0012_alter_user_first_name_max_length', '2025-07-03 08:43:50.815294');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (94, 'system', '0001_initial', '2025-07-03 08:43:50.815957');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (95, 'admin', '0001_initial', '2025-07-03 08:43:50.816615');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (96, 'admin', '0002_logentry_remove_auto_add', '2025-07-03 08:43:50.817213');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (97, 'admin', '0003_logentry_add_action_flag_choices', '2025-07-03 08:43:50.817800');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (98, 'authtoken', '0001_initial', '2025-07-03 08:43:50.818352');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (99, 'authtoken', '0002_auto_20160226_1747', '2025-07-03 08:43:50.818924');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (100, 'authtoken', '0003_tokenproxy', '2025-07-03 08:43:50.819477');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (101, 'authtoken', '0004_alter_tokenproxy_options', '2025-07-03 08:43:50.820040');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (102, 'sessions', '0001_initial', '2025-07-03 08:43:50.820534');
 COMMIT;
 
 -- ----------------------------
@@ -369,18 +369,18 @@ CREATE TABLE `system_dict_type` (
   `create_time` datetime(6) DEFAULT NULL COMMENT '创建时间',
   `is_deleted` tinyint(1) NOT NULL COMMENT '是否软删除',
   `name` varchar(100) NOT NULL,
-  `type` varchar(100) NOT NULL,
+  `value` varchar(100) NOT NULL,
   `status` int NOT NULL,
   `deleted_time` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `system_dict_type_type_b3b2d8f5` (`type`)
+  KEY `system_dict_type_type_b3b2d8f5` (`value`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_dict_type
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_dict_type` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `type`, `status`, `deleted_time`) VALUES (1, NULL, NULL, NULL, '2025-07-01 04:58:37.679182', '2025-06-29 13:32:51.050675', 0, 'jdjkhj', 'sad_ds', 1, NULL);
+INSERT INTO `system_dict_type` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `value`, `status`, `deleted_time`) VALUES (1, NULL, NULL, NULL, '2025-07-01 04:58:37.679182', '2025-06-29 13:32:51.050675', 0, 'jdjkhj', 'sad_ds', 1, NULL);
 COMMIT;
 
 -- ----------------------------

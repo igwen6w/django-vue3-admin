@@ -198,18 +198,18 @@ export function useColumns(
       title: $t('system.modifier'),
       width: 80,
     },
-    {
-      field: 'update_time',
-      title: $t('system.updateTime'),
-      width: 150,
-      formatter: ({ cellValue }) => format_datetime(cellValue),
-    },
-    {
-      field: 'create_time',
-      title: $t('system.createTime'),
-      width: 150,
-      formatter: ({ cellValue }) => format_datetime(cellValue),
-    },
+    // {
+    //   field: 'update_time',
+    //   title: $t('system.updateTime'),
+    //   width: 150,
+    //   formatter: ({ cellValue }) => format_datetime(cellValue),
+    // },
+    // {
+    //   field: 'create_time',
+    //   title: $t('system.createTime'),
+    //   width: 150,
+    //   formatter: ({ cellValue }) => format_datetime(cellValue),
+    // },
     {
       align: 'center',
       cellRender: {

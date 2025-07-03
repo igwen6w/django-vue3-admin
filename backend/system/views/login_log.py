@@ -3,6 +3,7 @@ from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
 from rest_framework import serializers
 from utils.permissions import HasButtonPermission
+from django_filters import rest_framework as filters
 
 class LoginLogSerializer(CustomModelSerializer):
     """
@@ -19,14 +20,23 @@ class LoginLogSerializer(CustomModelSerializer):
         return obj.get_result_display()
 
 
+class LoginLogFilter(filters.FilterSet):
+    username = filters.CharFilter(field_name='username', lookup_expr='icontains')
+    create_time = filters.DateFromToRangeFilter(field_name='create_time')
+
+    class Meta:
+        model = LoginLog
+        fields = ['username', 'create_time']
+
+
 class LoginLogViewSet(CustomModelViewSet):
     """
     系统访问记录 视图集
     """
     queryset = LoginLog.objects.filter(is_deleted=False).order_by('-id')
     serializer_class = LoginLogSerializer
-    filterset_fields = ['id', 'remark', 'creator', 'modifier', 'is_deleted', 'username', 'result', 'user_ip', 'user_agent']
-    search_fields = ['name']  # 根据实际字段调整
+    filterset_class = LoginLogFilter
+    search_fields = ['username']
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
     permission_classes = [HasButtonPermission]

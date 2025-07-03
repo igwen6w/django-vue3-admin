@@ -13,6 +13,7 @@ import { Button, message } from 'ant-design-vue';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { $t } from '#/locales';
 import { SystemPostModel } from '#/models/system/post';
+import { useGridFormSchema } from '#/views/system/post/data';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
@@ -81,6 +82,10 @@ function onActionClick({
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+    submitOnChange: true,
+  },
   gridEvents: {},
   gridOptions: {
     columns: useColumns(onActionClick),
@@ -105,6 +110,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       export: false,
       refresh: { code: 'query' },
       zoom: true,
+      search: true,
     },
   } as VxeTableGridOptions,
 });

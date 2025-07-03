@@ -6,11 +6,15 @@ import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { SystemLoginLogModel } from '#/models/system/login_log';
 
-import { useColumns } from './data';
+import { useColumns, useGridFormSchema } from './data';
 
 const formModel = new SystemLoginLogModel();
 
 const [Grid] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+    submitOnChange: true,
+  },
   gridEvents: {},
   gridOptions: {
     columns: useColumns(),
@@ -22,11 +26,17 @@ const [Grid] = useVbenVxeGrid({
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
-          return await formModel.list({
+          const { create_time, ...rest } = formValues;
+          const params = {
             page: page.currentPage,
             pageSize: page.pageSize,
-            ...formValues,
-          });
+            ...rest,
+          };
+          if (Array.isArray(create_time) && create_time.length === 2) {
+            params.create_time_after = create_time[0];
+            params.create_time_before = create_time[1];
+          }
+          return await formModel.list(params);
         },
       },
     },
@@ -35,6 +45,7 @@ const [Grid] = useVbenVxeGrid({
       export: false,
       refresh: { code: 'query' },
       zoom: true,
+      search: true,
     },
   } as VxeTableGridOptions,
 });

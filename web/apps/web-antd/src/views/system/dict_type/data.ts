@@ -27,14 +27,14 @@ export function useSchema(): VbenFormSchema[] {
     },
     {
       component: 'Input',
-      fieldName: 'type',
+      fieldName: 'value',
       label: '字典类型',
       rules: z
         .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict_type.type'), 2]))
+        .min(2, $t('ui.formRules.minLength', [$t('system.dict_type.value'), 2]))
         .max(
           20,
-          $t('ui.formRules.maxLength', [$t('system.dict_type.type'), 20]),
+          $t('ui.formRules.maxLength', [$t('system.dict_type.value'), 20]),
         ),
     },
     {
@@ -90,7 +90,7 @@ export function useColumns(
       title: '字典名称',
     },
     {
-      field: 'type',
+      field: 'value',
       title: '字典类型',
       width: 180,
     },
@@ -142,6 +142,35 @@ export function useColumns(
       showOverflow: false,
       title: '操作',
       width: 200,
+    },
+  ];
+}
+
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'Input',
+      fieldName: 'name',
+      label: '字典名称',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'Input',
+      fieldName: 'value',
+      label: '字典类型',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'Select',
+      fieldName: 'status',
+      label: '状态',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
     },
   ];
 }

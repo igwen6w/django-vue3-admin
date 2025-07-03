@@ -8,12 +8,24 @@
 它是一个完全开源的快速开发平台，个人、团体使用免费，Django-Vue3-Admin 是一个基于 RBAC（基于角色的访问控制）模型进行权限控制的全面基础开发平台，权限控制粒度达到列级。它遵循前后端分离的架构，后端使用 Django 和 Django Rest Framework，前端使用 Vue3、Composition API、TypeScript、Vite 和 vben-admin（Ant Design Vue）。
 
 # 启动说明
+python 版本 3.12
 
+node 版本v22.17.0
 ## 后端启动
 
 0. 修改数据库配置：
    打开 backend/backend/settings.py，找到 DATABASES，根据实际情况修改数据库连接信息（如主机、端口、用户名、密码、数据库名等）。
-
+   ```python
+   DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_vue',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+    }
+}
+```
 1. 进入 backend 目录：
    ```bash
    cd backend
@@ -37,6 +49,8 @@
    ```
 
 ## 前端启动（以 web-antd 为例）
+
+> 说明：web-ele 目前暂不支持，待 InputPassword 等组件开发完毕后再兼容。
 
 1. 进入前端目录：
    ```bash
