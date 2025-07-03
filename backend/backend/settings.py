@@ -178,12 +178,12 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
 CELERY_BEAT_SCHEDULE = {
-    'every-15-minutes': {
-        'task': 'system.tasks.add',  # 任务路径
-        'schedule': 900.0,  # 每15分钟执行一次
+    'every-1-minutes': {
+        'task': 'system.tasks.sync_temu_order',  # 任务路径
+        'schedule': 60,  # 每1分钟执行一次
     },
 }
-
+# celery 配置结束
 
 if os.path.exists(os.path.join(BASE_DIR, 'backend/local_settings.py')):
     from backend.local_settings import *

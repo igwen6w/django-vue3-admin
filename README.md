@@ -48,6 +48,46 @@ node 版本v22.17.0
    python manage.py runserver
    ```
 
+
+## (可选)Django 项目中启动 Celery 的标准方法如下：
+### Celery 任务队列与监控
+### 启动 Celery Worker
+![Celery 启动界面](images/celery.png)
+
+```bash
+celery -A backend worker -l info
+```
+
+### 启动 Celery Beat（如有定时任务）
+定时任务配置在 `backend/backend/settings.py` 的 `CELERY_BEAT_SCHEDULE`。
+```python
+CELERY_BEAT_SCHEDULE = {
+    'every-1-minutes': {
+        'task': 'system.tasks.sync_temu_order',  # 任务路径
+        'schedule': 60,  # 每1分钟执行一次
+    },
+}
+```
+```bash
+celery -A backend beat -l info
+```
+
+### 启动 Flower 监控
+
+```bash
+celery -A backend flower --port=5555 --basic_auth=admin:admin123
+```
+
+- `--port=5555`：指定 Flower 的访问端口（可自定义）
+- `--basic_auth=用户名:密码`：设置访问 Flower 的账号密码（如 admin:admin123）
+
+启动后，浏览器访问 [http://localhost:5555](http://localhost:5555) ，输入账号密码即可进入 Celery 任务监控界面。
+
+![Celery 监控界面](images/flower.png)
+
+---
+
+
 ## 前端启动（以 web-antd 为例）
 
 > 说明：web-ele 目前暂不支持，待 InputPassword 等组件开发完毕后再兼容。
