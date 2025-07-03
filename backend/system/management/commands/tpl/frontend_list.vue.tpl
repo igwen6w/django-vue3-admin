@@ -14,7 +14,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { $$t } from '#/locales';
 import { ${app_name_camel}${model_name}Model } from '#/models/${app_name}/${model_name_snake}';
 
-import { useColumns } from './data';
+import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
 const formModel = new ${app_name_camel}${model_name}Model();
@@ -81,6 +81,10 @@ function onActionClick({
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+    submitOnChange: true,
+  },
   gridEvents: {},
   gridOptions: {
     columns: useColumns(onActionClick),
@@ -105,6 +109,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       export: false,
       refresh: { code: 'query' },
       zoom: true,
+      search: true,
     },
   } as VxeTableGridOptions,
 });
@@ -122,7 +127,11 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid table-title="${verbose_name}">
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          type="primary"
+          @click="onCreate"
+          v-permission="'${app_name}:${model_name_snake}:create'"
+        >
           <Plus class="size-5" />
           {{ $$t('ui.actionTitle.create', [$$t('${app_name}.${model_name_snake}.name')]) }}
         </Button>

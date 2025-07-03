@@ -13,9 +13,8 @@ import { Button, message } from 'ant-design-vue';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { $t } from '#/locales';
 import { SystemPostModel } from '#/models/system/post';
-import { useGridFormSchema } from '#/views/system/post/data';
 
-import { useColumns } from './data';
+import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
 const formModel = new SystemPostModel();

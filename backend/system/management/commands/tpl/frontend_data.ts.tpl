@@ -18,6 +18,16 @@ ${form_fields}
 }
 
 /**
+ * 获取编辑表单的字段配置
+ */
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+${form_fields}
+  ];
+}
+
+
+/**
  * 获取表格列配置
  * @description 使用函数的形式返回列数据而不是直接export一个Array常量，是为了响应语言切换时重新翻译表头
  * @param onActionClick 表格操作按钮点击事件
@@ -36,7 +46,10 @@ ${columns}
           onClick: onActionClick,
         },
         name: 'CellOperation',
-        options: ['edit', 'delete'],
+        options: [
+          op('${app_name}:${model_name_snake}:edit', 'edit'),
+          op('${app_name}:${model_name_snake}:delete', 'delete'),
+        ],
       },
       field: 'action',
       fixed: 'right',

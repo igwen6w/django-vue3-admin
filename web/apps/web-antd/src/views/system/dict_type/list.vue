@@ -15,9 +15,8 @@ import { Button, message } from 'ant-design-vue';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteDictType, getDictTypeList } from '#/api/system/dict_type';
 import { $t } from '#/locales';
-import { useGridFormSchema } from '#/views/system/dict_type/data';
 
-import { useColumns } from './data';
+import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
 const router = useRouter();
