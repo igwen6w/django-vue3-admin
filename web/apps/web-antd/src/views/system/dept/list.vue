@@ -128,7 +128,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
 function refreshGrid() {
   gridApi.query();
 }
-
 </script>
 <template>
   <Page auto-content-height>

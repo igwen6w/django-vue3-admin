@@ -133,7 +133,11 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid table-title="字典数据">
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          type="primary"
+          @click="onCreate"
+          v-permission="'system:dict_data:create'"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.dict_data.name')]) }}
         </Button>

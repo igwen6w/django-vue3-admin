@@ -153,10 +153,14 @@ function onCreate() {
 </script>
 <template>
   <Page auto-content-height>
-    <FormDrawer @success="onRefresh"/>
+    <FormDrawer @success="onRefresh" />
     <Grid :table-title="$t('system.role.list')">
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          type="primary"
+          @click="onCreate"
+          v-permission="'system:role:create'"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.role.name')]) }}
         </Button>

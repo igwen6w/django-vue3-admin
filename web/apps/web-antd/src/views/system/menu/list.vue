@@ -115,7 +115,11 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
     <FormDrawer @success="onRefresh" />
     <Grid>
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          type="primary"
+          @click="onCreate"
+          v-permission="'system:menu:create'"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
         </Button>

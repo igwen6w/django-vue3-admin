@@ -4,6 +4,7 @@ import type { SystemRoleApi } from '#/api/system/role';
 
 import { $t } from '#/locales';
 import { format_datetime } from '#/utils/date';
+import {op} from "#/utils/permission";
 
 export function useFormSchema(): VbenFormSchema[] {
   return [
@@ -127,6 +128,10 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
           onClick: onActionClick,
         },
         name: 'CellOperation',
+        options: [
+          op('system:role:edit', 'edit'),
+          op('system:role:delete', 'delete'),
+        ],
       },
       field: 'operation',
       fixed: 'right',

@@ -7,7 +7,8 @@ import type { SystemDictDataApi } from '#/api/system/dict_data';
 import { z } from '#/adapter/form';
 import { getDictTypeList } from '#/api/system/dict_type';
 import { $t } from '#/locales';
-import {format_datetime} from "#/utils/date";
+import { format_datetime } from '#/utils/date';
+import { op } from '#/utils/permission';
 
 /**
  * 获取编辑表单的字段配置。如果没有使用多语言，可以直接export一个数组常量
@@ -88,7 +89,7 @@ export function useSchema(): VbenFormSchema[] {
             label: '危险',
           },
         ],
-      }
+      },
     },
     {
       component: 'Input',
@@ -191,13 +192,8 @@ export function useColumns(
         },
         name: 'CellOperation',
         options: [
-          'edit', // 默认的编辑按钮
-          {
-            code: 'delete', // 默认的删除按钮
-            disabled: (row: SystemDictDataApi.SystemDictData) => {
-              return !!(row.children && row.children.length > 0);
-            },
-          },
+          op('system:dict_data:edit', 'edit'),
+          op('system:dict_data:delete', 'delete'),
         ],
       },
       field: 'operation',

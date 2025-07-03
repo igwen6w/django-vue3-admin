@@ -128,7 +128,11 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid table-title="岗位信息表">
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          type="primary"
+          @click="onCreate"
+          v-permission="'system:post:create'"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.post.name')]) }}
         </Button>
