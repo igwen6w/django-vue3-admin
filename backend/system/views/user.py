@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
+from django_filters import rest_framework as filters
 
-from system.models import User, Menu, LoginLog
+from system.models import User, Menu, LoginLog, Dept
 
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -15,6 +16,7 @@ from utils.custom_model_viewSet import CustomModelViewSet
 
 class UserSerializer(CustomModelSerializer):
     roles = serializers.SerializerMethodField()  # 新增字段
+    depts = serializers.SerializerMethodField()  # 新增字段
     """
     用户数据 序列化器
     """
@@ -28,6 +30,10 @@ class UserSerializer(CustomModelSerializer):
         返回用户所有角色的名称列表
         """
         return list(obj.role.values_list('name', flat=True))
+
+    def get_depts(self, obj):
+        # 返回所有部门名称列表
+        return list(obj.dept.values_list('name', flat=True))
 
     def create(self, validated_data):
         if 'password' in validated_data:
@@ -110,6 +116,33 @@ class Codes(APIView):
         })
 
 
+class UserFilter(filters.FilterSet):
+    # 多部门过滤，假设字段为 dept，支持 ?dept=1,2,3
+    dept = filters.CharFilter(method='filter_dept')
+    # 名称和手机号模糊查询
+    username = filters.CharFilter(field_name='username', lookup_expr='icontains')
+    mobile = filters.CharFilter(field_name='mobile', lookup_expr='icontains')
+
+    class Meta:
+        model = User
+        fields = ['dept', 'username', 'nickname', 'mobile', 'status']
+
+    def filter_dept(self, queryset, name, value):
+        # value 可能是单个id或逗号分隔的多个id
+        dept_ids = [int(i) for i in value.split(',') if i]
+        all_ids = set()
+        for dept_id in dept_ids:
+            all_ids.update(get_dept_and_children_ids(dept_id))
+        return queryset.filter(dept__in=all_ids)
+
+def get_dept_and_children_ids(dept_id):
+    # 递归查找所有子部门id
+    ids = [dept_id]
+    children = Dept.objects.filter(pid_id=dept_id)
+    for child in children:
+        ids.extend(get_dept_and_children_ids(child.id))
+    return ids
+
 class UserViewSet(CustomModelViewSet):
     """
     用户数据 视图集
@@ -117,10 +150,8 @@ class UserViewSet(CustomModelViewSet):
     queryset = User.objects.filter(is_deleted=False).order_by('-id')
     serializer_class = UserSerializer
     read_only_fields = ['id', 'create_time', 'update_time', 'login_ip']
-    filterset_fields = ['username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'remark', 'creator',
-                        'modifier', 'is_deleted', 'mobile', 'nickname', 'gender', 'language', 'city', 'province',
-                        'country', 'avatar_url', 'status']
-    search_fields = ['name']  # 根据实际字段调整
+    filterset_class = UserFilter
+    search_fields = ['username', 'nickname', 'mobile']  # 支持模糊搜索
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
 

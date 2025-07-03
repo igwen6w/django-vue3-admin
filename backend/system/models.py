@@ -124,6 +124,7 @@ class Role(CoreModel):
         max_length=100,
         verbose_name='角色名称'
     )
+    code = models.CharField(max_length=100, blank=True, verbose_name='角色标识')
     status = models.IntegerField(
         choices=CommonStatus.choices,
         default=CommonStatus.ENABLED,

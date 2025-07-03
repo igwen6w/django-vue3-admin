@@ -163,7 +163,7 @@ export function useColumns(
     },
     {
       field: 'mobile',
-      title: 'mobile',
+      title: '手机号',
     },
     {
       cellRender: {
@@ -171,12 +171,12 @@ export function useColumns(
       },
       field: 'status',
       title: $t('system.status'),
-      width: 100,
+      width: 80,
     },
     {
       field: 'login_ip',
-      title: 'login ip',
-      width: 150,
+      title: '登录ip',
+      width: 100,
     },
     {
       field: 'last_login',
@@ -225,6 +225,51 @@ export function useColumns(
       fixed: 'right',
       title: '操作',
       width: 120,
+    },
+  ];
+}
+
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      component: 'ApiTreeSelect',
+      componentProps: {
+        allowClear: true,
+        api: getDeptList,
+        class: 'w-full',
+        resultField: 'items',
+        labelField: 'name',
+        valueField: 'id',
+        childrenField: 'children',
+      },
+      fieldName: 'dept',
+      label: '部门',
+    },
+    {
+      component: 'Input',
+      fieldName: 'username',
+      label: '用户名',
+      componentProps: { allowClear: true },
+    },
+    {
+      component: 'Input',
+      fieldName: 'mobile',
+      label: '手机号',
+      componentProps: {
+        allowClear: true,
+      },
+    },
+    {
+      component: 'Select',
+      fieldName: 'status',
+      label: '状态',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
     },
   ];
 }

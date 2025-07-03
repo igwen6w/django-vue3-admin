@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from django_filters import rest_framework as filters
 
 from system.models import RolePermission, Menu, Role
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -29,13 +30,22 @@ class RoleSerializer(CustomModelSerializer):
         return obj.get_status_display()
 
 
+class RoleFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    code = filters.CharFilter(field_name='code', lookup_expr='icontains')
+    status = filters.CharFilter(field_name='status')  # 保持精确，如需模糊可改为 icontains
+
+    class Meta:
+        model = Role
+        fields = ['status', 'name', 'code']
+
 
 class RoleViewSet(CustomModelViewSet):
     """角色管理视图集"""
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'name']
+    filterset_class = RoleFilter
     search_fields = ['name']
     ordering_fields = ['create_time']
 

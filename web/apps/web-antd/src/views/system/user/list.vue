@@ -14,7 +14,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { $t } from '#/locales';
 import { SystemUserModel } from '#/models/system/user';
 
-import { useColumns } from './data';
+import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
 const formModel = new SystemUserModel();
@@ -81,6 +81,11 @@ function onActionClick({
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    wrapperClass: 'grid-cols-1 md:grid-cols-3 lg:grid-cols-4',
+    schema: useGridFormSchema(),
+    submitOnChange: true,
+  },
   gridEvents: {},
   gridOptions: {
     columns: useColumns(onActionClick),
@@ -105,6 +110,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       export: false,
       refresh: { code: 'query' },
       zoom: true,
+      search: true,
     },
   } as VxeTableGridOptions,
 });

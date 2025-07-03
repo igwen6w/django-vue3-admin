@@ -14,6 +14,12 @@ export function useFormSchema(): VbenFormSchema[] {
       rules: 'required',
     },
     {
+      component: 'Input',
+      fieldName: 'code',
+      label: $t('system.role.code'),
+      rules: 'required',
+    },
+    {
       component: 'RadioGroup',
       componentProps: {
         buttonStyle: 'solid',
@@ -48,6 +54,17 @@ export function useGridFormSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'name',
       label: $t('system.role.roleName'),
+      componentProps: {
+        allowClear: true,
+      },
+    },
+    {
+      component: 'Input',
+      fieldName: 'code',
+      label: $t('system.role.code'),
+      componentProps: {
+        allowClear: true,
+      },
     },
     {
       component: 'Select',
@@ -70,14 +87,16 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
 ): VxeTableGridOptions['columns'] {
   return [
     {
-      field: 'name',
-      title: $t('system.role.roleName'),
-      width: 200,
-    },
-    {
       field: 'id',
       title: $t('system.role.id'),
-      width: 200,
+    },
+    {
+      field: 'name',
+      title: $t('system.role.roleName'),
+    },
+    {
+      field: 'code',
+      title: $t('system.role.code'),
     },
     {
       cellRender: {
@@ -96,7 +115,7 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
     {
       field: 'create_time',
       title: $t('system.role.createTime'),
-      width: 200,
+      width: 150,
       formatter: ({ cellValue }) => format_datetime(cellValue),
     },
     {

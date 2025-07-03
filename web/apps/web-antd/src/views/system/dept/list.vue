@@ -19,7 +19,7 @@ import Form from './modules/form.vue';
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
-  destroyOnClose: true,
+  destroyOnClose: false,
 });
 
 /**
@@ -117,6 +117,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       parentField: 'pid',
       rowField: 'id',
       transform: false,
+      defaultExpandAll: true, // 关键配置
     },
   } as VxeTableGridOptions,
 });
@@ -127,6 +128,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 function refreshGrid() {
   gridApi.query();
 }
+
 </script>
 <template>
   <Page auto-content-height>

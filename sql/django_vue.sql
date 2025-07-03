@@ -11,7 +11,7 @@
  Target Server Version : 90300 (9.3.0)
  File Encoding         : 65001
 
- Date: 03/07/2025 10:46:52
+ Date: 03/07/2025 11:45:13
 */
 
 SET NAMES utf8mb4;
@@ -67,7 +67,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of auth_permission
@@ -141,6 +141,10 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (66, 'Can change 系统访问记录', 17, 'change_systemloginlog');
 INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (67, 'Can delete 系统访问记录', 17, 'delete_systemloginlog');
 INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (68, 'Can view 系统访问记录', 17, 'view_systemloginlog');
+INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (69, 'Can add 系统访问记录', 18, 'add_loginlog');
+INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (70, 'Can change 系统访问记录', 18, 'change_loginlog');
+INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (71, 'Can delete 系统访问记录', 18, 'delete_loginlog');
+INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES (72, 'Can view 系统访问记录', 18, 'view_loginlog');
 COMMIT;
 
 -- ----------------------------
@@ -201,7 +205,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of django_content_type
@@ -217,6 +221,7 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (5, 'sessi
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (11, 'system', 'dept');
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (13, 'system', 'dictdata');
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (8, 'system', 'dicttype');
+INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (18, 'system', 'loginlog');
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (14, 'system', 'menu');
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (9, 'system', 'menumeta');
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES (16, 'system', 'post');
@@ -236,35 +241,35 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of django_migrations
 -- ----------------------------
 BEGIN;
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (32, 'contenttypes', '0001_initial', '2025-07-03 02:43:42.640149');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (33, 'contenttypes', '0002_remove_content_type_name', '2025-07-03 02:43:42.642008');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (34, 'auth', '0001_initial', '2025-07-03 02:43:42.643220');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (35, 'auth', '0002_alter_permission_name_max_length', '2025-07-03 02:43:42.644295');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (36, 'auth', '0003_alter_user_email_max_length', '2025-07-03 02:43:42.645393');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (37, 'auth', '0004_alter_user_username_opts', '2025-07-03 02:43:42.647044');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (38, 'auth', '0005_alter_user_last_login_null', '2025-07-03 02:43:42.648663');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (39, 'auth', '0006_require_contenttypes_0002', '2025-07-03 02:43:42.649682');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (40, 'auth', '0007_alter_validators_add_error_messages', '2025-07-03 02:43:42.650344');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (41, 'auth', '0008_alter_user_username_max_length', '2025-07-03 02:43:42.650998');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (42, 'auth', '0009_alter_user_last_name_max_length', '2025-07-03 02:43:42.651671');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (43, 'auth', '0010_alter_group_name_max_length', '2025-07-03 02:43:42.652289');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (44, 'auth', '0011_update_proxy_permissions', '2025-07-03 02:43:42.652855');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (45, 'auth', '0012_alter_user_first_name_max_length', '2025-07-03 02:43:42.653449');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (46, 'system', '0001_initial', '2025-07-03 02:43:42.654064');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (47, 'admin', '0001_initial', '2025-07-03 02:43:42.654613');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (48, 'admin', '0002_logentry_remove_auto_add', '2025-07-03 02:43:42.655201');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (49, 'admin', '0003_logentry_add_action_flag_choices', '2025-07-03 02:43:42.655755');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (50, 'authtoken', '0001_initial', '2025-07-03 02:43:42.656282');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (51, 'authtoken', '0002_auto_20160226_1747', '2025-07-03 02:43:42.656825');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (52, 'authtoken', '0003_tokenproxy', '2025-07-03 02:43:42.657367');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (53, 'authtoken', '0004_alter_tokenproxy_options', '2025-07-03 02:43:42.657933');
-INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (54, 'sessions', '0001_initial', '2025-07-03 02:43:42.658456');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (56, 'contenttypes', '0001_initial', '2025-07-03 03:44:52.908813');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (57, 'contenttypes', '0002_remove_content_type_name', '2025-07-03 03:44:52.911127');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (58, 'auth', '0001_initial', '2025-07-03 03:44:52.912623');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (59, 'auth', '0002_alter_permission_name_max_length', '2025-07-03 03:44:52.914061');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (60, 'auth', '0003_alter_user_email_max_length', '2025-07-03 03:44:52.915784');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (61, 'auth', '0004_alter_user_username_opts', '2025-07-03 03:44:52.917590');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (62, 'auth', '0005_alter_user_last_login_null', '2025-07-03 03:44:52.919017');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (63, 'auth', '0006_require_contenttypes_0002', '2025-07-03 03:44:52.920316');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (64, 'auth', '0007_alter_validators_add_error_messages', '2025-07-03 03:44:52.922403');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (65, 'auth', '0008_alter_user_username_max_length', '2025-07-03 03:44:52.924155');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (66, 'auth', '0009_alter_user_last_name_max_length', '2025-07-03 03:44:52.925595');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (67, 'auth', '0010_alter_group_name_max_length', '2025-07-03 03:44:52.927191');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (68, 'auth', '0011_update_proxy_permissions', '2025-07-03 03:44:52.928422');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (69, 'auth', '0012_alter_user_first_name_max_length', '2025-07-03 03:44:52.929767');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (70, 'system', '0001_initial', '2025-07-03 03:44:52.931096');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (71, 'admin', '0001_initial', '2025-07-03 03:44:52.932402');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (72, 'admin', '0002_logentry_remove_auto_add', '2025-07-03 03:44:52.933654');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (73, 'admin', '0003_logentry_add_action_flag_choices', '2025-07-03 03:44:52.934944');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (74, 'authtoken', '0001_initial', '2025-07-03 03:44:52.936279');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (75, 'authtoken', '0002_auto_20160226_1747', '2025-07-03 03:44:52.937883');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (76, 'authtoken', '0003_tokenproxy', '2025-07-03 03:44:52.939255');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (77, 'authtoken', '0004_alter_tokenproxy_options', '2025-07-03 03:44:52.940515');
+INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES (78, 'sessions', '0001_initial', '2025-07-03 03:44:52.941917');
 COMMIT;
 
 -- ----------------------------
@@ -458,7 +463,7 @@ INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`,
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (8, NULL, NULL, NULL, '2025-06-30 12:59:18.313868', '2025-06-30 12:59:18.313943', 0, 'SystemDeptCreate', 1, 'button', '', '', 'system:dept:create', 7, 8, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (9, NULL, NULL, NULL, '2025-06-30 12:59:45.455554', '2025-06-30 12:59:45.455621', 0, 'SystemDeptEdit', 1, 'button', '', '', 'system:dept:edit', 7, 9, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (10, NULL, NULL, NULL, '2025-06-30 13:00:27.836789', '2025-06-30 13:00:27.836845', 0, 'SystemDeptDelete', 1, 'button', '', '', 'system:dept:delete', 7, 10, 0);
-INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (12, NULL, NULL, 'admin', '2025-06-30 14:18:06.886332', '2025-06-30 14:14:57.815188', 0, 'About', 1, 'menu', '/about', '_core/about/index', '', NULL, 12, 0);
+INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (12, NULL, NULL, 'admin', '2025-07-03 03:12:19.599531', '2025-06-30 14:14:57.815188', 0, 'About', 1, 'menu', '/about', '_core/about/index', '', NULL, 12, 8);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (13, NULL, 'admin', 'admin', '2025-06-30 14:17:50.344871', '2025-06-30 14:17:50.344905', 0, 'Project', 1, 'catalog', '/vben-admin', '', '', NULL, 13, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (14, NULL, 'admin', 'admin', '2025-06-30 14:23:46.754262', '2025-06-30 14:23:46.754306', 0, 'VbenDocument', 1, 'embedded', '/vben-admin/document', '', '', 13, 14, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (15, NULL, 'admin', 'admin', '2025-07-01 08:10:19.878461', '2025-07-01 08:10:19.878496', 0, '查询', 1, 'button', '', '', 'system:menu:query', 3, 15, 1);
@@ -538,7 +543,7 @@ INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (9, NULL, NULL, NULL, '2025-06-30 12:59:45.429985', '2025-06-30 12:59:45.430037', 0, 'common.edit', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (10, NULL, NULL, NULL, '2025-06-30 13:00:27.814988', '2025-06-30 13:00:27.815021', 0, 'common.delete', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (11, NULL, NULL, NULL, '2025-06-30 13:00:28.085386', '2025-06-30 13:00:28.085434', 0, 'common.delete', '', 0, 0, '', '', '', '', '', 0, 0);
-INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (12, NULL, NULL, NULL, '2025-06-30 14:18:06.864181', '2025-06-30 14:14:57.789248', 0, 'demos.vben.about', 'lucide:copyright', 0, 0, '', '', '', '', '', 0, 0);
+INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (12, NULL, NULL, NULL, '2025-07-03 03:12:19.592343', '2025-06-30 14:14:57.789248', 0, 'demos.vben.about', 'lucide:copyright', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (13, NULL, NULL, NULL, '2025-06-30 14:17:50.320099', '2025-06-30 14:17:50.320137', 0, 'demos.vben.title', 'carbon:data-center', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (14, NULL, NULL, NULL, '2025-06-30 14:23:46.727547', '2025-06-30 14:23:46.727573', 0, 'demos.vben.document', 'carbon:book', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (15, NULL, NULL, NULL, '2025-07-01 08:10:19.854182', '2025-07-01 08:10:19.854206', 0, '查询', '', 0, 0, '', '', '', '', '', 0, 0);
@@ -621,6 +626,7 @@ CREATE TABLE `system_role` (
   `status` int NOT NULL,
   `sort` int NOT NULL,
   `remark` longtext NOT NULL,
+  `code` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -628,8 +634,8 @@ CREATE TABLE `system_role` (
 -- Records of system_role
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`) VALUES (2, NULL, 'admin', '2025-07-02 13:52:57.830726', '2025-06-30 13:43:33.222244', 0, '普通角色', 1, 0, '');
-INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`) VALUES (3, 'admin', 'admin', '2025-07-01 07:57:25.804540', '2025-06-30 14:01:56.403744', 0, '超级管理员', 1, 0, '');
+INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`, `code`) VALUES (2, NULL, 'admin', '2025-07-03 02:58:16.720330', '2025-06-30 13:43:33.222244', 0, '普通角色', 1, 0, '', 'common');
+INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`, `code`) VALUES (3, 'admin', 'admin', '2025-07-03 02:58:07.056753', '2025-06-30 14:01:56.403744', 0, '超级管理员', 1, 0, '', 'super_admin');
 COMMIT;
 
 -- ----------------------------
@@ -651,7 +657,7 @@ CREATE TABLE `system_role_permission` (
   KEY `system_role_permission_role_id_ca5e9412_fk_system_role_id` (`role_id`),
   CONSTRAINT `system_role_permission_menu_id_bf701eaf_fk_system_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `system_menu` (`id`),
   CONSTRAINT `system_role_permission_role_id_ca5e9412_fk_system_role_id` FOREIGN KEY (`role_id`) REFERENCES `system_role` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_role_permission
@@ -684,6 +690,40 @@ INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `up
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (42, NULL, NULL, NULL, '2025-07-02 11:25:22.723559', 0, '2025-07-02 11:25:22.723574', 15, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (43, NULL, NULL, NULL, '2025-07-02 13:52:57.845593', 0, '2025-07-02 13:52:57.845675', 9, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (44, NULL, NULL, NULL, '2025-07-02 13:52:57.845692', 0, '2025-07-02 13:52:57.845710', 10, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (45, NULL, NULL, NULL, '2025-07-03 02:58:07.066807', 0, '2025-07-03 02:58:07.066937', 15, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (46, NULL, NULL, NULL, '2025-07-03 02:58:07.066958', 0, '2025-07-03 02:58:07.066974', 16, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (47, NULL, NULL, NULL, '2025-07-03 02:58:07.066986', 0, '2025-07-03 02:58:07.066999', 17, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (48, NULL, NULL, NULL, '2025-07-03 02:58:07.067011', 0, '2025-07-03 02:58:07.067023', 18, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (49, NULL, NULL, NULL, '2025-07-03 02:58:07.067034', 0, '2025-07-03 02:58:07.067046', 24, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (50, NULL, NULL, NULL, '2025-07-03 02:58:07.067057', 0, '2025-07-03 02:58:07.067070', 25, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (51, NULL, NULL, NULL, '2025-07-03 02:58:07.067081', 0, '2025-07-03 02:58:07.067093', 26, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (52, NULL, NULL, NULL, '2025-07-03 02:58:07.067104', 0, '2025-07-03 02:58:07.067116', 27, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (53, NULL, NULL, NULL, '2025-07-03 02:58:07.067126', 0, '2025-07-03 02:58:07.067138', 28, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (54, NULL, NULL, NULL, '2025-07-03 02:58:07.067149', 0, '2025-07-03 02:58:07.067161', 29, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (55, NULL, NULL, NULL, '2025-07-03 02:58:07.067171', 0, '2025-07-03 02:58:07.067183', 30, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (56, NULL, NULL, NULL, '2025-07-03 02:58:07.067195', 0, '2025-07-03 02:58:07.067230', 31, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (57, NULL, NULL, NULL, '2025-07-03 02:58:07.067241', 0, '2025-07-03 02:58:07.067254', 32, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (58, NULL, NULL, NULL, '2025-07-03 02:58:07.067265', 0, '2025-07-03 02:58:07.067276', 33, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (59, NULL, NULL, NULL, '2025-07-03 02:58:07.067287', 0, '2025-07-03 02:58:07.067300', 34, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (60, NULL, NULL, NULL, '2025-07-03 02:58:07.067311', 0, '2025-07-03 02:58:07.067324', 35, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (61, NULL, NULL, NULL, '2025-07-03 02:58:07.067335', 0, '2025-07-03 02:58:07.067360', 36, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (62, NULL, NULL, NULL, '2025-07-03 02:58:07.067376', 0, '2025-07-03 02:58:07.067390', 37, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (63, NULL, NULL, NULL, '2025-07-03 02:58:07.067402', 0, '2025-07-03 02:58:07.067414', 38, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (64, NULL, NULL, NULL, '2025-07-03 02:58:07.067425', 0, '2025-07-03 02:58:07.067437', 39, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (65, NULL, NULL, NULL, '2025-07-03 02:58:07.067449', 0, '2025-07-03 02:58:07.067460', 40, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (66, NULL, NULL, NULL, '2025-07-03 02:58:07.067471', 0, '2025-07-03 02:58:07.067483', 41, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (67, NULL, NULL, NULL, '2025-07-03 02:58:07.067494', 0, '2025-07-03 02:58:07.067506', 42, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (68, NULL, NULL, NULL, '2025-07-03 02:58:07.067517', 0, '2025-07-03 02:58:07.067529', 43, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (69, NULL, NULL, NULL, '2025-07-03 02:58:07.067540', 0, '2025-07-03 02:58:07.067552', 44, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (70, NULL, NULL, NULL, '2025-07-03 02:58:07.067563', 0, '2025-07-03 02:58:07.067575', 45, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (71, NULL, NULL, NULL, '2025-07-03 02:58:07.067586', 0, '2025-07-03 02:58:07.067598', 46, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (72, NULL, NULL, NULL, '2025-07-03 02:58:07.067608', 0, '2025-07-03 02:58:07.067629', 47, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (73, NULL, NULL, NULL, '2025-07-03 02:58:07.067641', 0, '2025-07-03 02:58:07.067653', 48, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (74, NULL, NULL, NULL, '2025-07-03 02:58:07.067664', 0, '2025-07-03 02:58:07.067677', 49, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (75, NULL, NULL, NULL, '2025-07-03 02:58:07.067688', 0, '2025-07-03 02:58:07.067701', 50, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (76, NULL, NULL, NULL, '2025-07-03 02:58:07.067715', 0, '2025-07-03 02:58:07.067729', 51, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (77, NULL, NULL, NULL, '2025-07-03 02:58:07.067740', 0, '2025-07-03 02:58:07.067752', 52, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (78, NULL, NULL, NULL, '2025-07-03 02:58:07.067763', 0, '2025-07-03 02:58:07.067775', 53, 3);
 COMMIT;
 
 -- ----------------------------
@@ -726,8 +766,8 @@ CREATE TABLE `system_users` (
 -- Records of system_users
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$0Qslhd82Brfvm7Tp0zAJ5P$1nCBY+aS0quWfi1gzrS37tgvzHOFzcTroowfsroiPI8=', '2025-07-03 01:56:33.596708', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, NULL, '2025-06-29 13:09:47.892323', '2025-06-29 13:09:47.892332', 0, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$4Qpbp57wTE5yhMsdNMwJex$KY5Ej/oyMIcIvWzknuBxoowM4qBFb0xnFqez7CjJEAc=', '2025-07-02 08:57:47.554870', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-03 02:45:40.624332', '2025-07-01 06:25:50.947136', 0, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$ce99fyPlGRhdkDDRDsvQvw$6qzU+iuxtczU0Ebki6Tu0IUgYDWqELLUj9kgHfrlkJI=', '2025-07-03 01:56:33.596708', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, 'admin', '2025-07-03 03:41:58.074874', '2025-06-29 13:09:47.892332', 0, '18888888888', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$Kio1bmTf57Vi05slZAeIQm$lNBERuBlhT2UYJYt+vO2M5szmFT51S34/Cy4B5O76uw=', '2025-07-02 08:57:47.554870', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-03 03:20:14.862186', '2025-07-01 06:25:50.947136', 0, '18677777777', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
 COMMIT;
 
 -- ----------------------------
@@ -742,12 +782,13 @@ CREATE TABLE `system_users_dept` (
   UNIQUE KEY `system_users_dept_user_id_dept_id_b67fb9af_uniq` (`user_id`,`dept_id`),
   KEY `system_users_dept_user_id_0fc212c8` (`user_id`),
   KEY `system_users_dept_dept_id_896a13cf` (`dept_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_users_dept
 -- ----------------------------
 BEGIN;
+INSERT INTO `system_users_dept` (`id`, `user_id`, `dept_id`) VALUES (2, 1, 2);
 INSERT INTO `system_users_dept` (`id`, `user_id`, `dept_id`) VALUES (1, 2, 7);
 COMMIT;
 

@@ -52,6 +52,7 @@
   },
   "role": {
     "title": "Role Management",
+    "code": "Role Code",
     "list": "Role List",
     "name": "Role",
     "roleName": "Role Name",
