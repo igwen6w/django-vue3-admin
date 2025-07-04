@@ -12,7 +12,6 @@ lib/
 lib64/
 .DS_Store
 docs/_build/
-.env
 *.env
 **/local_settings.py
 static/

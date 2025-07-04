@@ -90,7 +90,12 @@ function onActionClick({
     }
   }
 }
-
+const expandAll = () => {
+  gridApi.grid?.setAllTreeExpand(true);
+};
+const collapseAll = () => {
+  gridApi.grid?.setAllTreeExpand(false);
+};
 const [Grid, gridApi] = useVbenVxeGrid({
   gridEvents: {},
   gridOptions: {
@@ -134,6 +139,12 @@ function refreshGrid() {
     <FormModal @success="refreshGrid" />
     <Grid table-title="部门列表">
       <template #toolbar-tools>
+        <Button class="mr-2" type="primary" @click="expandAll">
+          展开全部
+        </Button>
+        <Button class="mr-2" type="primary" @click="collapseAll">
+          折叠全部
+        </Button>
         <Button
           type="primary"
           @click="onCreate"

@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "48000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DATABASE_HOST=mysql
+    networks:
+      - dj_admin_network
+    env_file:
+      - ./docker/.env.dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: django_vue
+    ports:
+      - "43306:3306"
+    volumes:
+      - ./sql/django_vue.sql:/docker-entrypoint-initdb.d/django_vue.sql
+    networks:
+      - dj_admin_network
+    env_file:
+      - ./docker/.env.dev
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-pmy-secret-pw" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: ./web
+      target: dev
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    ports:
+      - "5678:5678"
+    command: pnpm run dev:antd
+    networks:
+      - dj_admin_network
+    env_file:
+      - ./docker/.env.dev
+
+networks:
+  dj_admin_network:
+    driver: bridge

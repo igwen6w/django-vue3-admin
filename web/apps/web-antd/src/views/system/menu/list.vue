@@ -90,7 +90,12 @@ function onCreate() {
 function onAppend(row: SystemMenuApi.SystemMenu) {
   formDrawerApi.setData({ pid: row.id }).open();
 }
-
+const expandAll = () => {
+  gridApi.grid?.setAllTreeExpand(true);
+};
+const collapseAll = () => {
+  gridApi.grid?.setAllTreeExpand(false);
+};
 function onDelete(row: SystemMenuApi.SystemMenu) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.name]),
@@ -115,6 +120,12 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
     <FormDrawer @success="onRefresh" />
     <Grid>
       <template #toolbar-tools>
+        <Button class="mr-2" type="primary" @click="expandAll">
+          展开全部
+        </Button>
+        <Button class="mr-2" type="primary" @click="collapseAll">
+          折叠全部
+        </Button>
         <Button
           type="primary"
           @click="onCreate"
