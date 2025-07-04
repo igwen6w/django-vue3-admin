@@ -1,0 +1,111 @@
+services:
+   db:
+     image: mysql:8
+     restart: always
+     env_file:
+       - ./docker/.env.prod
+     environment:
+       TZ: Asia/Shanghai
+     ports:
+       - "33306:3306"
+     volumes:
+       - ./sql/django_vue.sql:/docker-entrypoint-initdb.d/django_vue.sql
+       - ./data/mysql_prod:/var/lib/mysql   # <-- 加这一行
+     networks:
+       - app_net
+
+
+   redis:
+     image: redis:7
+     restart: always
+     ports:
+       - "36379:6379"
+     networks:
+       - app_net
+     env_file:
+       - ./docker/.env.prod
+
+   backend:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+       target: prod
+     command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
+     env_file:
+       - ./docker/.env.prod
+     depends_on:
+       - db
+       - redis
+     volumes:
+       - static_data:/app/static
+       - media_data:/app/media
+     ports:
+       - "38000:8000"
+     networks:
+       - app_net
+
+   celery_worker:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     command: celery -A backend worker -l info
+     env_file:
+       - ./docker/.env.prod
+     depends_on:
+       - backend
+       - redis
+     networks:
+       - app_net
+
+   celery_beat:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     command: celery -A backend beat -l info
+     env_file:
+       - ./docker/.env.prod
+     depends_on:
+       - backend
+       - redis
+     networks:
+       - app_net
+
+   flower:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     command: celery -A backend flower --port=5555
+     env_file:
+       - ./docker/.env.prod
+     depends_on:
+       - backend
+       - redis
+     ports:
+       - "35555:5555"
+     networks:
+       - app_net
+
+
+   frontend:
+     build:
+       context: ./web
+       dockerfile: Dockerfile
+       target: prod
+     depends_on:
+       - backend
+     ports:
+       - "35678:80"
+     networks:
+       - app_net
+     env_file:
+       - ./docker/.env.prod
+
+
+volumes:
+  db_data:
+  static_data:
+  media_data:
+
+networks:
+  app_net:
+    driver: bridge 

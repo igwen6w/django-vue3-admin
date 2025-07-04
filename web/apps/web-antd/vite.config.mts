@@ -1,10 +1,13 @@
 import { defineConfig } from '@vben/vite-config';
-
 import { loadEnv } from 'vite';
+import * as console from "node:console";
 
 export default defineConfig(async ({ mode }) => {
   // eslint-disable-next-line n/prefer-global/process
-  const env = loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, process.cwd());
+  // 这样获取
+  const backendUrl = env.VITE_BACKEND_URL;
+  console.log(backendUrl)
   return {
     application: {},
     vite: {
@@ -13,7 +16,7 @@ export default defineConfig(async ({ mode }) => {
         port: 5678,
         proxy: {
           '/api': {
-            target: env.VITE_BACKEND_URL,
+            target: backendUrl,
             changeOrigin: true,
           },
         },

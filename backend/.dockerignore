@@ -6,7 +6,6 @@ build/
 *.egg-info/
 .python-version
 .pytest_cache/
-dist/
 eggs/
 lib/
 lib64/
@@ -16,12 +15,6 @@ docs/_build/
 **/local_settings.py
 static/
 
-node_modules
-dist
-dist-ssr
-dist.zip
-dist.tar
-dist.war
 .nitro
 .output
 *-dist.zip
@@ -67,7 +60,3 @@ vite.config.ts.*
 *.sw?
 .history
 celerybeat-schedule.db
-**/.pnpm-store
-data/mysql
-data/mysql_prod
-web/node-compile-cache

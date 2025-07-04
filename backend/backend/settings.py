@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-m4@pv814c_m^pgpyhz^i96a@mcqh_@m9ccu(17*895t!79e!nb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
     '*',
@@ -92,9 +92,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_vue',
-        'USER': 'root',
-        'PASSWORD': 'my-secret-pw',
-        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'USER': os.getenv('DB_USER', 'chenze'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'my-secret-pw'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         # 'HOST': 'localhost',
     }
 }
@@ -168,9 +168,24 @@ REST_FRAMEWORK = {
     ]
 }
 
-# celery 配置
-CELERY_BROKER_URL = 'redis://localhost:6379/6'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/6'
+# ================= Redis 缓存配置 =================
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', 6379)}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# SESSION 存 Redis
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+# ================= Celery 配置（适配环境变量） =================
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', 6379)}/0"
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 # 时区设置
 CELERY_TIMEZONE = 'Asia/Shanghai'
 # 任务序列化方式

@@ -12,3 +12,5 @@ redis==6.2.0
 eventlet==0.40.0
 goofish_api==0.0.6
 flower==2.0.1
+gunicorn==23.0.0
+django_redis==6.0.0

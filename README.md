@@ -2,6 +2,14 @@
 
 本项目为基于 Django5 + Vue3（vben-admin）全栈开发的企业级中后台管理系统，支持动态菜单、按钮权限、自动化代码生成、前后端权限联动等功能，适用于多角色、多权限场景的管理后台。
 
+## 在线体验
+
+- admin/admin123  
+- chenze/admin123
+演示地址：http://demo.ywwuzi.cn
+文档地址：待完成
+
+
 # 许可证
 
 本项目遵循 MIT License。

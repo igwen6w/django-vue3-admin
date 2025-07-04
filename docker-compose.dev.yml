@@ -1,9 +1,6 @@
 services:
-  mysql:
+  db:
     image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: django_vue
     ports:
       - "43306:3306"
     volumes:
@@ -19,6 +16,57 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "46379:6379"
+    networks:
+      - dj_admin_network
+    env_file:
+      - ./docker/.env.dev
+  
+  
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend worker -l info
+    env_file:
+      - ./docker/.env.dev
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - dj_admin_network
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend beat -l info
+    env_file:
+      - ./docker/.env.dev
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - dj_admin_network
+
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend flower --port=5555
+    env_file:
+      - ./docker/.env.dev
+    depends_on:
+      - backend
+      - redis
+    ports:
+      - "45555:5555"
+    networks:
+      - dj_admin_network
 
   backend:
     build:
@@ -28,17 +76,15 @@ services:
       - ./backend:/app
     ports:
       - "48000:8000"
-    command: python manage.py runserver 0.0.0.0:8000
-    environment:
-      - DATABASE_HOST=mysql
     networks:
       - dj_admin_network
     env_file:
       - ./docker/.env.dev
+    environment:
+      DATABASE_HOST: "db"
     depends_on:
-      mysql:
+      db:
         condition: service_healthy
-
 
   web:
     build:
@@ -47,12 +93,13 @@ services:
     volumes:
       - ./web:/app
     ports:
-      - "5678:5678"
+      - "45678:5678"
+    depends_on:
+      - backend
     networks:
       - dj_admin_network
     env_file:
       - ./docker/.env.dev
-      - ./docker/.env.docker
 
 networks:
   dj_admin_network:

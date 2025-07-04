@@ -11,7 +11,7 @@
  Target Server Version : 90300 (9.3.0)
  File Encoding         : 65001
 
- Date: 03/07/2025 16:53:14
+ Date: 04/07/2025 22:51:23
 */
 
 SET NAMES utf8mb4;
@@ -400,7 +400,7 @@ CREATE TABLE `system_login_log` (
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_login_log
@@ -419,6 +419,11 @@ INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (11, NULL, NULL, NULL, '2025-07-02 08:57:47.575085', '2025-07-02 08:57:47.575095', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (12, NULL, NULL, NULL, '2025-07-02 09:16:09.528323', '2025-07-02 09:16:09.528338', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (13, NULL, NULL, NULL, '2025-07-03 01:56:33.628362', '2025-07-03 01:56:33.628383', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (14, NULL, NULL, NULL, '2025-07-03 09:03:55.601317', '2025-07-03 09:03:55.601325', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (15, NULL, NULL, NULL, '2025-07-04 05:48:38.799378', '2025-07-04 05:48:38.799423', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (16, NULL, NULL, NULL, '2025-07-04 09:41:07.394602', '2025-07-04 09:41:07.394619', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (17, NULL, NULL, NULL, '2025-07-04 14:46:34.812031', '2025-07-04 14:46:34.812041', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (18, NULL, NULL, NULL, '2025-07-04 14:48:20.347506', '2025-07-04 14:48:20.347516', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 COMMIT;
 
 -- ----------------------------
@@ -634,7 +639,7 @@ CREATE TABLE `system_role` (
 -- Records of system_role
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`, `code`) VALUES (2, NULL, 'admin', '2025-07-03 02:58:16.720330', '2025-06-30 13:43:33.222244', 0, '普通角色', 1, 0, '', 'common');
+INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`, `code`) VALUES (2, NULL, 'admin', '2025-07-03 09:05:32.917555', '2025-06-30 13:43:33.222244', 0, '普通角色', 1, 0, '', 'common');
 INSERT INTO `system_role` (`id`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `sort`, `remark`, `code`) VALUES (3, 'admin', 'admin', '2025-07-03 02:58:07.056753', '2025-06-30 14:01:56.403744', 0, '超级管理员', 1, 0, '', 'super_admin');
 COMMIT;
 
@@ -657,7 +662,7 @@ CREATE TABLE `system_role_permission` (
   KEY `system_role_permission_role_id_ca5e9412_fk_system_role_id` (`role_id`),
   CONSTRAINT `system_role_permission_menu_id_bf701eaf_fk_system_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `system_menu` (`id`),
   CONSTRAINT `system_role_permission_role_id_ca5e9412_fk_system_role_id` FOREIGN KEY (`role_id`) REFERENCES `system_role` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_role_permission
@@ -678,7 +683,6 @@ INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `up
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (23, NULL, NULL, NULL, '2025-06-30 14:01:56.610751', 0, '2025-06-30 14:01:56.610849', 8, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (24, NULL, NULL, NULL, '2025-06-30 14:01:56.634161', 0, '2025-06-30 14:01:56.634243', 9, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (25, NULL, NULL, NULL, '2025-06-30 14:01:56.657691', 0, '2025-06-30 14:01:56.657753', 10, 3);
-INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (26, NULL, NULL, NULL, '2025-07-01 07:57:14.090252', 0, '2025-07-01 07:57:14.090324', 8, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (29, NULL, NULL, NULL, '2025-07-01 07:57:14.090386', 0, '2025-07-01 07:57:14.090399', 7, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (30, NULL, NULL, NULL, '2025-07-01 07:57:25.893132', 0, '2025-07-01 07:57:25.893185', 12, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (31, NULL, NULL, NULL, '2025-07-01 07:57:25.893198', 0, '2025-07-01 07:57:25.893211', 13, 3);
@@ -686,10 +690,7 @@ INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `up
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (33, NULL, NULL, NULL, '2025-07-02 08:41:54.581823', 0, '2025-07-02 08:41:54.581874', 1, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (34, NULL, NULL, NULL, '2025-07-02 08:41:54.581888', 0, '2025-07-02 08:41:54.581902', 18, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (35, NULL, NULL, NULL, '2025-07-02 08:41:54.581914', 0, '2025-07-02 08:41:54.581927', 17, 2);
-INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (41, NULL, NULL, NULL, '2025-07-02 11:25:22.723470', 0, '2025-07-02 11:25:22.723543', 16, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (42, NULL, NULL, NULL, '2025-07-02 11:25:22.723559', 0, '2025-07-02 11:25:22.723574', 15, 2);
-INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (43, NULL, NULL, NULL, '2025-07-02 13:52:57.845593', 0, '2025-07-02 13:52:57.845675', 9, 2);
-INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (44, NULL, NULL, NULL, '2025-07-02 13:52:57.845692', 0, '2025-07-02 13:52:57.845710', 10, 2);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (45, NULL, NULL, NULL, '2025-07-03 02:58:07.066807', 0, '2025-07-03 02:58:07.066937', 15, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (46, NULL, NULL, NULL, '2025-07-03 02:58:07.066958', 0, '2025-07-03 02:58:07.066974', 16, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (47, NULL, NULL, NULL, '2025-07-03 02:58:07.066986', 0, '2025-07-03 02:58:07.066999', 17, 3);
@@ -724,6 +725,15 @@ INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `up
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (76, NULL, NULL, NULL, '2025-07-03 02:58:07.067715', 0, '2025-07-03 02:58:07.067729', 51, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (77, NULL, NULL, NULL, '2025-07-03 02:58:07.067740', 0, '2025-07-03 02:58:07.067752', 52, 3);
 INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (78, NULL, NULL, NULL, '2025-07-03 02:58:07.067763', 0, '2025-07-03 02:58:07.067775', 53, 3);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (79, NULL, NULL, NULL, '2025-07-03 09:04:53.644448', 0, '2025-07-03 09:04:53.644494', 16, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (80, NULL, NULL, NULL, '2025-07-03 09:05:02.903456', 0, '2025-07-03 09:05:02.903513', 8, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (81, NULL, NULL, NULL, '2025-07-03 09:05:11.591940', 0, '2025-07-03 09:05:11.592014', 9, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (82, NULL, NULL, NULL, '2025-07-03 09:05:19.612920', 0, '2025-07-03 09:05:19.612966', 10, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (83, NULL, NULL, NULL, '2025-07-03 09:05:32.927909', 0, '2025-07-03 09:05:32.927962', 34, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (84, NULL, NULL, NULL, '2025-07-03 09:05:32.927975', 0, '2025-07-03 09:05:32.927988', 35, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (85, NULL, NULL, NULL, '2025-07-03 09:05:32.928000', 0, '2025-07-03 09:05:32.928012', 36, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (86, NULL, NULL, NULL, '2025-07-03 09:05:32.928024', 0, '2025-07-03 09:05:32.928036', 37, 2);
+INSERT INTO `system_role_permission` (`id`, `remark`, `creator`, `modifier`, `update_time`, `is_deleted`, `create_time`, `menu_id`, `role_id`) VALUES (87, NULL, NULL, NULL, '2025-07-03 09:05:32.928047', 0, '2025-07-03 09:05:32.928060', 38, 2);
 COMMIT;
 
 -- ----------------------------
@@ -766,8 +776,8 @@ CREATE TABLE `system_users` (
 -- Records of system_users
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$ce99fyPlGRhdkDDRDsvQvw$6qzU+iuxtczU0Ebki6Tu0IUgYDWqELLUj9kgHfrlkJI=', '2025-07-03 01:56:33.596708', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, 'admin', '2025-07-03 03:41:58.074874', '2025-06-29 13:09:47.892332', 0, '18888888888', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$Kio1bmTf57Vi05slZAeIQm$lNBERuBlhT2UYJYt+vO2M5szmFT51S34/Cy4B5O76uw=', '2025-07-02 08:57:47.554870', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-03 03:20:14.862186', '2025-07-01 06:25:50.947136', 0, '18677777777', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$b8gwLD046kZQIz1VMiUnmN$8/HRWXvV2MawPTME6SBo2bmA+pXYMN375l91lFdIIZE=', '2025-07-04 14:48:20.327087', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, 'admin', '2025-07-04 14:48:13.446261', '2025-06-29 13:09:47.892332', 0, '18888888888', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$HTigORn4exnjjE2JJqJXy5$c3Ivb+1m+9a5aOnjDJvEEfCcUO1/JfZKYLbnkvJTbBE=', '2025-07-04 14:46:34.788246', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-03 09:03:50.080498', '2025-07-01 06:25:50.947136', 0, '18677777777', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
 COMMIT;
 
 -- ----------------------------
