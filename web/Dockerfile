@@ -33,6 +33,8 @@ RUN pnpm store prune && rm -rf $(pnpm store path) && \
     rm -rf node_modules .npmrc package-lock.json pnpm-lock.yaml .pnpm-store .turbo && \
     find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
 
+RUN npm run clean
+
 RUN yes | pnpm recursive install
 
 # 设置前端工作目录（根据实际情况修改）

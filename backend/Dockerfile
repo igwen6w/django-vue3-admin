@@ -11,11 +11,10 @@ RUN apt-get update && \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-
-COPY requirements.txt .
-RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-
 COPY . .
+
+RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+
 CMD ["sh", "-c", "sleep 10 && python manage.py runserver 0.0.0.0:8000"]
 
 # 默认命令，开发和生产通过 docker-compose 覆盖
