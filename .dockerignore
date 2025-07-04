@@ -67,5 +67,4 @@ vite.config.ts.*
 *.sw?
 .history
 celerybeat-schedule.db
-**/.pnpm-store
-data/mysql
+**/node_modules

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12.2
+FROM python:3.12.2 AS dev
 
 WORKDIR /app
 
@@ -16,6 +16,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
+CMD ["sh", "-c", "sleep 10 && python manage.py runserver 0.0.0.0:8000"]
 
 # 默认命令，开发和生产通过 docker-compose 覆盖
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] 
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

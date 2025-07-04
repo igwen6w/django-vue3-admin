@@ -1,17 +1,20 @@
 import { defineConfig } from '@vben/vite-config';
 
-export default defineConfig(async () => {
+import { loadEnv } from 'vite';
+
+export default defineConfig(async ({ mode }) => {
+  // eslint-disable-next-line n/prefer-global/process
+  const env = loadEnv(mode, process.cwd(), '');
   return {
     application: {},
     vite: {
       server: {
+        host: '0.0.0.0', // 保证 docker 内外都能访问
+        port: 5678,
         proxy: {
           '/api': {
+            target: env.VITE_BACKEND_URL,
             changeOrigin: true,
-            rewrite: (path) => path.replace(/^\/api/, ''),
-            // mock代理目标地址
-            target: 'http://localhost:5320/api',
-            ws: true,
           },
         },
       },

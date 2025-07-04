@@ -94,7 +94,8 @@ DATABASES = {
         'NAME': 'django_vue',
         'USER': 'root',
         'PASSWORD': '',
-        'HOST': 'localhost',
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        # 'HOST': 'localhost',
     }
 }
 
