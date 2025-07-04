@@ -13,7 +13,7 @@ RUN apt-get update && \
 
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY . .
 CMD ["sh", "-c", "sleep 10 && python manage.py runserver 0.0.0.0:8000"]

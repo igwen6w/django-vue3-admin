@@ -93,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_vue',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'my-secret-pw',
         'HOST': os.getenv('DATABASE_HOST', 'localhost'),
         # 'HOST': 'localhost',
     }
