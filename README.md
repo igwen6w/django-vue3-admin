@@ -11,6 +11,28 @@
 
 文档地址：待完成
 
+## 功能截图
+
+### 部门管理
+![部门管理](images/dj_dept.png)
+
+### 用户管理
+![用户管理](images/dj_user.png)
+
+### 角色管理
+![角色管理](images/dj_role.png)
+
+### 岗位管理
+![岗位管理](images/dj_post.png)
+
+### 菜单管理
+![菜单管理](images/dj_menu.png)
+
+### 前端界面
+![前端界面](images/dj_vue1.png)
+
+### 普通员工界面
+![普通员工界面](images/dj_chenze.png)
 
 # 许可证
 
@@ -116,6 +138,68 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
    pnpm dev
    # 或 npm run dev / yarn dev
    ```
+
+
+# Docker 启动与部署
+
+## 开发环境一键启动
+
+1. 复制开发环境变量模板（如有）：
+   ```bash
+   cp docker/.env.example docker/.env.dev
+   # 根据实际情况修改 docker/.env.dev
+   ```
+2. 构建并启动所有开发服务：
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d --build
+   ```
+3. 关闭所有开发服务：
+   ```bash
+   docker compose -f docker-compose.dev.yml down
+   ```
+
+> 如需自定义端口、数据库、Redis 密码等，请修改 `docker/.env.dev` 文件。
+
+## 生产环境一键启动
+
+本项目支持一键 Docker 部署，推荐生产环境使用。
+
+1. 复制环境变量模板：
+   ```bash
+   cp docker/.env.example docker/.env.prod
+   # 根据实际情况修改 docker/.env.prod
+   ```
+2. 构建并启动所有服务：
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d --build
+   ```
+3. 关闭所有服务：
+   ```bash
+   docker compose -f docker-compose.prod.yml down
+   ```
+
+如需自定义端口、数据库、Redis 密码等，请修改 docker/.env.prod 文件。
+
+## 阿里云 OSS 配置
+
+### 启用 OSS 上传
+
+1. 在 `docker/.env.prod` 中配置 OSS 参数：
+   ```env
+   VITE_OSS_ENABLED=true
+   VITE_OSS_REGION=oss-cn-hangzhou
+   VITE_OSS_ACCESS_KEY_ID=your_access_key_id
+   VITE_OSS_ACCESS_KEY_SECRET=your_access_key_secret
+   VITE_OSS_BUCKET=your_bucket_name
+   VITE_OSS_PREFIX=frontend/
+   VITE_OSS_DELETE_LOCAL=false
+   ```
+
+### 禁用 OSS 上传
+
+将 `VITE_OSS_ENABLED` 设置为 `false` 或删除相关配置即可。
+
+---
 
 # 技术架构
 

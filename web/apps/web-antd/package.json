@@ -47,5 +47,8 @@
     "pinia": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "ali-oss": "^6.23.0"
   }
 }

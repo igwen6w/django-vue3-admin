@@ -31,3 +31,4 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 FROM base AS prod
 
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
