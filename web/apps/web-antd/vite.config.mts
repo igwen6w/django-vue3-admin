@@ -11,10 +11,15 @@ export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   // 这样获取
   const backendUrl = env.VITE_BACKEND_URL;
-  console.log(backendUrl);
+
+  // 判断是否为构建模式
+  const isBuild = mode === 'production';
+  const isOssEnabled = env.VITE_OSS_ENABLED === 'true';
+
   return {
     application: {},
     vite: {
+      base: isBuild && isOssEnabled ? env.VITE_BASE_URL_PROD : '',
       server: {
         host: '0.0.0.0', // 保证 docker 内外都能访问
         port: 5678,

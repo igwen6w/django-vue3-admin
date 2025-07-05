@@ -146,8 +146,8 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 
 1. 复制开发环境变量模板（如有）：
    ```bash
-   cp docker/.env.example docker/.env.dev
-   # 根据实际情况修改 docker/.env.dev
+   cp docker/.env.example docker/.env.local
+   # 根据实际情况修改 docker/.env.local
    ```
 2. 构建并启动所有开发服务：
    ```bash
@@ -158,7 +158,7 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
    docker compose -f docker-compose.dev.yml down
    ```
 
-> 如需自定义端口、数据库、Redis 密码等，请修改 `docker/.env.dev` 文件。
+> 如需自定义端口、数据库、Redis 密码等，请修改 `docker/.env.local` 文件。
 
 ## 生产环境一键启动
 
@@ -166,8 +166,8 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 
 1. 复制环境变量模板：
    ```bash
-   cp docker/.env.example docker/.env.prod
-   # 根据实际情况修改 docker/.env.prod
+   cp docker/.env.example docker/.env.local
+   # 根据实际情况修改 docker/.env.local
    ```
 2. 构建并启动所有服务：
    ```bash
@@ -178,7 +178,7 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
    docker compose -f docker-compose.prod.yml down
    ```
 
-如需自定义端口、数据库、Redis 密码等，请修改 docker/.env.prod 文件。
+如需自定义端口、数据库、Redis 密码等，请修改 docker/.env.local 文件。
 
 ## 阿里云 OSS 配置
 
