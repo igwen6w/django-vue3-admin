@@ -13,26 +13,24 @@
 
 ## 功能截图
 
-### 部门管理
-![部门管理](images/dj_dept.png)
-
-### 用户管理
-![用户管理](images/dj_user.png)
-
-### 角色管理
-![角色管理](images/dj_role.png)
-
-### 岗位管理
-![岗位管理](images/dj_post.png)
-
-### 菜单管理
-![菜单管理](images/dj_menu.png)
-
-### 前端界面
-![前端界面](images/dj_vue1.png)
-
-### 普通员工界面
-![普通员工界面](images/dj_chenze.png)
+<table>
+  <tr>
+    <td><strong>部门管理</strong><br><img src="images/dj_dept.png" alt="部门管理" width="400"></td>
+    <td><strong>用户管理</strong><br><img src="images/dj_user.png" alt="用户管理" width="400"></td>
+  </tr>
+  <tr>
+    <td><strong>角色管理</strong><br><img src="images/dj_role.png" alt="角色管理" width="400"></td>
+    <td><strong>岗位管理</strong><br><img src="images/dj_post.png" alt="岗位管理" width="400"></td>
+  </tr>
+  <tr>
+    <td><strong>菜单管理</strong><br><img src="images/dj_menu.png" alt="菜单管理" width="400"></td>
+    <td><strong>前端界面</strong><br><img src="images/dj_vue1.png" alt="前端界面" width="400"></td>
+  </tr>
+  <tr>
+    <td><strong>权限员工界面</strong><br><img src="images/dj_chenze.png" alt="普通员工界面" width="400"></td>
+    <td></td>
+  </tr>
+</table>
 
 # 许可证
 

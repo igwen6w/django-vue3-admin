@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters import rest_framework as filters
 
 from system.models import User, Menu, LoginLog, Dept
+from utils.ip_utils import get_client_ip
 
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -54,8 +55,12 @@ class UserLogin(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        
+        # 获取真实IP地址
+        client_ip = get_client_ip(request)
+        
         # 更新登录IP和登录时间
-        user.login_ip = request.META.get('REMOTE_ADDR')
+        user.login_ip = client_ip
         user.last_login = timezone.now()
         user.save(update_fields=['login_ip', 'last_login'])
         user_data = UserSerializer(user).data
@@ -63,7 +68,7 @@ class UserLogin(ObtainAuthToken):
         LoginLog.objects.create(
             username=user.username,
             result=LoginLog.LoginResult.SUCCESS,
-            user_ip=request.META.get('REMOTE_ADDR', ''),
+            user_ip=client_ip,
             user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
         # 在序列化后的数据中加入 accessToken
