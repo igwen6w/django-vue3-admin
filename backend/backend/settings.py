@@ -25,6 +25,9 @@ SECRET_KEY = 'django-insecure-m4@pv814c_m^pgpyhz^i96a@mcqh_@m9ccu(17*895t!79e!nb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# 演示环境配置
+DEMO_MODE = os.getenv('DEMO_MODE', 'False') == 'False'
+
 ALLOWED_HOSTS = [
     '*',
 ]
@@ -63,6 +66,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# 演示环境中间件 - 全局禁止修改和删除操作
+if DEMO_MODE:
+    MIDDLEWARE.append('utils.middleware.DemoModeMiddleware')
 
 AUTH_USER_MODEL = 'system.User'
 ROOT_URLCONF = 'backend.urls'

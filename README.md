@@ -199,6 +199,27 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 
 将 `VITE_OSS_ENABLED` 设置为 `false` 或删除相关配置即可。
 
+## 演示环境配置
+
+### 启用演示模式
+
+在 `docker/.env.prod` 中设置：
+
+```env
+DEMO_MODE=true
+```
+
+演示模式下：
+- 全局禁止所有修改和删除操作（POST、PUT、PATCH、DELETE）
+- 只允许登录、登出等基础操作
+- 所有修改/删除请求将返回 403 错误
+- **禁用 Django Admin 后台管理界面**
+- 适用于在线演示，防止数据被误操作
+
+### 禁用演示模式
+
+将 `DEMO_MODE` 设置为 `false` 或删除该配置即可正常使用所有功能，包括 Admin 后台。
+
 ---
 
 # 技术架构

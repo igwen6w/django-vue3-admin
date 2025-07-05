@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('api/system/', include('system.urls')),
 ]
+
+# 演示环境下禁用 admin 路由
+if not settings.DEMO_MODE:
+    urlpatterns.insert(0, path('admin/', admin.site.urls))
