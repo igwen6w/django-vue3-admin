@@ -42,7 +42,7 @@ class RoleFilter(filters.FilterSet):
 
 class RoleViewSet(CustomModelViewSet):
     """角色管理视图集"""
-    queryset = Role.objects.all()
+    queryset = Role.objects.all().prefetch_related('permissions')
     serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = RoleFilter

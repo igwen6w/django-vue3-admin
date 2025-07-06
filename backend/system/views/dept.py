@@ -1,10 +1,11 @@
+from collections import defaultdict
 from datetime import timezone, datetime
 
+from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.response import Response
 
 from system.models import Dept
 from utils.custom_model_viewSet import CustomModelViewSet
@@ -23,9 +24,9 @@ class DeptSerializer(CustomModelSerializer):
 
     def get_children(self, obj):
         """获取子部门"""
-        children = obj.children.all().order_by('id')
+        children = getattr(obj, 'children', [])
         if children:
-            return DeptSerializer(children, many=True).data
+            return DeptSerializer(children.all(), many=True).data
         return []
 
     def get_status_text(self, obj):
@@ -35,7 +36,9 @@ class DeptSerializer(CustomModelSerializer):
 
 class DeptViewSet(CustomModelViewSet):
     """部门管理视图集"""
-    queryset = Dept.objects.filter(pid__isnull=True).order_by('id', 'status')
+    queryset = Dept.objects.filter(pid__isnull=True).order_by('id', 'status').select_related('pid').prefetch_related(
+        models.Prefetch('children', queryset=Dept.objects.order_by('id'))
+    )
     serializer_class = DeptSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'pid']
@@ -78,8 +81,39 @@ class DeptViewSet(CustomModelViewSet):
 
     @action(detail=False, methods=['get'])
     def tree(self, request):
-        """获取部门树形结构"""
-        queryset = self.get_queryset().filter(pid__isnull=True)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        """一次性查出所有部门，构建树形结构"""
+        all_depts = Dept.objects.all().order_by('sort', 'id')
+        dept_dict = {}
+        children_map = defaultdict(list)
 
+        # 先序列化为 dict，不递归
+        for dept in all_depts:
+            item = {
+                'id': dept.id,
+                'pid': dept.pid_id,
+                'name': dept.name,
+                'status': dept.status,
+                'status_text': dept.get_status_display(),
+                'create_time': dept.create_time,
+                'sort': dept.sort,
+                'leader': dept.leader,
+                'phone': dept.phone,
+                'email': dept.email,
+                'remark': dept.remark,
+                'children': [],
+            }
+            dept_dict[dept.id] = item
+            if dept.pid_id:
+                children_map[dept.pid_id].append(item)
+
+        # 构建树
+        for dept_id, dept in dept_dict.items():
+            dept['children'] = children_map.get(dept_id, [])
+
+        # 返回 pid=None（根部门）
+        tree = [dept for dept in dept_dict.values() if dept['pid'] is None]
+        return self._build_response(
+            data=tree,
+            message="ok",
+            status=status.HTTP_200_OK,
+        )

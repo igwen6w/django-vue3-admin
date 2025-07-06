@@ -53,4 +53,11 @@ async function deleteDept(id: string) {
   return requestClient.delete(`/system/dept/${id}/`);
 }
 
-export { createDept, deleteDept, getDeptList, updateDept };
+/**
+ * 查询tree
+ */
+async function treeDept() {
+  return requestClient.get(`/system/dept/tree/`);
+}
+
+export { createDept, deleteDept, getDeptList, treeDept, updateDept };

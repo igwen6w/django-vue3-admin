@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-m4@pv814c_m^pgpyhz^i96a@mcqh_@m9ccu(17*895t!79e!nb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # 演示环境配置
 DEMO_MODE = os.getenv('DEMO_MODE', 'False') == 'False'
@@ -207,6 +207,28 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 # celery 配置结束
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'ignore_auth_user': {
+            '()': 'utils.filters_logs.IgnoreSQLFilter',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['ignore_auth_user'],
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',   # 只在 DEBUG 模式时生效
+        },
+    }
+}
 
 if os.path.exists(os.path.join(BASE_DIR, 'backend/local_settings.py')):
     from backend.local_settings import *

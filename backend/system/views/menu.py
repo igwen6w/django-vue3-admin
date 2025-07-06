@@ -91,7 +91,7 @@ class MenuMetaViewSet(viewsets.ModelViewSet):
 
 class MenuViewSet(CustomModelViewSet):
     """菜单管理视图集"""
-    queryset = Menu.objects.filter(pid__isnull=True).order_by('sort', 'id', 'status')
+    queryset = Menu.objects.filter(pid__isnull=True).order_by('sort', 'id', 'status').prefetch_related('children')
     serializer_class = MenuSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'type', 'pid', 'name']

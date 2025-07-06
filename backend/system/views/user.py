@@ -1,3 +1,4 @@
+from django.db.models import Prefetch, F
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -152,7 +153,7 @@ class UserViewSet(CustomModelViewSet):
     """
     用户数据 视图集
     """
-    queryset = User.objects.filter(is_deleted=False).order_by('-id')
+    queryset = User.objects.filter(is_deleted=False).order_by('-id').prefetch_related('role', 'dept', 'post')
     serializer_class = UserSerializer
     read_only_fields = ['id', 'create_time', 'update_time', 'login_ip']
     filterset_class = UserFilter
