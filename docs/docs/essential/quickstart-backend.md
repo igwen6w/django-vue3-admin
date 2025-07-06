@@ -6,7 +6,8 @@ sidebar_position: 4
 ```bash
 cd backend
 pip install -r requirements.txt
-python manage.py migrate
+# 如有需要代理： pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+#python manage.py migrate
 python manage.py runserver
 ```
 

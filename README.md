@@ -124,7 +124,7 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 
 1. 进入前端目录：
    ```bash
-   cd web/apps/web-antd
+   cd web
    ```
 2. 安装依赖：
    ```bash

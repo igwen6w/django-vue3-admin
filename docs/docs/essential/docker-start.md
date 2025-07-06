@@ -7,6 +7,8 @@ sidebar_position: 6
 2. 在项目根目录执行：
 
 ```bash
+cp docker/.env.example docker/.env.local
+# 根据实际情况修改 docker/.env.local
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
