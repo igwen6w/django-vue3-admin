@@ -21,8 +21,8 @@ defineOptions({
 
 withDefaults(defineProps<Props>(), {
   description:
-    '是一个现代化开箱即用的中后台解决方案，采用最新的技术栈，包括 Vue 3.0、Vite、TailwindCSS 和 TypeScript 等前沿技术，代码规范严谨，提供丰富的配置选项，旨在为中大型项目的开发提供现成的开箱即用解决方案及丰富的示例，同时，它也是学习和深入前端技术的一个极佳示例。',
-  name: 'Vben Admin',
+    '本项目为基于 Django5 + Vue3（vben-admin）全栈开发的企业级中后台管理系统，支持动态菜单、按钮权限、自动化代码生成、前后端权限联动等功能，适用于多角色、多权限场景的管理后台。\n',
+  name: 'Django Vue3 Admin',
   title: '关于项目',
 });
 
@@ -76,7 +76,7 @@ const vbenDescriptionItems: DescriptionItem[] = [
     title: '最后构建时间',
   },
   {
-    content: renderLink(homepage, '点击查看'),
+    content: renderLink(VBEN_PREVIEW_URL, '点击查看'),
     title: '主页',
   },
   {
@@ -93,8 +93,8 @@ const vbenDescriptionItems: DescriptionItem[] = [
   },
   {
     content: h('div', [
-      renderLink(authorUrl, `${authorName}  `),
-      renderLink(`mailto:${authorEmail}`, authorEmail),
+      renderLink(authorUrl, `XIE7654  `),
+      renderLink(`mailto:${authorEmail}`, '765462425@qq.com'),
     ]),
     title: '作者',
   },

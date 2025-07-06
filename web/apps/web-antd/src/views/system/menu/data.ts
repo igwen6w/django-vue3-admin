@@ -2,7 +2,7 @@ import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { SystemMenuApi } from '#/api/system/menu';
 
 import { $t } from '#/locales';
-import {op} from "#/utils/permission";
+import { op } from '#/utils/permission';
 
 export function getMenuTypeOptions() {
   return [

@@ -238,7 +238,7 @@ const schema: VbenFormSchema[] = [
       },
       triggerFields: ['type'],
     },
-    fieldName: 'linkSrc',
+    fieldName: 'link',
     label: $t('system.menu.linkSrc'),
     rules: z.string().url($t('ui.formRules.invalidURL')),
   },
@@ -468,9 +468,9 @@ const [Drawer, drawerApi] = useVbenDrawer({
     if (isOpen) {
       const data = drawerApi.getData<SystemMenuApi.SystemMenu>();
       if (data?.type === 'link') {
-        data.linkSrc = data.meta?.link;
+        data.link = data.meta?.link;
       } else if (data?.type === 'embedded') {
-        data.linkSrc = data.meta?.iframeSrc;
+        data.link = data.meta?.iframe_src;
       }
       if (data) {
         formData.value = data;
@@ -495,11 +495,11 @@ async function onSubmit() {
         Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>
       >();
     if (data.type === 'link') {
-      data.meta = { ...data.meta, link: data.linkSrc };
+      data.meta = { ...data.meta, link: data.link };
     } else if (data.type === 'embedded') {
-      data.meta = { ...data.meta, iframeSrc: data.linkSrc };
+      data.meta = { ...data.meta, iframeSrc: data.link };
     }
-    delete data.linkSrc;
+    delete data.link;
     try {
       await (formData.value?.id
         ? updateMenu(formData.value.id, data)

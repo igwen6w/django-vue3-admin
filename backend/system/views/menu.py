@@ -14,6 +14,7 @@ class MenuMetaSerializer(serializers.ModelSerializer):
     """菜单元数据序列化器"""
     hideChildrenInMenu = serializers.SerializerMethodField()
     hideInMenu = serializers.SerializerMethodField()
+    iframeSrc = serializers.SerializerMethodField()
 
     class Meta:
         model = MenuMeta
@@ -24,6 +25,9 @@ class MenuMetaSerializer(serializers.ModelSerializer):
 
     def get_hideInMenu(self, obj):
         return getattr(obj, 'hide_in_menu', None)
+
+    def get_iframeSrc(self, obj):
+        return getattr(obj, 'iframe_src', None)
 
 
 class MenuSerializer(CustomModelSerializer):

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-m4@pv814c_m^pgpyhz^i96a@mcqh_@m9ccu(17*895t!79e!nb
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # 演示环境配置
-DEMO_MODE = os.getenv('DEMO_MODE', 'False') == 'False'
+DEMO_MODE = os.getenv('DEMO_MODE', 'False').lower() in ('true', '1')
 
 ALLOWED_HOSTS = [
     '*',

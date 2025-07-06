@@ -11,7 +11,7 @@
  Target Server Version : 90300 (9.3.0)
  File Encoding         : 65001
 
- Date: 04/07/2025 22:51:23
+ Date: 07/07/2025 00:04:11
 */
 
 SET NAMES utf8mb4;
@@ -400,7 +400,7 @@ CREATE TABLE `system_login_log` (
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_login_log
@@ -424,6 +424,10 @@ INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (16, NULL, NULL, NULL, '2025-07-04 09:41:07.394602', '2025-07-04 09:41:07.394619', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (17, NULL, NULL, NULL, '2025-07-04 14:46:34.812031', '2025-07-04 14:46:34.812041', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (18, NULL, NULL, NULL, '2025-07-04 14:48:20.347506', '2025-07-04 14:48:20.347516', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (19, NULL, NULL, NULL, '2025-07-05 01:54:03.993248', '2025-07-05 01:54:03.993260', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (20, NULL, NULL, NULL, '2025-07-05 02:02:58.915096', '2025-07-05 02:02:58.915110', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (21, NULL, NULL, NULL, '2025-07-05 02:03:48.892432', '2025-07-05 02:03:48.892446', 0, 'chenze', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (22, NULL, NULL, NULL, '2025-07-05 02:03:56.725873', '2025-07-05 02:03:56.725887', 0, 'admin', 1, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36');
 COMMIT;
 
 -- ----------------------------
@@ -452,7 +456,7 @@ CREATE TABLE `system_menu` (
   KEY `system_menu_pid_id_94c9bb14_fk_system_menu_id` (`pid_id`),
   CONSTRAINT `system_menu_meta_id_3c0f37de_fk_system_menu_meta_id` FOREIGN KEY (`meta_id`) REFERENCES `system_menu_meta` (`id`),
   CONSTRAINT `system_menu_pid_id_94c9bb14_fk_system_menu_id` FOREIGN KEY (`pid_id`) REFERENCES `system_menu` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_menu
@@ -469,8 +473,8 @@ INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`,
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (9, NULL, NULL, NULL, '2025-06-30 12:59:45.455554', '2025-06-30 12:59:45.455621', 0, 'SystemDeptEdit', 1, 'button', '', '', 'system:dept:edit', 7, 9, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (10, NULL, NULL, NULL, '2025-06-30 13:00:27.836789', '2025-06-30 13:00:27.836845', 0, 'SystemDeptDelete', 1, 'button', '', '', 'system:dept:delete', 7, 10, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (12, NULL, NULL, 'admin', '2025-07-03 03:12:19.599531', '2025-06-30 14:14:57.815188', 0, 'About', 1, 'menu', '/about', '_core/about/index', '', NULL, 12, 8);
-INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (13, NULL, 'admin', 'admin', '2025-06-30 14:17:50.344871', '2025-06-30 14:17:50.344905', 0, 'Project', 1, 'catalog', '/vben-admin', '', '', NULL, 13, 0);
-INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (14, NULL, 'admin', 'admin', '2025-06-30 14:23:46.754262', '2025-06-30 14:23:46.754306', 0, 'VbenDocument', 1, 'embedded', '/vben-admin/document', '', '', 13, 14, 0);
+INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (13, NULL, 'admin', 'admin', '2025-07-06 16:01:51.348938', '2025-06-30 14:17:50.344905', 0, 'Project', 1, 'catalog', '/django-vue3-admin', '', '', NULL, 13, 0);
+INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (14, NULL, 'admin', 'admin', '2025-07-06 16:01:45.924656', '2025-06-30 14:23:46.754306', 0, 'VbenDocument', 1, 'embedded', '/django-vue3-admin/document', 'IFrameView', '', 13, 14, 0);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (15, NULL, 'admin', 'admin', '2025-07-01 08:10:19.878461', '2025-07-01 08:10:19.878496', 0, '查询', 1, 'button', '', '', 'system:menu:query', 3, 15, 1);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (16, NULL, 'admin', 'admin', '2025-07-01 08:17:08.227740', '2025-07-01 08:17:08.227775', 0, '查询', 1, 'button', '', '', 'system:dept:query', 7, 16, 1);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (17, NULL, 'admin', 'admin', '2025-07-01 09:43:54.210777', '2025-07-01 09:43:54.210831', 0, '分析页', 1, 'menu', '/analytics', '/dashboard/analytics/index', '', 1, 17, 1);
@@ -505,6 +509,7 @@ INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`,
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (51, NULL, NULL, NULL, '2025-07-02 08:02:58.020560', '2025-07-02 08:02:58.020564', 0, 'loginlogCreate', 1, 'button', '', '', 'system:login_log:create', 49, 51, 1);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (52, NULL, NULL, NULL, '2025-07-02 08:02:58.023348', '2025-07-02 08:02:58.023354', 0, 'loginlogEdit', 1, 'button', '', '', 'system:login_log:edit', 49, 52, 2);
 INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (53, NULL, NULL, NULL, '2025-07-02 08:02:58.024971', '2025-07-02 08:02:58.024976', 0, 'loginlogDelete', 1, 'button', '', '', 'system:login_log:delete', 49, 53, 3);
+INSERT INTO `system_menu` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `name`, `status`, `type`, `path`, `component`, `auth_code`, `pid_id`, `meta_id`, `sort`) VALUES (54, NULL, 'admin', 'admin', '2025-07-06 16:02:20.555780', '2025-07-06 16:00:22.966211', 0, 'VbenGithub', 1, 'embedded', '/django-vue3-admin/github', '', '', 13, 54, 2);
 COMMIT;
 
 -- ----------------------------
@@ -531,7 +536,7 @@ CREATE TABLE `system_menu_meta` (
   `hide_children_in_menu` tinyint(1) NOT NULL COMMENT '隐藏子菜单',
   `hide_in_menu` tinyint(1) NOT NULL COMMENT '隐藏菜单',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_menu_meta
@@ -549,8 +554,8 @@ INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (10, NULL, NULL, NULL, '2025-06-30 13:00:27.814988', '2025-06-30 13:00:27.815021', 0, 'common.delete', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (11, NULL, NULL, NULL, '2025-06-30 13:00:28.085386', '2025-06-30 13:00:28.085434', 0, 'common.delete', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (12, NULL, NULL, NULL, '2025-07-03 03:12:19.592343', '2025-06-30 14:14:57.789248', 0, 'demos.vben.about', 'lucide:copyright', 0, 0, '', '', '', '', '', 0, 0);
-INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (13, NULL, NULL, NULL, '2025-06-30 14:17:50.320099', '2025-06-30 14:17:50.320137', 0, 'demos.vben.title', 'carbon:data-center', 0, 0, '', '', '', '', '', 0, 0);
-INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (14, NULL, NULL, NULL, '2025-06-30 14:23:46.727547', '2025-06-30 14:23:46.727573', 0, 'demos.vben.document', 'carbon:book', 0, 0, '', '', '', '', '', 0, 0);
+INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (13, NULL, NULL, NULL, '2025-07-06 16:01:51.343973', '2025-06-30 14:17:50.320137', 0, 'demos.vben.title', 'carbon:data-center', 0, 0, '', '', '', '', '', 0, 0);
+INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (14, NULL, NULL, NULL, '2025-07-06 16:01:45.915788', '2025-06-30 14:23:46.727573', 0, 'demos.vben.document', 'carbon:book', 0, 0, '', '', '', 'https://docs.ywwuzi.cn/', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (15, NULL, NULL, NULL, '2025-07-01 08:10:19.854182', '2025-07-01 08:10:19.854206', 0, '查询', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (16, NULL, NULL, NULL, '2025-07-01 08:17:08.205093', '2025-07-01 08:17:08.205154', 0, '查询', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (17, NULL, NULL, NULL, '2025-07-01 09:43:54.186595', '2025-07-01 09:43:54.186661', 0, '分析页', '', 0, 0, '', '', '', '', '', 0, 0);
@@ -585,6 +590,7 @@ INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (51, NULL, NULL, NULL, '2025-07-02 08:02:58.018239', '2025-07-02 08:02:58.018243', 0, 'common.create', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (52, NULL, NULL, NULL, '2025-07-02 08:02:58.021897', '2025-07-02 08:02:58.021901', 0, 'common.edit', '', 0, 0, '', '', '', '', '', 0, 0);
 INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (53, NULL, NULL, NULL, '2025-07-02 08:02:58.024225', '2025-07-02 08:02:58.024229', 0, 'common.delete', '', 0, 0, '', '', '', '', '', 0, 0);
+INSERT INTO `system_menu_meta` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `icon`, `sort`, `affix_tab`, `badge`, `badge_type`, `badge_variants`, `iframe_src`, `link`, `hide_children_in_menu`, `hide_in_menu`) VALUES (54, NULL, NULL, NULL, '2025-07-06 16:02:20.548920', '2025-07-06 16:00:22.954337', 0, 'Github', 'mdi:github', 0, 0, '', '', '', '', 'https://github.com/XIE7654/django-vue3-admin', 0, 0);
 COMMIT;
 
 -- ----------------------------
@@ -776,8 +782,8 @@ CREATE TABLE `system_users` (
 -- Records of system_users
 -- ----------------------------
 BEGIN;
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$b8gwLD046kZQIz1VMiUnmN$8/HRWXvV2MawPTME6SBo2bmA+pXYMN375l91lFdIIZE=', '2025-07-04 14:48:20.327087', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, 'admin', '2025-07-04 14:48:13.446261', '2025-06-29 13:09:47.892332', 0, '18888888888', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
-INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$HTigORn4exnjjE2JJqJXy5$c3Ivb+1m+9a5aOnjDJvEEfCcUO1/JfZKYLbnkvJTbBE=', '2025-07-04 14:46:34.788246', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-03 09:03:50.080498', '2025-07-01 06:25:50.947136', 0, '18677777777', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (1, 'pbkdf2_sha256$1000000$b8gwLD046kZQIz1VMiUnmN$8/HRWXvV2MawPTME6SBo2bmA+pXYMN375l91lFdIIZE=', '2025-07-05 02:03:56.705767', 1, 'admin', '', '', '765462425@qq.com', 1, 1, '2025-06-29 13:09:47.780431', NULL, NULL, 'admin', '2025-07-04 14:48:13.446261', '2025-06-29 13:09:47.892332', 0, '18888888888', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
+INSERT INTO `system_users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `mobile`, `nickname`, `gender`, `language`, `city`, `province`, `country`, `avatar_url`, `status`, `login_ip`) VALUES (2, 'pbkdf2_sha256$1000000$MWNyUoBTr4K24ySzXNbQup$eB+xVm6dCqwSVBQV5hIrURgMe2NGFgaeXpsociexCcI=', '2025-07-05 02:03:48.872113', 0, 'chenze', '', '', '765462425@qq.com', 0, 1, '2025-07-01 06:25:50.946515', NULL, 'admin', 'admin', '2025-07-05 02:04:38.567613', '2025-07-01 06:25:50.947136', 0, '18677777776', NULL, 0, NULL, NULL, NULL, NULL, NULL, 1, '127.0.0.1');
 COMMIT;
 
 -- ----------------------------
