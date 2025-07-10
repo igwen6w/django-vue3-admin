@@ -20,6 +20,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('api/system/', include('system.urls')),
+    path('api/ai/', include('ai.urls')),
 ]
 
 # 演示环境下禁用 admin 路由

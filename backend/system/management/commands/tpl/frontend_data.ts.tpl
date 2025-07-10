@@ -7,6 +7,7 @@ import type { ${app_name_camel}${model_name}Api } from '#/models/${app_name}/${m
 import { z } from '#/adapter/form';
 import { $$t } from '#/locales';
 import { format_datetime } from '#/utils/date';
+import { op } from '#/utils/permission';
 
 /**
  * 获取编辑表单的字段配置
