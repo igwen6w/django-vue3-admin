@@ -20,8 +20,8 @@ const formModel = new AiAIApiKeyModel();
 const formData = ref<AiAIApiKeyApi.AiAIApiKey>();
 const getTitle = computed(() => {
   return formData.value?.id
-    ? $t('ui.actionTitle.edit', [$t('ai.aiapikey.name')])
-    : $t('ui.actionTitle.create', [$t('ai.aiapikey.name')]);
+    ? $t('ui.actionTitle.edit', [$t('ai.ai_api_key.name')])
+    : $t('ui.actionTitle.create', [$t('ai.ai_api_key.name')]);
 });
 
 const [Form, formApi] = useVbenForm({

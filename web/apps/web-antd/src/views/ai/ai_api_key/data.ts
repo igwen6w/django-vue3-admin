@@ -16,52 +16,55 @@ export function useSchema(): VbenFormSchema[] {
     {
       component: 'Input',
       fieldName: 'name',
-      label: 'name',
+      label: '名称',
       rules: z
         .string()
-        .min(1, $t('ui.formRules.required', ['name']))
-        .max(100, $t('ui.formRules.maxLength', ['name', 100])),
+        .min(1, $t('ui.formRules.required', ['名称']))
+        .max(100, $t('ui.formRules.maxLength', ['名称', 100])),
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'platform',
-      label: 'platform',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['platform']))
-        .max(100, $t('ui.formRules.maxLength', ['platform', 100])),
+      label: '平台',
+      componentProps: {
+        options: PLATFORM_OPTIONS,
+        style: { minWidth: '180px' },
+        dropdownStyle: { minWidth: '180px' },
+      },
+      rules: z.string(),
     },
     {
       component: 'Input',
       fieldName: 'api_key',
-      label: 'api key',
+      label: '密钥',
       rules: z
         .string()
-        .min(1, $t('ui.formRules.required', ['api key']))
-        .max(100, $t('ui.formRules.maxLength', ['api key', 100])),
+        .min(1, $t('ui.formRules.required', ['密钥']))
+        .max(100, $t('ui.formRules.maxLength', ['密钥', 100])),
     },
     {
       component: 'Input',
       fieldName: 'url',
-      label: 'url',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['url']))
-        .max(100, $t('ui.formRules.maxLength', ['url', 100])),
+      label: '自定义 API 地址',
     },
     {
-      component: 'InputNumber',
+      component: 'RadioGroup',
+      componentProps: {
+        buttonStyle: 'solid',
+        options: [
+          { label: $t('common.enabled'), value: 1 },
+          { label: $t('common.disabled'), value: 0 },
+        ],
+        optionType: 'button',
+      },
+      defaultValue: 1,
       fieldName: 'status',
-      label: '状态',
+      label: $t('system.status'),
     },
     {
       component: 'Input',
       fieldName: 'remark',
-      label: 'remark',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['remark']))
-        .max(100, $t('ui.formRules.maxLength', ['remark', 100])),
+      label: $t('system.remark'),
     },
   ];
 }
@@ -74,32 +77,28 @@ export function useGridFormSchema(): VbenFormSchema[] {
     {
       component: 'Input',
       fieldName: 'name',
-      label: 'name',
+      label: '名称',
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'platform',
-      label: 'platform',
+      label: '平台',
+      componentProps: {
+        allowClear: true,
+        options: PLATFORM_OPTIONS,
+      },
     },
     {
-      component: 'Input',
-      fieldName: 'api_key',
-      label: 'api key',
-    },
-    {
-      component: 'Input',
-      fieldName: 'url',
-      label: 'url',
-    },
-    {
-      component: 'InputNumber',
+      component: 'Select',
       fieldName: 'status',
       label: '状态',
-    },
-    {
-      component: 'Input',
-      fieldName: 'remark',
-      label: 'remark',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+      },
     },
   ];
 }
@@ -112,6 +111,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
 export function useColumns(
   onActionClick?: OnActionClickFn<AiAIApiKeyApi.AiAIApiKey>,
 ): VxeTableGridOptions<AiAIApiKeyApi.AiAIApiKey>['columns'] {
+  // 平台映射表
   return [
     {
       field: 'id',
@@ -119,47 +119,32 @@ export function useColumns(
     },
     {
       field: 'name',
-      title: 'name',
+      title: '名称',
     },
     {
+      cellRender: {
+        name: 'CellTag',
+      },
       field: 'platform',
-      title: 'platform',
-    },
-    {
-      field: 'api_key',
-      title: 'api key',
+      title: '平台',
+      formatter: ({ cellValue }: { cellValue: string }) => {
+        return PLATFORM_MAP[String(cellValue)] || String(cellValue);
+      },
     },
     {
       field: 'url',
-      title: 'url',
+      title: '自定义 API 地址',
     },
     {
+      cellRender: {
+        name: 'CellTag',
+      },
       field: 'status',
       title: '状态',
     },
     {
       field: 'remark',
-      title: 'remark',
-    },
-    {
-      field: 'creator',
-      title: 'creator',
-    },
-    {
-      field: 'modifier',
-      title: 'modifier',
-    },
-    {
-      field: 'update_time',
-      title: 'update time',
-    },
-    {
-      field: 'create_time',
-      title: 'create time',
-    },
-    {
-      field: 'is_deleted',
-      title: 'is deleted',
+      title: '备注',
     },
     {
       align: 'center',
@@ -182,3 +167,27 @@ export function useColumns(
     },
   ];
 }
+
+// 平台选项和映射常量
+export const PLATFORM_OPTIONS = [
+  { label: 'OpenAI 微软', value: 'AzureOpenAI' },
+  { label: 'OpenAI', value: 'OpenAI' },
+  { label: 'Ollama', value: 'Ollama' },
+  { label: '文心一言', value: 'YiYan' },
+  { label: '讯飞星火', value: 'XingHuo' },
+  { label: '通义千问', value: 'TongYi' },
+  { label: 'StableDiffusion', value: 'StableDiffusion' },
+  { label: 'Midjourney', value: 'Midjourney' },
+  { label: 'Suno', value: 'Suno' },
+  { label: 'DeepSeek', value: 'DeepSeek' },
+  { label: '字节豆包', value: 'DouBao' },
+  { label: '腾讯混元', value: 'HunYuan' },
+  { label: '硅基流动', value: 'SiliconFlow' },
+  { label: '智谱', value: 'ZhiPu' },
+  { label: 'MiniMax', value: 'MiniMax' },
+  { label: '月之暗灭', value: 'Moonshot' },
+  { label: '百川智能', value: 'BaiChuan' },
+];
+export const PLATFORM_MAP: Record<string, string> = Object.fromEntries(
+  PLATFORM_OPTIONS.map((opt) => [opt.value, opt.label]),
+);

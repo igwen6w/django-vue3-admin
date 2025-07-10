@@ -7,7 +7,7 @@ import type { SystemPostApi } from '#/models/system/post';
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
 import { format_datetime } from '#/utils/date';
-import {op} from "#/utils/permission";
+import { op } from '#/utils/permission';
 
 /**
  * 获取编辑表单的字段配置

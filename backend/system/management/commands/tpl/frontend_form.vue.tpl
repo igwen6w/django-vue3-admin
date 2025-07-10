@@ -20,8 +20,8 @@ const formModel = new ${app_name_camel}${model_name}Model();
 const formData = ref<${app_name_camel}${model_name}Api.${app_name_camel}${model_name}>();
 const getTitle = computed(() => {
   return formData.value?.id
-    ? $$t('ui.actionTitle.edit', [$$t('${app_name}.${model_name_lower}.name')])
-    : $$t('ui.actionTitle.create', [$$t('${app_name}.${model_name_lower}.name')]);
+    ? $$t('ui.actionTitle.edit', [$$t('${app_name}.${model_name_snake}.name')])
+    : $$t('ui.actionTitle.create', [$$t('${app_name}.${model_name_snake}.name')]);
 });
 
 const [Form, formApi] = useVbenForm({

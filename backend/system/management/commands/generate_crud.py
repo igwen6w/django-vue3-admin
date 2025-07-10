@@ -164,12 +164,23 @@ class Command(BaseCommand):
             field_config = self.generate_form_field(field)
             if field_config:
                 form_fields.append(field_config)
+
+        # useGridFormSchema
+        grid_form_fields = []
+        for field in business_fields:
+            if field.name in ['id']:
+                continue
+            field_config = self.generate_grid_form_field(field)
+            if field_config:
+                grid_form_fields.append(field_config)
+                
         # 生成 useColumns
         columns = []
         for field in business_fields + core_fields:
             columns.append(f"    {{\n      field: '{field.name}',\n      title: '{getattr(field, 'verbose_name', field.name)}',\n    }},")
         context = get_context(app_name, model_name, model, model_name_snake)
         context['form_fields'] = '\n'.join(form_fields)
+        context['grid_form_fields'] = '\n'.join(grid_form_fields)
         context['columns'] = '\n'.join(columns)
         data_path = f'../web/apps/web-antd/src/views/{app_name.lower()}/{model_name_snake}/data.ts'
         data_code = render_tpl('frontend_data.ts.tpl', context)
@@ -219,4 +230,16 @@ class Command(BaseCommand):
         elif isinstance(field, models.BooleanField):
             return f'''    {{\n      component: 'RadioGroup',\n      componentProps: {{\n        buttonStyle: 'solid',\n        options: [\n          {{ label: '开启', value: 1 }},\n          {{ label: '关闭', value: 0 }},\n        ],\n        optionType: 'button',\n      }},\n      defaultValue: 1,\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
         else:
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},''' 
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+
+    def generate_grid_form_field(self, field):
+        field_name = field.name
+        field_label = getattr(field, 'verbose_name', field_name)
+        # 查询表单一般只需要 component/fieldName/label，不需要 rules
+        if isinstance(field, models.CharField):
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+        elif isinstance(field, models.IntegerField):
+            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+        # 其他类型同理
+        else:
+            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''

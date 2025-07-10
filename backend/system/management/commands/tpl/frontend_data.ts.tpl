@@ -23,7 +23,7 @@ ${form_fields}
  */
 export function useGridFormSchema(): VbenFormSchema[] {
   return [
-${form_fields}
+${grid_form_fields}
   ];
 }
 
