@@ -7,7 +7,7 @@
 - admin/admin123  
 - chenze/admin123
 
-演示地址：https://demo.ywwuzi.cn
+体验地址：https://demo.ywwuzi.cn
 
 文档地址：https://docs.ywwuzi.cn
 

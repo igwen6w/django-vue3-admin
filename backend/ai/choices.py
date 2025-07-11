@@ -19,3 +19,8 @@ class PlatformChoices(models.TextChoices):
     MINIMAX = 'MiniMax', 'MiniMax'
     MOONSHOT = 'Moonshot', '月之暗灭'
     BAICHUAN = 'BaiChuan', '百川智能'
+
+
+class MessageType(models.TextChoices):
+    USER = 'user', '用户发送'
+    ASSISTANT = 'assistant', '模型回复'

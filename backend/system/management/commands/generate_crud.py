@@ -173,11 +173,9 @@ class Command(BaseCommand):
             field_config = self.generate_grid_form_field(field)
             if field_config:
                 grid_form_fields.append(field_config)
-                
+
         # 生成 useColumns
-        columns = []
-        for field in business_fields + core_fields:
-            columns.append(f"    {{\n      field: '{field.name}',\n      title: '{getattr(field, 'verbose_name', field.name)}',\n    }},")
+        columns = self.get_columns_code(business_fields + core_fields)
         context = get_context(app_name, model_name, model, model_name_snake)
         context['form_fields'] = '\n'.join(form_fields)
         context['grid_form_fields'] = '\n'.join(grid_form_fields)
@@ -218,28 +216,41 @@ class Command(BaseCommand):
             return 'any'
 
     def generate_form_field(self, field):
-        """生成表单字段配置"""
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
+        if field_name == 'status':
+            return "{ component: 'RadioGroup', componentProps: { buttonStyle: 'solid', options: [{ label: $t('common.enabled'), value: 1 }, { label: $t('common.disabled'), value: 0 }], optionType: 'button' }, defaultValue: 1, fieldName: 'status', label: $t('system.status') },"
         if isinstance(field, models.CharField):
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n      rules: z\n        .string()\n        .min(1, $t('ui.formRules.required', ['{field_label}']))\n        .max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),\n    }},'''
+            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}', rules: z.string().min(1, $t('ui.formRules.required', ['{field_label}'])).max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])) }},"
         elif isinstance(field, models.TextField):
-            return f'''    {{\n      component: 'Input',\n      componentProps: {{\n        rows: 3,\n        showCount: true,\n      }},\n      fieldName: '{field_name}',\n      label: '{field_label}',\n      rules: z\n        .string()\n        .max(500, $t('ui.formRules.maxLength', ['{field_label}', 500]))\n        .optional(),\n    }},'''
+            return f"{{ component: 'Input', componentProps: {{ rows: 3, showCount: true }}, fieldName: '{field_name}', label: '{field_label}', rules: z.string().max(500, $t('ui.formRules.maxLength', ['{field_label}', 500])).optional() }},"
         elif isinstance(field, models.IntegerField):
-            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f"{{ component: 'InputNumber', fieldName: '{field_name}', label: '{field_label}' }},"
         elif isinstance(field, models.BooleanField):
-            return f'''    {{\n      component: 'RadioGroup',\n      componentProps: {{\n        buttonStyle: 'solid',\n        options: [\n          {{ label: '开启', value: 1 }},\n          {{ label: '关闭', value: 0 }},\n        ],\n        optionType: 'button',\n      }},\n      defaultValue: 1,\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f"{{ component: 'RadioGroup', componentProps: {{ buttonStyle: 'solid', options: [{{ label: '开启', value: 1 }}, {{ label: '关闭', value: 0 }}], optionType: 'button' }}, defaultValue: 1, fieldName: '{field_name}', label: '{field_label}' }},"
         else:
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
 
     def generate_grid_form_field(self, field):
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
-        # 查询表单一般只需要 component/fieldName/label，不需要 rules
+        if field_name == 'status':
+            return "{ component: 'Select', fieldName: 'status', label: '状态', componentProps: { allowClear: true, options: [{ label: '启用', value: 1 }, { label: '禁用', value: 0 }] } },"
         if isinstance(field, models.CharField):
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
         elif isinstance(field, models.IntegerField):
-            return f'''    {{\n      component: 'InputNumber',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
-        # 其他类型同理
+            return f"{{ component: 'InputNumber', fieldName: '{field_name}', label: '{field_label}' }},"
         else:
-            return f'''    {{\n      component: 'Input',\n      fieldName: '{field_name}',\n      label: '{field_label}',\n    }},'''
+            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
+
+    def get_columns_code(self, fields):
+        columns = []
+        for field in fields:
+            if field.name == 'status':
+                columns.append("{ field: 'status', title: '状态', cellRender: { name: 'CellTag' } },")
+                continue
+            if isinstance(field, (models.DateField, models.DateTimeField)):
+                columns.append(f"{{ field: '{field.name}', title: '{getattr(field, 'verbose_name', field.name)}', width: 150, formatter: ({{ cellValue }}) => format_datetime(cellValue) }},")
+                continue
+            columns.append(f"{{ field: '{field.name}', title: '{getattr(field, 'verbose_name', field.name)}' }},")
+        return columns
