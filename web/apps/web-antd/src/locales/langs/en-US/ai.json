@@ -1,11 +1,15 @@
 {
   "title": "AI Management",
   "ai_api_key": {
-    "title": "API KEY",
-    "name": "API KEY"
+    "title": "KEY Management",
+    "name": "KEY Management"
   },
   "ai_model": {
-    "title": "MODEL CONFIG",
-    "name": "MODEL CONFIG"
+    "title": "MODEL Management",
+    "name": "MODEL Management"
+  },
+  "tool": {
+    "title": "TOOL Management",
+    "name": "TOOL Management"
   }
 }

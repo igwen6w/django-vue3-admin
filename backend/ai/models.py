@@ -59,3 +59,18 @@ class AIModel(CoreModel):
 
     def __str__(self):
         return self.name
+
+
+class Tool(CoreModel):
+    """ AI 工具表 """
+    name = models.CharField(max_length=128, verbose_name="工具名称")
+    description = models.CharField(max_length=256, null=True, blank=True, verbose_name="工具描述")
+    status = models.SmallIntegerField(verbose_name="状态")
+
+    class Meta:
+        db_table = "ai_tool"
+        verbose_name = "AI 工具"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
