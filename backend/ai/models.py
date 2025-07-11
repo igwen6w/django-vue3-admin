@@ -54,7 +54,7 @@ class AIModel(CoreModel):
 
     class Meta:
         db_table = "ai_model"
-        verbose_name = "AI 模型"
+        verbose_name = "模型配置"
         verbose_name_plural = verbose_name
 
     def __str__(self):

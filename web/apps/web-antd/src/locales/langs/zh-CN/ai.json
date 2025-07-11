@@ -3,5 +3,9 @@
   "ai_api_key": {
     "title": "API 密钥",
     "name": "API 密钥"
+  },
+  "ai_model": {
+    "title": "模型配置",
+    "name": "模型配置"
   }
 }

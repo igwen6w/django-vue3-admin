@@ -3,5 +3,9 @@
   "ai_api_key": {
     "title": "API KEY",
     "name": "API KEY"
+  },
+  "ai_model": {
+    "title": "MODEL CONFIG",
+    "name": "MODEL CONFIG"
   }
 }

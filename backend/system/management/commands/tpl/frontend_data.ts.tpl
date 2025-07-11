@@ -27,7 +27,6 @@ ${grid_form_fields}
   ];
 }
 
-
 /**
  * 获取表格列配置
  * @description 使用函数的形式返回列数据而不是直接export一个Array常量，是为了响应语言切换时重新翻译表头
