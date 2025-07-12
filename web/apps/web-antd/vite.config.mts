@@ -1,5 +1,3 @@
-import * as console from 'node:console';
-
 import { defineConfig } from '@vben/vite-config';
 
 import { loadEnv } from 'vite';
@@ -9,8 +7,8 @@ import vitePluginOss from './plugins/vite-plugin-oss.mjs';
 export default defineConfig(async ({ mode }) => {
   // eslint-disable-next-line n/prefer-global/process
   const env = loadEnv(mode, process.cwd());
-  // 这样获取
-  const backendUrl = env.VITE_BACKEND_URL;
+  // 这样获取，提供默认值
+  const backendUrl = env.VITE_BACKEND_URL || 'http://localhost:8000';
 
   // 判断是否为构建模式
   const isBuild = mode === 'production';
@@ -27,6 +25,11 @@ export default defineConfig(async ({ mode }) => {
           '/api': {
             target: backendUrl,
             changeOrigin: true,
+          },
+          '/ws': {
+            target: backendUrl,
+            changeOrigin: true,
+            ws: true, // 启用WebSocket代理
           },
         },
       },

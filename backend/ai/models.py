@@ -218,14 +218,12 @@ class ChatRole(CoreModel):
         blank=True,
         related_name="roles",
         verbose_name="关联的知识库",
-        db_comment="关联的知识库"
     )
     tools = models.ManyToManyField(
         'Tool',
         blank=True,
         related_name="roles",
         verbose_name="关联的工具",
-        db_comment="关联的工具"
     )
 
     class Meta:

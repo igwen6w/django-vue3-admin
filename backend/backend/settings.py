@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'rest_framework.authtoken',
+    'channels',
     "system",
     "ai",
 ]
@@ -228,6 +229,16 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',   # 只在 DEBUG 模式时生效
         },
+    }
+}
+
+ASGI_APPLICATION = 'backend.asgi.application'
+
+
+# 简单用内存通道层
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
     }
 }
 
