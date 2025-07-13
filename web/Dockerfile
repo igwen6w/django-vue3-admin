@@ -5,23 +5,33 @@ FROM node:22.17.0 AS base
 
 WORKDIR /app
 ENV PNPM_SKIP_PROMPT=true
+ENV CI=true
+
+RUN corepack enable && corepack prepare pnpm@10.10.0 --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+#
+RUN pnpm install --frozen-lockfile
+
 
 # 拷贝项目
 COPY . .
 
+#RUN pnpm i
 
 # 安装 pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# 清理依赖缓存
-RUN pnpm store prune && rm -rf $(pnpm store path) && \
-    rm -rf node_modules .npmrc package-lock.json pnpm-lock.yaml .pnpm-store .turbo && \
-    find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
-
-RUN npm run clean
-
-# 安装依赖
-RUN pnpm install --force
+#RUN corepack enable && corepack prepare pnpm@latest --activate
+#
+## 清理依赖缓存
+#RUN pnpm store prune && rm -rf $(pnpm store path) && \
+#    rm -rf node_modules .npmrc package-lock.json pnpm-lock.yaml .pnpm-store .turbo && \
+#    find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+#
+##RUN pnpm run clean
+#
+## 安装依赖
+##RUN pnpm install --force
 
 
 
@@ -33,7 +43,7 @@ FROM base AS dev
 
 # 暴露端口（根据需要）
 EXPOSE 5678
-# CMD ["tail", "-f", "/dev/null"]
+#CMD ["tail", "-f", "/dev/null"]
 
 # 启动开发服务器
 CMD ["npm", "run", "dev:antd"]
