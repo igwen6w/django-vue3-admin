@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'ai_api_key', views.AIApiKeyViewSet)
 router.register(r'ai_model', views.AIModelViewSet)
 router.register(r'tool', views.ToolViewSet)
+router.register(r'knowledge', views.KnowledgeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -17,6 +17,27 @@ const AiKeyModel = new AiAIApiKeyModel();
 export function useSchema(): VbenFormSchema[] {
   return [
     {
+      component: 'ApiSelect',
+      componentProps: {
+        api: () => AiKeyModel.list(),
+        class: 'w-full',
+        resultField: 'items',
+        labelField: 'name',
+        valueField: 'id',
+      },
+      fieldName: 'key',
+      label: 'API 秘钥',
+    },
+    {
+      component: 'Input',
+      fieldName: 'platform',
+      label: '模型平台',
+      rules: z
+        .string()
+        .min(1, $t('ui.formRules.required', ['模型平台']))
+        .max(100, $t('ui.formRules.maxLength', ['模型平台', 100])),
+    },
+    {
       component: 'Input',
       fieldName: 'name',
       label: '模型名字',
@@ -24,6 +45,20 @@ export function useSchema(): VbenFormSchema[] {
         .string()
         .min(1, $t('ui.formRules.required', ['模型名字']))
         .max(100, $t('ui.formRules.maxLength', ['模型名字', 100])),
+    },
+    {
+      component: 'Input',
+      fieldName: 'model',
+      label: '模型标识',
+      rules: z
+        .string()
+        .min(1, $t('ui.formRules.required', ['模型标识']))
+        .max(100, $t('ui.formRules.maxLength', ['模型标识', 100])),
+    },
+    {
+      component: 'InputNumber',
+      fieldName: 'sort',
+      label: '排序',
     },
     {
       component: 'RadioGroup',
@@ -38,41 +73,6 @@ export function useSchema(): VbenFormSchema[] {
       defaultValue: 1,
       fieldName: 'status',
       label: $t('system.status'),
-    },
-    {
-      component: 'ApiSelect',
-      componentProps: {
-        api: () => AiKeyModel.list(),
-        class: 'w-full',
-        resultField: 'items',
-        labelField: 'name',
-        valueField: 'id',
-      },
-      fieldName: 'key',
-      label: 'API 秘钥',
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'sort',
-      label: '排序',
-    },
-    {
-      component: 'Input',
-      fieldName: 'platform',
-      label: '模型平台',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['模型平台']))
-        .max(100, $t('ui.formRules.maxLength', ['模型平台', 100])),
-    },
-    {
-      component: 'Input',
-      fieldName: 'model',
-      label: '模型标识',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['模型标识']))
-        .max(100, $t('ui.formRules.maxLength', ['模型标识', 100])),
     },
     {
       component: 'Input',

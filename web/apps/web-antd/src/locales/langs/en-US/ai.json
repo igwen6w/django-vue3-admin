@@ -11,5 +11,9 @@
   "tool": {
     "title": "TOOL Management",
     "name": "TOOL Management"
+  },
+  "knowledge": {
+    "title": "KNOWLEDGE Management",
+    "name": "KNOWLEDGE Management"
   }
 }

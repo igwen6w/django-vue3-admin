@@ -27,35 +27,25 @@ export function useSchema(): VbenFormSchema[] {
       },
       fieldName: 'dict_type',
       label: '字典类型',
+      rules: z.any(),
     },
     {
       component: 'Input',
       fieldName: 'label',
       label: '字典标签',
-      rules: z
-        .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict_data.type'), 2]))
-        .max(
-          20,
-          $t('ui.formRules.maxLength', [$t('system.dict_data.type'), 20]),
-        ),
+      rules: z.string(),
     },
     {
       component: 'Input',
       fieldName: 'value',
       label: '字典键值',
-      rules: z
-        .string()
-        .min(2, $t('ui.formRules.minLength', [$t('system.dict_data.type'), 2]))
-        .max(
-          50,
-          $t('ui.formRules.maxLength', [$t('system.dict_data.type'), 50]),
-        ),
+      rules: z.string(),
     },
     {
       component: 'InputNumber',
       fieldName: 'sort',
       label: '字典排序',
+      rules: z.number(),
     },
     {
       component: 'ApiSelect',
@@ -119,10 +109,6 @@ export function useSchema(): VbenFormSchema[] {
       },
       fieldName: 'remark',
       label: '备注',
-      rules: z
-        .string()
-        .max(50, $t('ui.formRules.maxLength', [$t('system.remark'), 50]))
-        .optional(),
     },
   ];
 }
@@ -140,7 +126,7 @@ export function useColumns(
       align: 'left',
       field: 'id',
       fixed: 'left',
-      title: '字典编码',
+      title: 'id',
       treeNode: true,
       width: 150,
     },

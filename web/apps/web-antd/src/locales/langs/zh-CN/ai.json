@@ -11,5 +11,9 @@
   "tool": {
     "title": "工具管理",
     "name": "工具管理"
+  },
+  "knowledge": {
+    "title": "知识库管理",
+    "name": "知识库管理"
   }
 }

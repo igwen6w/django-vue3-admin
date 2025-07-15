@@ -23,7 +23,7 @@ const getTitle = computed(() => {
 });
 const route = useRoute();
 const [Form, formApi] = useVbenForm({
-  layout: 'vertical',
+  layout: 'horizontal',
   schema: useSchema(),
   showDefaultActions: false,
 });
