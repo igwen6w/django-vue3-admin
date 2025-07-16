@@ -1,6 +1,8 @@
 from $app_name.models import $model_name
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
+from django_filters import rest_framework as filters
+
 
 class ${model_name}Serializer(CustomModelSerializer):
     """
@@ -12,13 +14,20 @@ class ${model_name}Serializer(CustomModelSerializer):
         read_only_fields = ['id', 'create_time', 'update_time']
 
 
+class $model_nameFilter(filters.FilterSet):
+
+    class Meta:
+        model = $model_name
+        fields = [$filterset_fields]
+
+
 class ${model_name}ViewSet(CustomModelViewSet):
     """
     $verbose_name 视图集
     """
     queryset = $model_name.objects.filter(is_deleted=False).order_by('-id')
     serializer_class = ${model_name}Serializer
-    filterset_fields = [$filterset_fields]
+    filterset_class = [$filterset_fields]
     search_fields = ['name']  # 根据实际字段调整
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']

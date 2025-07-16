@@ -11,6 +11,7 @@ export namespace AiAIApiKeyApi {
     is_deleted: boolean;
     name: string;
     platform: string;
+    model_type: string;
     api_key: string;
     url: string;
     status: number;

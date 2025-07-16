@@ -219,38 +219,124 @@ class Command(BaseCommand):
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
         if field_name == 'status':
-            return "{ component: 'RadioGroup', componentProps: { buttonStyle: 'solid', options: [{ label: $t('common.enabled'), value: 1 }, { label: $t('common.disabled'), value: 0 }], optionType: 'button' }, defaultValue: 1, fieldName: 'status', label: $t('system.status') },"
+            return f'''    {{
+      component: 'RadioGroup',
+      componentProps: {{
+        buttonStyle: 'solid',
+        options: [
+          {{ label: $t('common.enabled'), value: 1 }},
+          {{ label: $t('common.disabled'), value: 0 }},
+        ],
+        optionType: 'button',
+      }},
+      defaultValue: 1,
+      fieldName: 'status',
+      label: $t('system.status'),
+    }},'''
         if isinstance(field, models.CharField):
-            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}', rules: z.string().min(1, $t('ui.formRules.required', ['{field_label}'])).max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])) }},"
+            return f'''    {{
+      component: 'Input',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+      rules: z.string().min(1, $t('ui.formRules.required', ['{field_label}'])).max(100, $t('ui.formRules.maxLength', ['{field_label}', 100])),
+    }},'''
         elif isinstance(field, models.TextField):
-            return f"{{ component: 'Input', componentProps: {{ rows: 3, showCount: true }}, fieldName: '{field_name}', label: '{field_label}', rules: z.string().max(500, $t('ui.formRules.maxLength', ['{field_label}', 500])).optional() }},"
+            return f'''    {{
+      component: 'Input',
+      componentProps: {{ rows: 3, showCount: true }},
+      fieldName: '{field_name}',
+      label: '{field_label}',
+      rules: z.string().max(500, $t('ui.formRules.maxLength', ['{field_label}', 500])).optional(),
+    }},'''
         elif isinstance(field, models.IntegerField):
-            return f"{{ component: 'InputNumber', fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'InputNumber',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
         elif isinstance(field, models.BooleanField):
-            return f"{{ component: 'RadioGroup', componentProps: {{ buttonStyle: 'solid', options: [{{ label: '开启', value: 1 }}, {{ label: '关闭', value: 0 }}], optionType: 'button' }}, defaultValue: 1, fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'RadioGroup',
+      componentProps: {{
+        buttonStyle: 'solid',
+        options: [
+          {{ label: '开启', value: 1 }},
+          {{ label: '关闭', value: 0 }},
+        ],
+        optionType: 'button',
+      }},
+      defaultValue: 1,
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
         else:
-            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'Input',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
 
     def generate_grid_form_field(self, field):
         field_name = field.name
         field_label = getattr(field, 'verbose_name', field_name)
         if field_name == 'status':
-            return "{ component: 'Select', fieldName: 'status', label: '状态', componentProps: { allowClear: true, options: [{ label: '启用', value: 1 }, { label: '禁用', value: 0 }] } },"
+            return f'''    {{
+      component: 'Select',
+      fieldName: 'status',
+      label: '状态',
+      componentProps: {{
+        allowClear: true,
+        options: [
+          {{ label: '启用', value: 1 }},
+          {{ label: '禁用', value: 0 }},
+        ],
+      }},
+    }},'''
         if isinstance(field, models.CharField):
-            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'Input',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
         elif isinstance(field, models.IntegerField):
-            return f"{{ component: 'InputNumber', fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'InputNumber',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
         else:
-            return f"{{ component: 'Input', fieldName: '{field_name}', label: '{field_label}' }},"
+            return f'''    {{
+      component: 'Input',
+      fieldName: '{field_name}',
+      label: '{field_label}',
+    }},'''
 
     def get_columns_code(self, fields):
         columns = []
         for field in fields:
             if field.name == 'status':
-                columns.append("{ field: 'status', title: '状态', cellRender: { name: 'CellTag' } },")
+                columns.append(
+                    """    {
+      field: 'status',
+      title: '状态',
+      cellRender: { name: 'CellTag' },
+    },"""
+                )
                 continue
             if isinstance(field, (models.DateField, models.DateTimeField)):
-                columns.append(f"{{ field: '{field.name}', title: '{getattr(field, 'verbose_name', field.name)}', width: 150, formatter: ({{ cellValue }}) => format_datetime(cellValue) }},")
+                columns.append(
+                    f"""    {{
+      field: '{field.name}',
+      title: '{getattr(field, 'verbose_name', field.name)}',
+      width: 150,
+      formatter: ({{ cellValue }}) => format_datetime(cellValue),
+    }},"""
+                )
                 continue
-            columns.append(f"{{ field: '{field.name}', title: '{getattr(field, 'verbose_name', field.name)}' }},")
+            columns.append(
+                f"""    {{
+      field: '{field.name}',
+      title: '{getattr(field, 'verbose_name', field.name)}',
+    }},"""
+            )
         return columns

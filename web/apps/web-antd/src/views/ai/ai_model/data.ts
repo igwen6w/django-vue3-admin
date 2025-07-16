@@ -5,6 +5,7 @@ import type { OnActionClickFn } from '#/adapter/vxe-table';
 import type { AiAIModelApi } from '#/models/ai/ai_model';
 
 import { z } from '#/adapter/form';
+import { dictFormatter, useDictOptions } from '#/hooks/useDictOptions';
 import { $t } from '#/locales';
 import { AiAIApiKeyModel } from '#/models/ai/ai_api_key';
 import { op } from '#/utils/permission';
@@ -27,15 +28,27 @@ export function useSchema(): VbenFormSchema[] {
       },
       fieldName: 'key',
       label: 'API 秘钥',
+      rules: z.number(),
     },
     {
-      component: 'Input',
+      component: 'ApiSelect',
       fieldName: 'platform',
+      componentProps: {
+        options: useDictOptions('ai_platform'),
+        class: 'w-full',
+      },
       label: '模型平台',
-      rules: z
-        .string()
-        .min(1, $t('ui.formRules.required', ['模型平台']))
-        .max(100, $t('ui.formRules.maxLength', ['模型平台', 100])),
+      rules: z.string(),
+    },
+    {
+      component: 'ApiSelect',
+      fieldName: 'model_type',
+      componentProps: {
+        options: useDictOptions('ai_model_type'),
+        class: 'w-full',
+      },
+      label: '模型类型',
+      rules: z.string(),
     },
     {
       component: 'Input',
@@ -59,6 +72,9 @@ export function useSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       fieldName: 'sort',
       label: '排序',
+      componentProps: {
+        class: 'w-full',
+      },
     },
     {
       component: 'RadioGroup',
@@ -82,12 +98,18 @@ export function useSchema(): VbenFormSchema[] {
     {
       component: 'InputNumber',
       fieldName: 'max_tokens',
-      label: '回复数 Token 数',
+      label: '回复Token数',
+      componentProps: {
+        class: 'w-full',
+      },
     },
     {
       component: 'InputNumber',
       fieldName: 'max_contexts',
       label: '上下文数量',
+      componentProps: {
+        class: 'w-full',
+      },
     },
     {
       component: 'Input',
@@ -162,6 +184,12 @@ export function useColumns(
     {
       field: 'platform',
       title: '模型平台',
+      formatter: dictFormatter('ai_platform'),
+    },
+    {
+      field: 'model_type',
+      title: '模型类型',
+      formatter: dictFormatter('ai_model_type'),
     },
     {
       field: 'model',

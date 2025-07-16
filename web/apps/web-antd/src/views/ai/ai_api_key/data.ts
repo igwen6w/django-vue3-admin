@@ -28,8 +28,8 @@ export function useSchema(): VbenFormSchema[] {
       label: '平台',
       componentProps: {
         options: PLATFORM_OPTIONS,
-        style: { minWidth: '180px' },
-        dropdownStyle: { minWidth: '180px' },
+        class: 'w-full',
+        placeholder: '请选择',
       },
       rules: z.string(),
     },

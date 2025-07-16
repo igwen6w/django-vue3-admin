@@ -22,7 +22,7 @@ class DictDataFilter(filters.FilterSet):
 
 
 class DictDataLabelValueSerializer(serializers.ModelSerializer):
-    dict_type_value = serializers.CharField(source='dict_type.value')
+    dict_type = serializers.CharField(source='dict_type.value')
 
     class Meta:
         model = DictData
@@ -39,4 +39,4 @@ class DictDataViewSet(CustomModelViewSet):
         # 复用filterset_class过滤DictData
         queryset = self.get_queryset().filter(status=CommonStatus.ENABLED)
         serializer = DictDataLabelValueSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return self._build_response(data=serializer.data)

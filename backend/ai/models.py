@@ -46,6 +46,7 @@ class AIModel(CoreModel):
         on_delete=models.CASCADE,
         db_comment='API 秘钥编号', verbose_name="API 秘钥编号"
     )
+    model_type = models.CharField(max_length=32, db_comment="模型类型", verbose_name="模型类型", blank=True, null=True)
     platform = models.CharField(max_length=32, db_comment="模型平台", verbose_name="模型平台")
     model = models.CharField(max_length=64, db_comment="模型标识", verbose_name="模型标识")
 
