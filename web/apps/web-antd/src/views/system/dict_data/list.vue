@@ -26,7 +26,7 @@ const [FormModal, formModalApi] = useVbenModal({
 });
 
 /**
- * 编辑套餐
+ * 编辑字典数据
  * @param row
  */
 function onEdit(row: SystemDictDataApi.SystemDictData) {
@@ -37,14 +37,18 @@ function onEdit(row: SystemDictDataApi.SystemDictData) {
 }
 
 /**
- * 创建新套餐
+ * 创建字典数据
  */
 function onCreate() {
-  formModalApi.setData(null).open();
+  formModalApi
+    .setData({
+      dict_type: Number(route.query.dict_type),
+    })
+    .open();
 }
 
 /**
- * 删除套餐
+ * 删除字典数据
  * @param row
  */
 function onDelete(row: SystemDictDataApi.SystemDictData) {

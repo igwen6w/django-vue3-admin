@@ -44,6 +44,14 @@ async function updateDictData(
 ) {
   return requestClient.put(`/system/dict_data/${id}/`, data);
 }
+
+/**
+ * 获取字典数据select用
+ */
+async function getDictDataSimple() {
+  return requestClient.get(`/system/dict_data/simple/`);
+}
+
 /**
  * 更新字典数据
  *
@@ -69,6 +77,7 @@ export {
   createDictData,
   deleteDictData,
   getDictDataList,
+  getDictDataSimple,
   patchDictData,
   updateDictData,
 };

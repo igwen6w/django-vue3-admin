@@ -128,15 +128,17 @@ export function useColumns(
       fixed: 'left',
       title: 'id',
       treeNode: true,
-      width: 150,
+      width: 50,
     },
     {
       field: 'label',
       title: '字典标签',
+      width: 100,
     },
     {
       field: 'value',
       title: '字典键值',
+      width: 100,
     },
     {
       field: 'sort',
@@ -187,7 +189,7 @@ export function useColumns(
       headerAlign: 'center',
       showOverflow: false,
       title: '操作',
-      width: 200,
+      width: 100,
     },
   ];
 }

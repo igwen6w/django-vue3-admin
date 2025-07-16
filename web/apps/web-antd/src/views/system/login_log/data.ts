@@ -80,6 +80,7 @@ export function useColumns(): VxeTableGridOptions<SystemLoginLogApi.SystemLoginL
     {
       field: 'user_ip',
       title: '登录地址',
+      width: 150,
     },
     {
       field: 'user_agent',
