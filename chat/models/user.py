@@ -1,0 +1,16 @@
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class AuthToken(Base):
+    __tablename__ = 'authtoken_token'
+    key = Column(String(40), primary_key=True)
+    user_id = Column(Integer, nullable=False)
+    created = Column(DateTime)
+
+class DjangoUser(Base):
+    __tablename__ = 'system_users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String(150), nullable=False)
+    email = Column(String(254)) 
