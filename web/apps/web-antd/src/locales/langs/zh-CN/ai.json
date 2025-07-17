@@ -15,5 +15,9 @@
   "knowledge": {
     "title": "知识库管理",
     "name": "知识库管理"
+  },
+  "chat": {
+    "title": "AI对话",
+    "name": "AI对话"
   }
 }

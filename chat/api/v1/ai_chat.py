@@ -11,7 +11,6 @@ class ChatRequest(BaseModel):
     prompt: str
 
 
-
 @router.post("/")
 def chat_api(data: ChatRequest, user=Depends(get_current_user)):
     # return {"msg": "pong"}

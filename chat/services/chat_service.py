@@ -12,4 +12,4 @@ class ChatService:
         # 简单调用LLM
         return self.llm(prompt)
 
-chat_service = ChatService() 
+chat_service = ChatService()

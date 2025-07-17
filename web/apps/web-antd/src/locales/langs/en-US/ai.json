@@ -15,5 +15,9 @@
   "knowledge": {
     "title": "KNOWLEDGE Management",
     "name": "KNOWLEDGE Management"
+  },
+  "chat": {
+    "title": "AI CHAT",
+    "name": "AI CHAT"
   }
 }
