@@ -5,13 +5,14 @@ from models.ai import ChatConversation, ChatMessage, MessageType
 
 class ChatDBService:
     @staticmethod
-    def get_or_create_conversation(db: Session, conversation_id: int | None, user_id: int, model: str) -> ChatConversation:
+    def get_or_create_conversation(db: Session, conversation_id: int | None, user_id: int, model: str, content: str) -> ChatConversation:
         if not conversation_id:
+            print(conversation_id, 'conversation_id')
             conversation = ChatConversation(
-                title="新对话",
+                title=content,
                 user_id=user_id,
                 role_id=None,
-                model_id=1,  # 需根据实际模型id调整
+                model_id=None,  # 需根据实际模型id调整
                 model=model,
                 system_message=None,
                 temperature=0.7,

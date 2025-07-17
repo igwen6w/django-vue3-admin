@@ -23,7 +23,7 @@ interface Message {
 }
 
 interface ChatItem {
-  id: number;
+  id: null | number;
   title: string;
   lastMessage: string;
 }
@@ -33,7 +33,6 @@ const chatList = ref<ChatItem[]>([]);
 
 // 聊天消息
 const messages = ref<Message[]>([]);
-const currentMessages = ref<Message[]>([]);
 
 // 模型列表
 const modelOptions = [
@@ -57,18 +56,19 @@ const filteredChats = computed(() => {
 async function selectChat(id: number) {
   selectedChatId.value = id;
   const { data } = await getMessages(id);
-  currentMessages.value = data;
+  messages.value = data;
   nextTick(scrollToBottom);
 }
 
 function handleNewChat() {
-  const newId = Date.now();
+  const newId = null;
   chatList.value.unshift({
     id: newId,
     title: `新对话${chatList.value.length + 1}`,
     lastMessage: '',
   });
   selectedChatId.value = newId;
+  messages.value = [];
   nextTick(scrollToBottom);
 }
 
@@ -87,30 +87,30 @@ async function handleSend() {
     content: '',
   };
   messages.value.push(aiMsgObj);
-  currentAiMessage.value = aiMsgObj;
+  const aiMsgIndex = messages.value.length - 1; // 记录AI消息的索引
+
   isAiTyping.value = true;
 
   const stream = await fetchAIStream({
     content: input.value,
     conversation_id: selectedChatId.value, // 新增
   });
-
+  if (chatList.value.length > 0) {
+    chatList.value[0]!.title = input.value.slice(0, 10);
+  }
+  // 立刻清空输入框
+  input.value = '';
   for await (const chunk of stream) {
     for (const char of chunk) {
-      aiMsgObj.content += char;
-      // 保证messages数组响应式更新
-      const idx = messages.value.indexOf(aiMsgObj);
-      if (idx !== -1) {
-        messages.value.splice(idx, 1, { ...aiMsgObj });
-      }
-      currentAiMessage.value = { ...aiMsgObj };
+      messages.value[aiMsgIndex]!.content += char;
+      // 用 splice 替换，确保响应式
+      messages.value.splice(aiMsgIndex, 1, { ...messages.value[aiMsgIndex]! });
       await nextTick();
       scrollToBottom();
       await new Promise((resolve) => setTimeout(resolve, 15));
     }
   }
   isAiTyping.value = false;
-  input.value = '';
   nextTick(scrollToBottom);
 }
 
@@ -144,7 +144,7 @@ onMounted(() => {
   <Page auto-content-height>
     <Row style="height: 100%">
       <!-- 左侧历史对话 -->
-      <Col :span="6" class="chat-sider">
+      <Col :span="5" class="chat-sider">
         <div class="sider-header">
           <Button type="primary" @click="handleNewChat">新建对话</Button>
           <Input
@@ -195,9 +195,9 @@ onMounted(() => {
             />
           </div>
         </div>
-        <div class="chat-messages" ref="messagesRef">
+        <div class="chat-messages" style="height: 100%;" ref="messagesRef">
           <div
-            v-for="msg in currentMessages"
+            v-for="msg in messages"
             :key="msg.id"
             class="chat-message"
             :class="[msg.type]"
@@ -208,7 +208,9 @@ onMounted(() => {
                 {{ msg.content }}
                 <span
                   v-if="
-                    msg.type === 'ai' && isAiTyping && msg === currentAiMessage
+                    msg.type === 'assistant' &&
+                    isAiTyping &&
+                    msg === currentAiMessage
                   "
                   class="typing-cursor"
                 ></span>
@@ -277,6 +279,7 @@ onMounted(() => {
 }
 .chat-content {
   display: flex;
+  height: 100%;
   flex-direction: column;
   padding: 16px 24px 8px 24px;
   background: #f6f8fa;
@@ -292,13 +295,13 @@ onMounted(() => {
   justify-content: flex-end;
 }
 .chat-messages {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   background: #fff;
   border-radius: 8px;
   padding: 24px 16px 80px 16px;
   margin-bottom: 0;
-  min-height: 300px;
+  /* min-height: 300px; */
   box-shadow: 0 2px 8px #0001;
   transition: box-shadow 0.2s;
   scrollbar-width: thin;

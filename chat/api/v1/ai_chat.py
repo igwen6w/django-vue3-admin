@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from langchain.chains import ConversationChain
 from langchain_community.chat_models import ChatOpenAI
 
@@ -16,6 +16,7 @@ from services.chat_service import ChatDBService
 from db.session import get_db
 from models.ai import ChatConversation, ChatMessage, MessageType
 from utils.resp import resp_success, Response
+from langchain_deepseek import ChatDeepSeek
 
 router = APIRouter()
 
@@ -23,13 +24,13 @@ class ChatRequest(BaseModel):
     prompt: str
 
 
-def get_deepseek_llm(api_key: str, model: str, openai_api_base: str):
+
+def get_deepseek_llm(api_key: SecretStr, model: str):
     # deepseek 兼容 OpenAI API，需指定 base_url
-    return ChatOpenAI(
-        openai_api_key=api_key,
-        model_name=model,
+    return ChatDeepSeek(
+        api_key=api_key,
+        model=model,
         streaming=True,
-        openai_api_base=openai_api_base,   # deepseek的API地址
     )
 
 @router.post('/stream')
@@ -41,29 +42,34 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     model = 'deepseek-chat'
     api_key = os.getenv("DEEPSEEK_API_KEY")
     openai_api_base = "https://api.deepseek.com/v1"
-    llm = get_deepseek_llm(api_key, model, openai_api_base)
+    llm = get_deepseek_llm(api_key, model)
 
     if not content or not isinstance(content, str):
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": "content不能为空"}, status_code=400)
 
     user_id = user["user_id"]
-
+    print(conversation_id, 'conversation_id')
     # 1. 获取或新建对话
     try:
-        conversation = ChatDBService.get_or_create_conversation(db, conversation_id, user_id, model)
+        conversation = ChatDBService.get_or_create_conversation(db, conversation_id, user_id, model, content)
     except ValueError as e:
+        print(23232)
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": str(e)}, status_code=400)
-
+    print(conversation, 'dsds')
     # 2. 插入当前消息
     ChatDBService.add_message(db, conversation, user_id, content)
-
+    context = [
+        ("system", "You are a helpful assistant. Answer all questions to the best of your ability in {language}.")
+    ]
     # 3. 查询历史消息，组装上下文
     history = ChatDBService.get_history(db, conversation.id)
-    history_contents = [msg.content for msg in history]
-    context = '\n'.join(history_contents)
-
+    for msg in history:
+        # 假设 msg.type 存储的是 'user' 或 'assistant'
+        # role = msg.type if msg.type in ("user", "assistant") else "user"
+        context.append((msg.type, msg.content))
+    print('context', context)
     ai_reply = ""
 
     async def event_generator():
@@ -76,7 +82,7 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
                 ai_reply += chunk
                 yield f"data: {chunk}\n\n"
             await asyncio.sleep(0.01)
-        # 生成器结束时插入AI消息
+        # 只保留最新AI回复
         if ai_reply:
             ChatDBService.insert_ai_message(db, conversation, user_id, ai_reply, model)
 
