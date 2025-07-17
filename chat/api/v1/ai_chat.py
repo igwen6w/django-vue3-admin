@@ -72,12 +72,12 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
 
 @router.get('/conversations')
 def get_conversations(
-    user_id: int = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
 ):
-    """获取指定用户的聊天对话列表"""
+    """获取当前用户的聊天对话列表"""
+    user_id = user["user_id"]
     conversations = db.query(ChatConversation).filter(ChatConversation.user_id == user_id).order_by(ChatConversation.update_time.desc()).all()
-    # 可根据需要序列化
     return [
         {
             'id': c.id,
@@ -90,19 +90,18 @@ def get_conversations(
 
 @router.get('/messages')
 def get_messages(
-    conversation_id: int = Query(None),
-    user_id: int = Query(None),
-    db: Session = Depends(get_db)
+    conversation_id: int = Query(...),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
 ):
-    """获取指定会话的消息列表，可选user_id过滤"""
-    query = db.query(ChatMessage).filter(ChatMessage.conversation_id == conversation_id)
-    if user_id is not None:
-        query = query.filter(ChatMessage.user_id == user_id)
+    """获取指定会话的消息列表（当前用户）"""
+    user_id = user["user_id"]
+    query = db.query(ChatMessage).filter(ChatMessage.conversation_id == conversation_id, ChatMessage.user_id == user_id)
     messages = query.order_by(ChatMessage.id).all()
     return [
         {
             'id': m.id,
-            'role': m.role_id,  # 如需role名可再查
+            'role': m.role_id,
             'content': m.content,
             'user_id': m.user_id,
             'conversation_id': m.conversation_id,

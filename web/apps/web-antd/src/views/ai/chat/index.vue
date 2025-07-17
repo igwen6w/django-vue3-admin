@@ -14,7 +14,7 @@ import {
   Select,
 } from 'ant-design-vue';
 
-import { fetchAIStream } from '#/api/ai/chat';
+import { fetchAIStream, getConversations, getMessages } from '#/api/ai/chat';
 
 interface Message {
   id: number;
@@ -33,6 +33,7 @@ const chatList = ref<ChatItem[]>([]);
 
 // mock 聊天消息
 const messages = ref<Message[]>([]);
+const currentMessages = ref<Message[]>([]);
 
 // mock 模型列表
 const modelOptions = [
@@ -52,17 +53,11 @@ const filteredChats = computed(() => {
   if (!search.value) return chatList.value;
   return chatList.value.filter((chat) => chat.title.includes(search.value));
 });
-// 直接用conversationId过滤
-const currentMessages = computed(() => {
-  if (!selectedChatId.value) return [];
-  return [];
-  // return messages.value.filter(
-  //   (msg) => msg.conversationId === selectedChatId.value,
-  // );
-});
 
-function selectChat(id: number) {
+async function selectChat(id: number) {
   selectedChatId.value = id;
+  const data = await getMessages(id);
+  currentMessages.value = data;
   nextTick(scrollToBottom);
 }
 
@@ -78,7 +73,6 @@ function handleNewChat() {
 }
 
 async function handleSend() {
-  console.log(111);
   const msg: Message = {
     id: Date.now(),
     role: 'user',
@@ -128,10 +122,7 @@ function scrollToBottom() {
 
 // 获取历史对话
 async function fetchConversations() {
-  // 这里假设user_id为1，实际应从登录信息获取
-  const params = new URLSearchParams({ user_id: '1' });
-  const res = await fetch(`/chat/api/v1/conversations?${params.toString()}`);
-  const data = await res.json();
+  const data = await getConversations();
   chatList.value = data.map((item: any) => ({
     id: item.id,
     title: item.title,
@@ -141,6 +132,7 @@ async function fetchConversations() {
   // 默认选中第一个对话
   if (chatList.value.length > 0) {
     selectedChatId.value = chatList.value[0].id;
+    selectChat(selectedChatId.value)
   }
 }
 
@@ -491,7 +483,7 @@ onMounted(() => {
 .chat-list {
   flex: 1;
   overflow-y: auto; /* 只在对话列表区滚动 */
-  min-height: 0;    /* 关键：flex子项内滚动时必须加 */
+  min-height: 0; /* 关键：flex子项内滚动时必须加 */
   max-height: calc(100vh - 120px); /* 可根据实际header/footer高度调整 */
 }
 </style>

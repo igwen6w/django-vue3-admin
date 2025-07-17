@@ -1,7 +1,18 @@
-import { useAccessStore } from '@vben/stores';
+import { fetchWithAuth } from '#/utils/fetch-with-auth';
 
-import { formatToken } from '#/utils/auth';
+export async function getConversations() {
+  const res = await fetchWithAuth('/chat/api/v1/conversations');
+  return await res.json();
+}
 
+export async function getMessages(conversationId: number) {
+  const res = await fetchWithAuth(
+    `/chat/api/v1/messages?conversation_id=${conversationId}`,
+  );
+  return await res.json();
+}
+
+// 你原有的fetchAIStream方法保留
 export interface FetchAIStreamParams {
   content: string;
   conversation_id?: null | number;
@@ -11,28 +22,14 @@ export async function fetchAIStream({
   content,
   conversation_id,
 }: FetchAIStreamParams) {
-  const accessStore = useAccessStore();
-  const token = accessStore.accessToken;
-  const headers = new Headers();
-
-  headers.append('Content-Type', 'application/json');
-  headers.append('Authorization', <string>formatToken(token));
-
-  const response = await fetch('/chat/api/v1/stream', {
+  const res = await fetchWithAuth('/chat/api/v1/stream', {
     method: 'POST',
-    headers,
-    body: JSON.stringify({
-      content,
-      conversation_id,
-    }),
+    body: JSON.stringify({ content, conversation_id }),
   });
-
-  if (!response.body) throw new Error('No stream body');
-
-  const reader = response.body.getReader();
+  if (!res.body) throw new Error('No stream body');
+  const reader = res.body.getReader();
   const decoder = new TextDecoder('utf8');
   let buffer = '';
-
   return {
     async *[Symbol.asyncIterator]() {
       while (true) {
