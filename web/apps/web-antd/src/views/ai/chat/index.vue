@@ -14,6 +14,9 @@ import {
   Select,
 } from 'ant-design-vue';
 
+import { fetchAIStream } from '#/api/ai/chat';
+// 移除 import typingSound from '@/assets/typing.mp3';
+
 interface Message {
   id: number;
   role: 'ai' | 'user';
@@ -24,7 +27,7 @@ interface Message {
 const chatList = ref([
   {
     id: 1,
-    title: '和GPT-3.5的对话',
+    title: '和deepseek的对话',
     lastMessage: 'AI: 你好，有什么可以帮您？',
   },
   { id: 2, title: '工作助理', lastMessage: 'AI: 今天的日程已为您安排。' },
@@ -44,7 +47,7 @@ const messages = ref<Record<number, Message[]>>({
 
 // mock 模型列表
 const modelOptions = [
-  { label: 'GPT-3.5', value: 'gpt-3.5' },
+  { label: 'deepseek', value: 'deepseek' },
   { label: 'GPT-4', value: 'gpt-4' },
 ];
 
@@ -53,6 +56,8 @@ const selectedModel = ref(modelOptions[0].value);
 const search = ref('');
 const input = ref('');
 const messagesRef = ref<HTMLElement | null>(null);
+const currentAiMessage = ref<Message | null>(null);
+const isAiTyping = ref(false);
 
 const filteredChats = computed(() => {
   if (!search.value) return chatList.value;
@@ -80,22 +85,36 @@ function handleNewChat() {
   nextTick(scrollToBottom);
 }
 
-function handleSend() {
+async function handleSend() {
   if (!input.value.trim()) return;
   const msg: Message = { id: Date.now(), role: 'user', content: input.value };
   if (!messages.value[selectedChatId.value]) {
     messages.value[selectedChatId.value] = [];
   }
   messages.value[selectedChatId.value].push(msg);
-  // mock AI 回复
-  setTimeout(() => {
-    messages.value[selectedChatId.value]?.push({
-      id: Date.now() + 1,
-      role: 'ai',
-      content: 'AI回复内容（mock）',
-    });
-    nextTick(scrollToBottom);
-  }, 600);
+
+  // 预留AI消息
+  const aiMsgObj: Message = { id: Date.now() + 1, role: 'ai', content: '' };
+  messages.value[selectedChatId.value].push(aiMsgObj);
+  currentAiMessage.value = aiMsgObj;
+  isAiTyping.value = true;
+
+  const stream = await fetchAIStream({
+    content: input.value,
+  });
+
+  // 移除打字音效播放
+
+  for await (const chunk of stream) {
+    for (const char of chunk) {
+      aiMsgObj.content += char;
+      currentAiMessage.value = { ...aiMsgObj };
+      // 移除打字音效播放
+      await new Promise(resolve => setTimeout(resolve, 15));
+      nextTick(scrollToBottom);
+    }
+  }
+  isAiTyping.value = false;
   input.value = '';
   nextTick(scrollToBottom);
 }
@@ -165,7 +184,15 @@ function scrollToBottom() {
           >
             <div class="bubble" :class="[msg.role]">
               <span class="role">{{ msg.role === 'user' ? '我' : 'AI' }}</span>
-              <span class="bubble-content">{{ msg.content }}</span>
+              <span class="bubble-content">
+                {{ msg.content }}
+                <span
+                  v-if="
+                    msg.role === 'ai' && isAiTyping && msg === currentAiMessage
+                  "
+                  class="typing-cursor"
+                ></span>
+              </span>
             </div>
           </div>
         </div>
@@ -326,5 +353,19 @@ function scrollToBottom() {
   .chat-content {
     padding: 8px 4px 8px 4px;
   }
+}
+.typing-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background: #1677ff;
+  margin-left: 2px;
+  animation: blink-cursor 1s steps(1) infinite;
+  vertical-align: bottom;
+  border-radius: 2px;
+}
+@keyframes blink-cursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 </style>

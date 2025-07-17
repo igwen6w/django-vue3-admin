@@ -22,14 +22,13 @@ export default defineConfig(async ({ mode }) => {
         host: '0.0.0.0', // 保证 docker 内外都能访问
         port: 5678,
         proxy: {
+          '/chat': {
+            target: 'http://localhost:8010',
+            changeOrigin: true,
+          },
           '/api': {
             target: backendUrl,
             changeOrigin: true,
-          },
-          '/ws': {
-            target: backendUrl,
-            changeOrigin: true,
-            ws: true, // 启用WebSocket代理
           },
         },
       },
