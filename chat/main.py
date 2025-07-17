@@ -1,7 +1,12 @@
+import os
 from fastapi import FastAPI
+from dotenv import load_dotenv
 from api.v1 import ai_chat
 from fastapi.middleware.cors import CORSMiddleware
 from routers.ai_api_key import router as ai_api_key_router
+
+# 加载.env环境变量，优先项目根目录
+load_dotenv()
 
 app = FastAPI()
 

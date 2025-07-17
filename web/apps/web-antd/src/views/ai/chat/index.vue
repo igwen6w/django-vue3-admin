@@ -15,7 +15,6 @@ import {
 } from 'ant-design-vue';
 
 import { fetchAIStream } from '#/api/ai/chat';
-// 移除 import typingSound from '@/assets/typing.mp3';
 
 interface Message {
   id: number;
@@ -23,27 +22,17 @@ interface Message {
   content: string;
 }
 
+interface ChatItem {
+  id: number;
+  title: string;
+  lastMessage: string;
+}
+
 // mock 历史对话
-const chatList = ref([
-  {
-    id: 1,
-    title: '和deepseek的对话',
-    lastMessage: 'AI: 你好，有什么可以帮您？',
-  },
-  { id: 2, title: '工作助理', lastMessage: 'AI: 今天的日程已为您安排。' },
-]);
+const chatList = ref<ChatItem[]>([]);
 
 // mock 聊天消息
-const messages = ref<Record<number, Message[]>>({
-  1: [
-    { id: 1, role: 'user', content: '你好' },
-    { id: 2, role: 'ai', content: '你好，有什么可以帮您？' },
-  ],
-  2: [
-    { id: 1, role: 'user', content: '帮我安排下今天的日程' },
-    { id: 2, role: 'ai', content: '今天的日程已为您安排。' },
-  ],
-});
+const messages = ref<Message[]>([]);
 
 // mock 模型列表
 const modelOptions = [
@@ -51,8 +40,8 @@ const modelOptions = [
   { label: 'GPT-4', value: 'gpt-4' },
 ];
 
-const selectedChatId = ref(chatList.value[0]?.id || 1);
-const selectedModel = ref(modelOptions[0].value);
+const selectedChatId = ref<null | number>(chatList.value[0]?.id ?? null);
+const selectedModel = ref(modelOptions[0]?.value);
 const search = ref('');
 const input = ref('');
 const messagesRef = ref<HTMLElement | null>(null);
@@ -64,9 +53,14 @@ const filteredChats = computed(() => {
   return chatList.value.filter((chat) => chat.title.includes(search.value));
 });
 
-const currentMessages = computed(
-  () => messages.value?.[selectedChatId.value] || [],
-);
+// 直接用conversationId过滤
+const currentMessages = computed(() => {
+  if (!selectedChatId.value) return [];
+  return [];
+  // return messages.value.filter(
+  //   (msg) => msg.conversationId === selectedChatId.value,
+  // );
+});
 
 function selectChat(id: number) {
   selectedChatId.value = id;
@@ -80,38 +74,46 @@ function handleNewChat() {
     title: `新对话${chatList.value.length + 1}`,
     lastMessage: '',
   });
-  messages.value[newId] = [];
   selectedChatId.value = newId;
   nextTick(scrollToBottom);
 }
 
 async function handleSend() {
-  if (!input.value.trim()) return;
-  const msg: Message = { id: Date.now(), role: 'user', content: input.value };
-  if (!messages.value[selectedChatId.value]) {
-    messages.value[selectedChatId.value] = [];
-  }
-  messages.value[selectedChatId.value].push(msg);
+  console.log(111);
+  const msg: Message = {
+    id: Date.now(),
+    role: 'user',
+    content: input.value,
+  };
+  messages.value.push(msg);
 
   // 预留AI消息
-  const aiMsgObj: Message = { id: Date.now() + 1, role: 'ai', content: '' };
-  messages.value[selectedChatId.value].push(aiMsgObj);
+  const aiMsgObj: Message = {
+    id: Date.now() + 1,
+    role: 'ai',
+    content: '',
+  };
+  messages.value.push(aiMsgObj);
   currentAiMessage.value = aiMsgObj;
   isAiTyping.value = true;
 
   const stream = await fetchAIStream({
     content: input.value,
+    conversation_id: selectedChatId.value, // 新增
   });
-
-  // 移除打字音效播放
 
   for await (const chunk of stream) {
     for (const char of chunk) {
       aiMsgObj.content += char;
+      // 保证messages数组响应式更新
+      const idx = messages.value.indexOf(aiMsgObj);
+      if (idx !== -1) {
+        messages.value.splice(idx, 1, { ...aiMsgObj });
+      }
       currentAiMessage.value = { ...aiMsgObj };
-      // 移除打字音效播放
-      await new Promise(resolve => setTimeout(resolve, 15));
-      nextTick(scrollToBottom);
+      await nextTick();
+      scrollToBottom();
+      await new Promise((resolve) => setTimeout(resolve, 15));
     }
   }
   isAiTyping.value = false;
@@ -365,7 +367,13 @@ function scrollToBottom() {
   border-radius: 2px;
 }
 @keyframes blink-cursor {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 </style>

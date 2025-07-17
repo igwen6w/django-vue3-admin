@@ -4,9 +4,13 @@ import { formatToken } from '#/utils/auth';
 
 export interface FetchAIStreamParams {
   content: string;
+  conversation_id?: null | number;
 }
 
-export async function fetchAIStream({ content }: FetchAIStreamParams) {
+export async function fetchAIStream({
+  content,
+  conversation_id,
+}: FetchAIStreamParams) {
   const accessStore = useAccessStore();
   const token = accessStore.accessToken;
   const headers = new Headers();
@@ -19,6 +23,7 @@ export async function fetchAIStream({ content }: FetchAIStreamParams) {
     headers,
     body: JSON.stringify({
       content,
+      conversation_id,
     }),
   });
 
