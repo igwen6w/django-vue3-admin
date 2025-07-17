@@ -17,8 +17,8 @@ import {
 import { fetchAIStream, getConversations, getMessages } from '#/api/ai/chat';
 
 interface Message {
-  id: number;
-  role: 'ai' | 'user';
+  id: null | number;
+  type: 'assistant' | 'user';
   content: string;
 }
 
@@ -28,14 +28,14 @@ interface ChatItem {
   lastMessage: string;
 }
 
-// mock 历史对话
+// 历史对话
 const chatList = ref<ChatItem[]>([]);
 
-// mock 聊天消息
+// 聊天消息
 const messages = ref<Message[]>([]);
 const currentMessages = ref<Message[]>([]);
 
-// mock 模型列表
+// 模型列表
 const modelOptions = [
   { label: 'deepseek', value: 'deepseek' },
   { label: 'GPT-4', value: 'gpt-4' },
@@ -56,7 +56,7 @@ const filteredChats = computed(() => {
 
 async function selectChat(id: number) {
   selectedChatId.value = id;
-  const data = await getMessages(id);
+  const { data } = await getMessages(id);
   currentMessages.value = data;
   nextTick(scrollToBottom);
 }
@@ -74,16 +74,16 @@ function handleNewChat() {
 
 async function handleSend() {
   const msg: Message = {
-    id: Date.now(),
-    role: 'user',
+    id: null,
+    type: 'user',
     content: input.value,
   };
   messages.value.push(msg);
 
   // 预留AI消息
   const aiMsgObj: Message = {
-    id: Date.now() + 1,
-    role: 'ai',
+    id: null,
+    type: 'assistant',
     content: '',
   };
   messages.value.push(aiMsgObj);
@@ -122,17 +122,16 @@ function scrollToBottom() {
 
 // 获取历史对话
 async function fetchConversations() {
-  const data = await getConversations();
+  const { data } = await getConversations();
   chatList.value = data.map((item: any) => ({
     id: item.id,
     title: item.title,
     lastMessage: item.last_message || '',
   }));
-  console.log(chatList.value, 'chatList');
   // 默认选中第一个对话
   if (chatList.value.length > 0) {
     selectedChatId.value = chatList.value[0].id;
-    selectChat(selectedChatId.value)
+    await selectChat(selectedChatId.value);
   }
 }
 
@@ -201,15 +200,15 @@ onMounted(() => {
             v-for="msg in currentMessages"
             :key="msg.id"
             class="chat-message"
-            :class="[msg.role]"
+            :class="[msg.type]"
           >
-            <div class="bubble" :class="[msg.role]">
-              <span class="role">{{ msg.role === 'user' ? '我' : 'AI' }}</span>
+            <div class="bubble" :class="[msg.type]">
+              <span class="role">{{ msg.type === 'user' ? '我' : 'AI' }}</span>
               <span class="bubble-content">
                 {{ msg.content }}
                 <span
                   v-if="
-                    msg.role === 'ai' && isAiTyping && msg === currentAiMessage
+                    msg.type === 'ai' && isAiTyping && msg === currentAiMessage
                   "
                   class="typing-cursor"
                 ></span>

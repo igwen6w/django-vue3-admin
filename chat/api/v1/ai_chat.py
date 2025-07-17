@@ -1,18 +1,21 @@
 import os
 import asyncio
-
 from fastapi import APIRouter, Depends, Request, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from typing import List
+from datetime import datetime
 
 from pydantic import BaseModel
 from langchain.chains import ConversationChain
 from langchain_community.chat_models import ChatOpenAI
 
+from api.v1.vo import MessageVO, ConversationsVO
 from deps.auth import get_current_user
 from services.chat_service import ChatDBService
 from db.session import get_db
-from models.ai import ChatConversation, ChatMessage
+from models.ai import ChatConversation, ChatMessage, MessageType
+from utils.resp import resp_success, Response
 
 router = APIRouter()
 
@@ -34,6 +37,7 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     body = await request.json()
     content = body.get('content')
     conversation_id = body.get('conversation_id')
+    print(content, 'content')
     model = 'deepseek-chat'
     api_key = os.getenv("DEEPSEEK_API_KEY")
     openai_api_base = "https://api.deepseek.com/v1"
@@ -51,6 +55,7 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     except ValueError as e:
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": str(e)}, status_code=400)
+
     # 2. 插入当前消息
     ChatDBService.add_message(db, conversation, user_id, content)
 
@@ -59,36 +64,44 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     history_contents = [msg.content for msg in history]
     context = '\n'.join(history_contents)
 
+    ai_reply = ""
+
     async def event_generator():
+        nonlocal ai_reply
         async for chunk in llm.astream(context):
-            # 只返回 chunk.content 内容
             if hasattr(chunk, 'content'):
+                ai_reply += chunk.content
                 yield f"data: {chunk.content}\n\n"
             else:
+                ai_reply += chunk
                 yield f"data: {chunk}\n\n"
             await asyncio.sleep(0.01)
+        # 生成器结束时插入AI消息
+        if ai_reply:
+            ChatDBService.insert_ai_message(db, conversation, user_id, ai_reply, model)
 
     return StreamingResponse(event_generator(), media_type='text/event-stream')
 
 @router.get('/conversations')
-def get_conversations(
+async def get_conversations(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    """获取当前用户的聊天对话列表"""
+    """获取当前用户的聊天对话列表，last_message为字符串"""
     user_id = user["user_id"]
     conversations = db.query(ChatConversation).filter(ChatConversation.user_id == user_id).order_by(ChatConversation.update_time.desc()).all()
-    return [
+    return resp_success(data=[
         {
             'id': c.id,
             'title': c.title,
             'update_time': c.update_time,
-            'last_message': c.messages[-1].content if c.messages else '',
+            'last_message': c.messages[-1].content if c.messages else None,
         }
         for c in conversations
-    ]
+    ])
 
-@router.get('/messages')
+
+@router.get('/messages', response_model=Response[List[MessageVO]])
 def get_messages(
     conversation_id: int = Query(...),
     db: Session = Depends(get_db),
@@ -96,16 +109,7 @@ def get_messages(
 ):
     """获取指定会话的消息列表（当前用户）"""
     user_id = user["user_id"]
-    query = db.query(ChatMessage).filter(ChatMessage.conversation_id == conversation_id, ChatMessage.user_id == user_id)
-    messages = query.order_by(ChatMessage.id).all()
-    return [
-        {
-            'id': m.id,
-            'role': m.role_id,
-            'content': m.content,
-            'user_id': m.user_id,
-            'conversation_id': m.conversation_id,
-            'create_time': m.create_time,
-        }
-        for m in messages
-    ]
+    query = db.query(ChatMessage).filter(ChatMessage.conversation_id == conversation_id,
+                                         ChatMessage.user_id == user_id).order_by(ChatMessage.id).all()
+    return resp_success(data=query)
+

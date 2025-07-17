@@ -39,7 +39,7 @@ class ChatDBService:
             role_id=None,
             model=conversation.model,
             model_id=conversation.model_id,
-            type=MessageType.TEXT,
+            type=MessageType.USER,
             reply_id=None,
             content=content,
             use_context=True,
@@ -51,6 +51,28 @@ class ChatDBService:
         db.add(message)
         db.commit()
         return message
+
+    @staticmethod
+    def insert_ai_message(db: Session, conversation, user_id: int, content: str, model: str):
+        from datetime import datetime
+        from models.ai import MessageType
+        message = ChatMessage(
+            conversation_id=conversation.id,
+            user_id=user_id,
+            role_id=None,
+            model=model,
+            model_id=conversation.model_id,
+            type=MessageType.ASSISTANT,
+            reply_id=None,
+            content=content,
+            use_context=True,
+            segment_ids=None,
+            create_time=datetime.now(),
+            update_time=datetime.now(),
+            is_deleted=False
+        )
+        db.add(message)
+        db.commit()
 
     @staticmethod
     def get_history(db: Session, conversation_id: int) -> list[ChatMessage]:

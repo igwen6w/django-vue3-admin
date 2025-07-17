@@ -29,13 +29,34 @@ class PlatformChoices:
 
 # 消息类型选择类（示例）
 class MessageType:
-    TEXT = 'text'
-    IMAGE = 'image'
+    SYSTEM = "system"  # 系统指令
+    USER = "user"  # 用户消息
+    ASSISTANT = "assistant"  # 助手回复
+    FUNCTION = "function"  # 函数返回结果
 
     @staticmethod
     def choices():
-        return [('text', '文本'), ('image', '图片')]
+        """返回可用的消息角色选项"""
+        return [
+            (MessageType.SYSTEM, "系统"),
+            (MessageType.USER, "用户"),
+            (MessageType.ASSISTANT, "助手"),
+            (MessageType.FUNCTION, "函数")
+        ]
 
+
+class MessageContentType:
+    """消息内容类型"""
+    TEXT = "text"
+    FUNCTION_CALL = "function_call"
+
+    @staticmethod
+    def choices():
+        """返回可用的内容类型选项"""
+        return [
+            (MessageContentType.TEXT, "文本"),
+            (MessageContentType.FUNCTION_CALL, "函数调用")
+        ]
 
 # AI API 密钥表
 class AIApiKey(CoreModel):
