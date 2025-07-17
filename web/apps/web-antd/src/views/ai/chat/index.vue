@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
 
@@ -9,7 +9,7 @@ import {
   Input,
   InputSearch,
   List,
-  ListItemMeta,
+  ListItem,
   Row,
   Select,
 } from 'ant-design-vue';
@@ -52,7 +52,6 @@ const filteredChats = computed(() => {
   if (!search.value) return chatList.value;
   return chatList.value.filter((chat) => chat.title.includes(search.value));
 });
-
 // 直接用conversationId过滤
 const currentMessages = computed(() => {
   if (!selectedChatId.value) return [];
@@ -126,6 +125,28 @@ function scrollToBottom() {
     messagesRef.value.scrollTop = messagesRef.value.scrollHeight;
   }
 }
+
+// 获取历史对话
+async function fetchConversations() {
+  // 这里假设user_id为1，实际应从登录信息获取
+  const params = new URLSearchParams({ user_id: '1' });
+  const res = await fetch(`/chat/api/v1/conversations?${params.toString()}`);
+  const data = await res.json();
+  chatList.value = data.map((item: any) => ({
+    id: item.id,
+    title: item.title,
+    lastMessage: item.last_message || '',
+  }));
+  console.log(chatList.value, 'chatList');
+  // 默认选中第一个对话
+  if (chatList.value.length > 0) {
+    selectedChatId.value = chatList.value[0].id;
+  }
+}
+
+onMounted(() => {
+  fetchConversations();
+});
 </script>
 
 <template>
@@ -142,28 +163,34 @@ function scrollToBottom() {
             style="margin: 12px 0 8px 0"
           />
         </div>
-        <List style="flex: 1; overflow-y: auto; padding-bottom: 12px">
-          <template #default>
-            <ListItemMeta
-              v-for="item in filteredChats"
-              :key="item.id"
-              class="chat-list-item"
-              :class="[{ selected: item.id === selectedChatId }]"
-              @click="selectChat(item.id)"
-            >
-              <ListItemMeta>
-                <template #title>
-                  <span class="chat-title" :title="item.title">{{
-                    item.title
-                  }}</span>
-                </template>
-                <template #description>
-                  <span class="chat-desc">{{ item.lastMessage }}</span>
-                </template>
-              </ListItemMeta>
-            </ListItemMeta>
-          </template>
-        </List>
+        <div class="chat-list">
+          <List style="flex: 1; overflow-y: auto; padding-bottom: 12px">
+            <template #default>
+              <ListItem
+                v-for="item in filteredChats"
+                :key="item.id"
+                class="chat-list-item"
+                :class="[{ selected: item.id === selectedChatId }]"
+                @click="selectChat(item.id)"
+              >
+                <div class="chat-item-avatar">
+                  <!-- 可用头像或首字母 -->
+                  <span class="avatar-text">{{ item.title.slice(0, 1) }}</span>
+                </div>
+                <div class="chat-item-content">
+                  <div class="chat-item-title-row">
+                    <span class="chat-title" :title="item.title">{{
+                      item.title
+                    }}</span>
+                    <!-- 未读角标（如有未读可加） -->
+                    <!-- <span class="unread-dot"></span> -->
+                  </div>
+                  <div class="chat-desc">{{ item.lastMessage }}</div>
+                </div>
+              </ListItem>
+            </template>
+          </List>
+        </div>
       </Col>
       <!-- 右侧聊天区 -->
       <Col :span="18" class="chat-content">
@@ -375,5 +402,96 @@ function scrollToBottom() {
   100% {
     opacity: 0;
   }
+}
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.chat-list-item.selected {
+  background: #e6f7ff;
+  box-shadow: 0 2px 8px #1677ff22;
+  border: 1.5px solid #1677ff;
+}
+.chat-list-item:hover {
+  background: #f0f5ff;
+  box-shadow: 0 2px 8px #1677ff11;
+}
+.chat-item-avatar {
+  width: 36px;
+  height: 36px;
+  background: #1677ff22;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 18px;
+  color: #1677ff;
+  font-weight: bold;
+}
+.avatar-text {
+  user-select: none;
+}
+.chat-item-content {
+  flex: 1;
+  min-width: 0;
+}
+.chat-item-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.chat-title {
+  font-weight: 500;
+  font-size: 15px;
+  max-width: 140px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ff4d4f;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+.chat-desc {
+  color: #888;
+  font-size: 12px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.chat-sider {
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #eee;
+  padding: 16px 8px 8px 8px;
+  height: 100%; /* 关键：让侧边栏高度100% */
+  min-width: 220px;
+}
+
+.sider-header {
+  margin-bottom: 8px;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto; /* 只在对话列表区滚动 */
+  min-height: 0;    /* 关键：flex子项内滚动时必须加 */
+  max-height: calc(100vh - 120px); /* 可根据实际header/footer高度调整 */
 }
 </style>
