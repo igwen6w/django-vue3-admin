@@ -103,7 +103,7 @@ services:
       - db
       - redis
     networks:
-      - dj_admin_network
+      - app_net
     env_file:
       - ./docker/.env.dev
       - ./docker/.env.local
