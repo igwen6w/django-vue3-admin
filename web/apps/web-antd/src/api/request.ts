@@ -16,6 +16,7 @@ import { useAccessStore } from '@vben/stores';
 import { message } from 'ant-design-vue';
 
 import { useAuthStore } from '#/store';
+import { formatToken } from '#/utils/auth';
 
 import { refreshTokenApi } from './core';
 
@@ -54,10 +55,6 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     const newToken = resp.data;
     accessStore.setAccessToken(newToken);
     return newToken;
-  }
-
-  function formatToken(token: null | string) {
-    return token ? `Bearer ${token}` : null;
   }
 
   // 请求头处理

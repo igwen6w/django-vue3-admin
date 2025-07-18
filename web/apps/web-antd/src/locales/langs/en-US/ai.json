@@ -1,6 +1,6 @@
 {
   "title": "AI Management",
-  "ai_api_key": {
+  "api_key": {
     "title": "KEY Management",
     "name": "KEY Management"
   },
@@ -15,5 +15,17 @@
   "knowledge": {
     "title": "KNOWLEDGE Management",
     "name": "KNOWLEDGE Management"
+  },
+  "chat": {
+    "title": "AI CHAT",
+    "name": "AI CHAT"
+  },
+  "chat_conversation": {
+    "title": "CHAT Management",
+    "name": "CHAT Management"
+  },
+  "chat_message": {
+    "title": "MESSAGE Management",
+    "name": "MESSAGE Management"
   }
 }

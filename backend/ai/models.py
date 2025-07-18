@@ -258,6 +258,7 @@ class ChatConversation(CoreModel):
     model_id = models.ForeignKey(
         'AIModel',
         on_delete=models.CASCADE,
+        null=True, blank=True,
         db_column='model_id',
         verbose_name="向量模型编号",
         db_comment='向量模型编号'
@@ -302,6 +303,7 @@ class ChatMessage(CoreModel):
     model_id = models.ForeignKey(
         'AIModel',
         on_delete=models.CASCADE,
+        null=True, blank=True,
         db_column='model_id',
         verbose_name="向量模型编号",
         db_comment='向量模型编号'

@@ -4,10 +4,13 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'ai_api_key', views.AIApiKeyViewSet)
+router.register(r'api_key', views.AIApiKeyViewSet)
 router.register(r'ai_model', views.AIModelViewSet)
 router.register(r'tool', views.ToolViewSet)
 router.register(r'knowledge', views.KnowledgeViewSet)
+router.register(r'chat_conversation', views.ChatConversationViewSet)
+router.register(r'chat_message', views.ChatMessageViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
