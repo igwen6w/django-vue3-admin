@@ -8,6 +8,8 @@ router.register(r'ai_api_key', views.AIApiKeyViewSet)
 router.register(r'ai_model', views.AIModelViewSet)
 router.register(r'tool', views.ToolViewSet)
 router.register(r'knowledge', views.KnowledgeViewSet)
+router.register(r'chat_conversation', views.ChatConversationViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),

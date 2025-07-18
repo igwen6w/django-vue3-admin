@@ -151,7 +151,7 @@ export function useColumns(
       cellRender: {
         attrs: {
           nameField: 'name',
-          nameTitle: $t('ai.ai_api_key.name'),
+          nameTitle: $t('ai.api_key.name'),
           onClick: onActionClick,
         },
         name: 'CellOperation',

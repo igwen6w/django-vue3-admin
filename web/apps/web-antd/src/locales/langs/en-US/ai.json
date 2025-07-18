@@ -19,5 +19,9 @@
   "chat": {
     "title": "AI CHAT",
     "name": "AI CHAT"
+  },
+  "chat_conversation": {
+    "title": "CHAT Management",
+    "name": "CHAT Management"
   }
 }
