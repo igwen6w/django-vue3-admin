@@ -133,7 +133,7 @@ function refreshGrid() {
           v-permission="'ai:ai_api_key:create'"
         >
           <Plus class="size-5" />
-          {{ $t('ui.actionTitle.create', [$t('ai.api_key.name')]) }}
+          {{ $t('ui.actionTitle.create') }}
         </Button>
       </template>
     </Grid>

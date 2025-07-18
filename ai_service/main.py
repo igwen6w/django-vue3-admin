@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # 注册路由
-app.include_router(ai_chat.router, prefix="/chat/api/v1", tags=["chat"])
+app.include_router(ai_chat.router, prefix="/api/ai/v1", tags=["chat"])
 
 # 健康检查
 @app.get("/ping")

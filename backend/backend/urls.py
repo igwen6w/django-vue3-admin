@@ -19,8 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
-    path('api/system/', include('system.urls')),
-    path('api/ai/', include('ai.urls')),
+    path('api/admin/system/', include('system.urls')),
+    path('api/admin/ai/', include('ai.urls')),
 ]
 
 # 演示环境下禁用 admin 路由

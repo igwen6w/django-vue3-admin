@@ -9,6 +9,7 @@ export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   // 这样获取，提供默认值
   const backendUrl = env.VITE_BACKEND_URL || 'http://localhost:8000';
+  const aiUrl = env.VITE_AI_URL || 'http://localhost:8010';
 
   // 判断是否为构建模式
   const isBuild = mode === 'production';
@@ -22,11 +23,11 @@ export default defineConfig(async ({ mode }) => {
         host: '0.0.0.0', // 保证 docker 内外都能访问
         port: 5678,
         proxy: {
-          '/chat': {
-            target: 'http://localhost:8010',
+          '/api/ai': {
+            target: aiUrl,
             changeOrigin: true,
           },
-          '/api': {
+          '/api/admin': {
             target: backendUrl,
             changeOrigin: true,
           },

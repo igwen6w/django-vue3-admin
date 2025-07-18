@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'rest_framework.authtoken',
-    'channels',
+    # 'channels',
     "system",
     "ai",
 ]
@@ -104,7 +104,6 @@ DATABASES = {
         'USER': os.getenv('DB_USER', 'chenze'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'my-secret-pw'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        # 'HOST': 'localhost',
     }
 }
 
@@ -236,11 +235,11 @@ ASGI_APPLICATION = 'backend.asgi.application'
 
 
 # 简单用内存通道层
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
-    }
-}
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer'
+#     }
+# }
 
 if os.path.exists(os.path.join(BASE_DIR, 'backend/local_settings.py')):
     from backend.local_settings import *

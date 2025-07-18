@@ -20,6 +20,6 @@ export namespace AiAIApiKeyApi {
 
 export class AiAIApiKeyModel extends BaseModel<AiAIApiKeyApi.AiAIApiKey> {
   constructor() {
-    super('/ai/ai_api_key/');
+    super('/ai/api_key/');
   }
 }
