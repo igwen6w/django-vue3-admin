@@ -12,5 +12,5 @@ class Response(BaseModel, Generic[T]):
 def resp_success(data: T, message: str = "success") -> Response[T]:
     return Response(code=0, message=message, data=data)
 
-def resp_error(message="error", code=1) -> Response[None]:
+def resp_error(message="error", code=1) -> Response[T]:
     return Response(code=code, message=message, data=None)

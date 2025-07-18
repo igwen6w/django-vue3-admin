@@ -5,9 +5,12 @@ from models.ai import ChatConversation, ChatMessage, MessageType
 
 class ChatDBService:
     @staticmethod
+    def get_conversation(db: Session, conversation_id: int):
+        return db.query(ChatConversation).filter(ChatConversation.id == conversation_id).first()
+
+    @staticmethod
     def get_or_create_conversation(db: Session, conversation_id: int | None, user_id: int, model: str, content: str) -> ChatConversation:
         if not conversation_id:
-            print(conversation_id, 'conversation_id')
             conversation = ChatConversation(
                 title=content,
                 user_id=user_id,
@@ -31,6 +34,17 @@ class ChatDBService:
             if not conversation:
                 raise ValueError("无效的conversation_id")
             return conversation
+
+    @staticmethod
+    def update_conversation_title(db, conversation_id: int, title: str):
+        conversation = db.query(ChatConversation).filter(ChatConversation.id == conversation_id).first()
+        if conversation:
+            conversation.title = title[:255]  # 保证不超过255字符
+            db.add(conversation)
+            db.commit()
+            return conversation
+        else:
+            raise ValueError("Conversation not found")
 
     @staticmethod
     def add_message(db: Session, conversation: ChatConversation, user_id: int, content: str) -> ChatMessage:

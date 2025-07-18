@@ -4,26 +4,19 @@ from fastapi import APIRouter, Depends, Request, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
 
 from pydantic import BaseModel, SecretStr
 from langchain.chains import ConversationChain
-from langchain_community.chat_models import ChatOpenAI
 
-from api.v1.vo import MessageVO, ConversationsVO
+from api.v1.vo import MessageVO
 from deps.auth import get_current_user
 from services.chat_service import ChatDBService
 from db.session import get_db
-from models.ai import ChatConversation, ChatMessage, MessageType
+from models.ai import ChatConversation, ChatMessage
 from utils.resp import resp_success, Response
 from langchain_deepseek import ChatDeepSeek
 
 router = APIRouter()
-
-class ChatRequest(BaseModel):
-    prompt: str
-
-
 
 def get_deepseek_llm(api_key: SecretStr, model: str):
     # deepseek 兼容 OpenAI API，需指定 base_url
@@ -38,26 +31,22 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     body = await request.json()
     content = body.get('content')
     conversation_id = body.get('conversation_id')
-    print(content, 'content')
     model = 'deepseek-chat'
     api_key = os.getenv("DEEPSEEK_API_KEY")
-    openai_api_base = "https://api.deepseek.com/v1"
-    llm = get_deepseek_llm(api_key, model)
+    llm = get_deepseek_llm(SecretStr(api_key), model)
 
     if not content or not isinstance(content, str):
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": "content不能为空"}, status_code=400)
 
     user_id = user["user_id"]
-    print(conversation_id, 'conversation_id')
-    # 1. 获取或新建对话
+    # 1. 获取对话
     try:
-        conversation = ChatDBService.get_or_create_conversation(db, conversation_id, user_id, model, content)
+        conversation = ChatDBService.get_conversation(db, conversation_id)
+        conversation = db.merge(conversation)  # ✅ 防止 DetachedInstanceError
     except ValueError as e:
-        print(23232)
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": str(e)}, status_code=400)
-    print(conversation, 'dsds')
     # 2. 插入当前消息
     ChatDBService.add_message(db, conversation, user_id, content)
     context = [
@@ -65,13 +54,16 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     ]
     # 3. 查询历史消息，组装上下文
     history = ChatDBService.get_history(db, conversation.id)
+    # === 新增：如果只有一条消息，更新 title ===
+    if len(history) == 1:
+        ChatDBService.update_conversation_title(db, conversation.id, content[:255])
+
     for msg in history:
         # 假设 msg.type 存储的是 'user' 或 'assistant'
         # role = msg.type if msg.type in ("user", "assistant") else "user"
         context.append((msg.type, msg.content))
-    print('context', context)
-    ai_reply = ""
 
+    ai_reply = ""
     async def event_generator():
         nonlocal ai_reply
         async for chunk in llm.astream(context):
@@ -88,6 +80,13 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
 
     return StreamingResponse(event_generator(), media_type='text/event-stream')
 
+@router.post("/conversations")
+def create_conversation(db: Session = Depends(get_db), user=Depends(get_current_user),):
+    user_id = user["user_id"]
+    model = 'deepseek-chat'
+    conversation = ChatDBService.get_or_create_conversation(db, None, user_id, model, '新对话')
+    return resp_success(data=conversation.id)
+    
 @router.get('/conversations')
 async def get_conversations(
     db: Session = Depends(get_db),

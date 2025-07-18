@@ -14,16 +14,21 @@ import {
   Select,
 } from 'ant-design-vue';
 
-import { fetchAIStream, getConversations, getMessages } from '#/api/ai/chat';
+import {
+  createConversation,
+  fetchAIStream,
+  getConversations,
+  getMessages,
+} from '#/api/ai/chat';
 
 interface Message {
-  id: null | number;
+  id: number;
   type: 'assistant' | 'user';
   content: string;
 }
 
 interface ChatItem {
-  id: null | number;
+  id: number;
   title: string;
   lastMessage: string;
 }
@@ -60,14 +65,13 @@ async function selectChat(id: number) {
   nextTick(scrollToBottom);
 }
 
-function handleNewChat() {
-  const newId = null;
-  chatList.value.unshift({
-    id: newId,
-    title: `新对话${chatList.value.length + 1}`,
-    lastMessage: '',
-  });
-  selectedChatId.value = newId;
+async function handleNewChat() {
+  // 调用后端新建对话
+  const { data } = await createConversation();
+  // 刷新对话列表
+  await fetchConversations();
+  // 选中新建的对话
+  selectedChatId.value = data;
   messages.value = [];
   nextTick(scrollToBottom);
 }
@@ -195,7 +199,7 @@ onMounted(() => {
             />
           </div>
         </div>
-        <div class="chat-messages" style="height: 100%;" ref="messagesRef">
+        <div class="chat-messages" style="height: 100%" ref="messagesRef">
           <div
             v-for="msg in messages"
             :key="msg.id"

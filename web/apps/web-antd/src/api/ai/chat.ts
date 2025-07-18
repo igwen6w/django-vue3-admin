@@ -5,6 +5,16 @@ export async function getConversations() {
   return await res.json();
 }
 
+export async function createConversation() {
+  const response = await fetchWithAuth('/chat/api/v1/conversations', {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw new Error('创建对话失败');
+  }
+  return await response.json();
+}
+
 export async function getMessages(conversationId: number) {
   const res = await fetchWithAuth(
     `/chat/api/v1/messages?conversation_id=${conversationId}`,
