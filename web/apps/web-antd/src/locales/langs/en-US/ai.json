@@ -23,5 +23,9 @@
   "chat_conversation": {
     "title": "CHAT Management",
     "name": "CHAT Management"
+  },
+  "chat_message": {
+    "title": "MESSAGE Management",
+    "name": "MESSAGE Management"
   }
 }

@@ -6,8 +6,8 @@ import type { AiChatConversationApi } from '#/models/ai/chat_conversation';
 
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
-import { format_datetime } from '#/utils/date';
-import { op } from '#/utils/permission';
+// import { format_datetime } from '#/utils/date';
+// import { op } from '#/utils/permission';
 
 /**
  * 获取编辑表单的字段配置
@@ -139,6 +139,10 @@ export function useColumns(
       title: 'ID',
     },
     {
+      field: 'title',
+      title: '标题',
+    },
+    {
       field: 'username',
       title: '用户',
     },
@@ -168,6 +172,10 @@ export function useColumns(
         },
         name: 'CellOperation',
         options: [
+          {
+            code: 'view',
+            text: '查看消息',
+          },
           // op('ai:chat_conversation:edit', 'edit'),
           // op('ai:chat_conversation:delete', 'delete'),
         ],

@@ -23,5 +23,9 @@
   "chat_conversation": {
     "title": "对话列表",
     "name": "对话列表"
+  },
+  "chat_message": {
+    "title": "消息列表",
+    "name": "消息列表"
   }
 }

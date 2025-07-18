@@ -3,22 +3,23 @@ import type {
   OnActionClickParams,
   VxeTableGridOptions,
 } from '#/adapter/vxe-table';
-import type { AiChatConversationApi } from '#/models/ai/chat_conversation';
+import type { AiChatMessageApi } from '#/models/ai/chat_message';
 
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { AiChatConversationModel } from '#/models/ai/chat_conversation';
+import { AiChatMessageModel } from '#/models/ai/chat_message';
 
 import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 
-const formModel = new AiChatConversationModel();
-const router = useRouter();
+const route = useRoute();
+
+const formModel = new AiChatMessageModel();
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
@@ -26,18 +27,18 @@ const [FormModal, formModalApi] = useVbenModal({
 });
 
 /**
- * 编辑AI 聊天对话
+ * 编辑AI 聊天消息
  */
-function onEdit(row: AiChatConversationApi.AiChatConversation) {
+function onEdit(row: AiChatMessageApi.AiChatMessage) {
   formModalApi.setData(row).open();
 }
 
 /**
- * 删除AI 聊天对话
+ * 删除AI 聊天消息
  */
-function onDelete(row: AiChatConversationApi.AiChatConversation) {
+function onDelete(row: AiChatMessageApi.AiChatMessage) {
   const hideLoading = message.loading({
-    content: '删除AI 聊天对话',
+    content: '删除AI 聊天消息',
     duration: 0,
     key: 'action_process_msg',
   });
@@ -61,7 +62,7 @@ function onDelete(row: AiChatConversationApi.AiChatConversation) {
 function onActionClick({
   code,
   row,
-}: OnActionClickParams<AiChatConversationApi.AiChatConversation>) {
+}: OnActionClickParams<AiChatMessageApi.AiChatMessage>) {
   switch (code) {
     case 'delete': {
       onDelete(row);
@@ -71,19 +72,9 @@ function onActionClick({
       onEdit(row);
       break;
     }
-    case 'view': {
-      handleMessageDetail(row);
-      break;
-    }
   }
 }
 
-const handleMessageDetail = (row: AiChatConversationApi.AiChatConversation) => {
-  router.push({
-    path: '/ai/chat_message/', // 目标页面路径
-    query: { conversation_id: row.id }, // 传递查询参数
-  });
-};
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
@@ -100,9 +91,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
+          const { conversation_id } = route.query;
           return await formModel.list({
             page: page.currentPage,
             pageSize: page.pageSize,
+            conversation_id,
             ...formValues,
           });
         },
@@ -129,6 +122,6 @@ function refreshGrid() {
 <template>
   <Page auto-content-height>
     <FormModal @success="refreshGrid" />
-    <Grid table-title="AI 聊天对话" />
+    <Grid table-title="AI 聊天消息" />
   </Page>
 </template>

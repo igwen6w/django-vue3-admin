@@ -9,6 +9,7 @@ router.register(r'ai_model', views.AIModelViewSet)
 router.register(r'tool', views.ToolViewSet)
 router.register(r'knowledge', views.KnowledgeViewSet)
 router.register(r'chat_conversation', views.ChatConversationViewSet)
+router.register(r'chat_message', views.ChatMessageViewSet)
 
 
 urlpatterns = [
