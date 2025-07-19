@@ -2,6 +2,8 @@
 
 本项目为基于 Django5 + Vue3（vben-admin）全栈开发的企业级中后台管理系统，支持动态菜单、按钮权限、自动化代码生成、前后端权限联动等功能，适用于多角色、多权限场景的管理后台。
 
+新增 ai_service 子项目，基于 FastAPI 实现，集成了 AI 对话能力，支持接入 DeepSeek 等大模型，实现智能对话、知识问答等功能，可灵活扩展多种 AI 场景。
+
 ## 在线体验
 
 - admin/admin123  
@@ -14,6 +16,9 @@
 ## 功能截图
 
 <table>
+ <tr>
+    <td><strong>AI对话</strong><br><img src="images/ai_chat.png" alt="AI对话" width="400"></td>
+  </tr>
   <tr>
     <td><strong>部门管理</strong><br><img src="images/dj_dept.png" alt="部门管理" width="400"></td>
     <td><strong>用户管理</strong><br><img src="images/dj_user.png" alt="用户管理" width="400"></td>
@@ -118,6 +123,44 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 ---
 
 
+# ai_service 启动说明
+
+ai_service 是基于 FastAPI 的 AI 服务模块，支持本地开发和生产部署。
+
+## 依赖安装
+
+1. 进入 ai_service 目录：
+   ```bash
+   cd ai_service
+   ```
+2. 安装依赖：
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## 配置说明
+
+- 数据库、API Key、模型等配置请参考 `ai_service/config.py`，`.env`  或相关环境变量。
+- 如需自定义数据库等参数，请根据实际情况修改配置文件。
+
+## 本地开发启动（推荐 uvicorn）
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8010
+```
+- `--reload`：支持热重载，开发环境建议开启。
+- 默认访问地址：http://localhost:8010/docs 可查看自动生成的 API 文档。
+
+## 生产部署（推荐 gunicorn + uvicorn worker）
+
+```bash
+gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8010 --workers 4
+```
+- `--workers`：根据服务器 CPU 核心数调整。
+- 生产环境建议关闭 `--reload`。
+
+---
+
 ## 前端启动（以 web-antd 为例）
 
 > 说明：web-ele 目前暂不支持，待 InputPassword 等组件开发完毕后再兼容。
@@ -129,12 +172,10 @@ celery -A backend flower --port=5555 --basic_auth=admin:admin123
 2. 安装依赖：
    ```bash
    pnpm install
-   # 或 npm install / yarn install
    ```
 3. 启动开发服务：
    ```bash
-   pnpm dev
-   # 或 npm run dev / yarn dev
+   npm run dev:antd
    ```
 
 
