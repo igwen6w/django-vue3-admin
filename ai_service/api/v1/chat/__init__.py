@@ -8,7 +8,7 @@ from typing import List
 from pydantic import BaseModel, SecretStr
 from langchain.chains import ConversationChain
 
-from api.v1.vo import MessageVO
+from api.v1.chat.vo import MessageVO
 from deps.auth import get_current_user
 from services.chat_service import ChatDBService
 from db.session import get_db
@@ -16,7 +16,7 @@ from models.ai import ChatConversation, ChatMessage
 from utils.resp import resp_success, Response
 from langchain_deepseek import ChatDeepSeek
 
-router = APIRouter()
+router = APIRouter(prefix="/chat", tags=["chat"])
 
 def get_deepseek_llm(api_key: SecretStr, model: str):
     # deepseek 兼容 OpenAI API，需指定 base_url

@@ -1,12 +1,12 @@
 import { fetchWithAuth } from '#/utils/fetch-with-auth';
 
 export async function getConversations() {
-  const res = await fetchWithAuth('/api/ai/v1/conversations');
+  const res = await fetchWithAuth('chat/conversations');
   return await res.json();
 }
 
 export async function createConversation() {
-  const response = await fetchWithAuth('/api/ai/v1/conversations', {
+  const response = await fetchWithAuth('chat/conversations', {
     method: 'POST',
   });
   if (!response.ok) {
@@ -17,7 +17,7 @@ export async function createConversation() {
 
 export async function getMessages(conversationId: number) {
   const res = await fetchWithAuth(
-    `/api/ai/v1/messages?conversation_id=${conversationId}`,
+    `chat/messages?conversation_id=${conversationId}`,
   );
   return await res.json();
 }
@@ -32,7 +32,7 @@ export async function fetchAIStream({
   content,
   conversation_id,
 }: FetchAIStreamParams) {
-  const res = await fetchWithAuth('/api/ai/v1/stream', {
+  const res = await fetchWithAuth('chat/stream', {
     method: 'POST',
     body: JSON.stringify({ content, conversation_id }),
   });

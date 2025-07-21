@@ -23,24 +23,20 @@ class TongYiAdapter(MultiModalAICapability):
         async for chunk in self.llm.astream(messages):
             yield chunk
 
-    @staticmethod
-    def create_image_task(api_key, model, prompt: str, style='<watercolor>', size='1024*1024', n=1):
+    def create_drawing_task(self, prompt: str, style='watercolor', size='1024*1024', n=1, **kwargs):
+        print(self.model, self.api_key, 'key')
         """创建异步图片生成任务"""
         rsp = ImageSynthesis.async_call(
-            api_key=api_key,
-            model=model,
+            api_key=self.api_key,
+            model=self.model,
             prompt=prompt,
             n=n,
-            style=style,
+            style=f'<{style}>',
             size=size
         )
-        if rsp.status_code == HTTPStatus.OK:
-            return rsp
-        else:
-            raise Exception(f"Failed, status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}")
+        print(rsp, 'rsp')
 
-    @staticmethod
-    def fetch_image_task_status(task):
+    def fetch_drawing_task_status(self, task):
         """获取异步图片任务状态"""
         status = ImageSynthesis.fetch(task)
         if status.status_code == HTTPStatus.OK:

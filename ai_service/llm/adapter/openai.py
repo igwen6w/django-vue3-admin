@@ -15,7 +15,7 @@ class OpenAIAdapter(MultiModalAICapability):
             yield chunk
 
     # 如需图片生成（DALL·E），可实现如下
-    def create_image_task(self, prompt, **kwargs):
+    def create_drawing_task(self, **kwargs):
         # 伪代码，需用 openai.Image.create
         # import openai
         # response = openai.Image.create(api_key=self.api_key, prompt=prompt, ...)

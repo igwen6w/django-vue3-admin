@@ -332,7 +332,7 @@ class ChatMessage(CoreModel):
         return self.content[:30]
 
 
-class Image(CoreModel):
+class Drawing(CoreModel):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -359,6 +359,6 @@ class Image(CoreModel):
     buttons = models.CharField(max_length=2048, null=True, verbose_name='mj buttons 按钮')
 
     class Meta:
-        db_table = 'ai_image'
+        db_table = 'ai_drawing'
         verbose_name = 'AI 绘画表'
         verbose_name_plural = verbose_name

@@ -9,14 +9,14 @@ class MultiModalAICapability(ABC):
         raise NotImplementedError("stream_chat not supported by this provider")
 
     # 图片生成能力
-    def create_image_task(self, prompt, **kwargs):
-        raise NotImplementedError("image generation not supported by this provider")
+    def create_drawing_task(self, prompt: str, style='watercolor', size='1024*1024', n=1, **kwargs):
+        raise NotImplementedError("drawing generation not supported by this provider")
 
-    def fetch_image_task_status(self, task):
-        raise NotImplementedError("image task status not supported by this provider")
+    def fetch_drawing_task_status(self, task):
+        raise NotImplementedError("drawing task status not supported by this provider")
 
-    def fetch_image_result(self, task):
-        raise NotImplementedError("image result not supported by this provider")
+    def fetch_drawing_result(self, task):
+        raise NotImplementedError("drawing result not supported by this provider")
 
     # 视频生成能力
     def create_video_task(self, prompt, **kwargs):

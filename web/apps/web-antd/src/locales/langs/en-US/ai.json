@@ -20,6 +20,10 @@
     "title": "AI CHAT",
     "name": "AI CHAT"
   },
+  "drawing": {
+    "title": "AI DRAWING",
+    "name": "AI DRAWING"
+  },
   "chat_conversation": {
     "title": "CHAT Management",
     "name": "CHAT Management"

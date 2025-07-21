@@ -253,8 +253,8 @@ class ChatRoleTool(Base):
     tool_id = Column(Integer, ForeignKey('ai_tool.id'), primary_key=True)
 
 
-class Image(CoreModel):
-    __tablename__ = 'ai_image'
+class Drawing(CoreModel):
+    __tablename__ = 'ai_drawing'
 
     user_id = Column(Integer, ForeignKey('system_users.id'), nullable=True)
     public_status = Column(Boolean, default=False, nullable=False)
