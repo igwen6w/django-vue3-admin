@@ -7,3 +7,4 @@ langchain-community==0.3.26
 PyMySQL==1.1.1
 SQLAlchemy==2.0.41
 gunicorn==23.0.0
+dashscope==1.23.8
