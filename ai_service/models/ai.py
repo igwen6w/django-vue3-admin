@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Text, DateTime, Boolean, Float, ForeignKey
+    Column, Integer, String, Text, DateTime, Boolean, Float, ForeignKey, JSON
 )
 from sqlalchemy.orm import relationship, declarative_base
 
@@ -251,3 +251,30 @@ class ChatRoleTool(Base):
 
     chat_role_id = Column(Integer, ForeignKey('ai_chat_role.id'), primary_key=True)
     tool_id = Column(Integer, ForeignKey('ai_tool.id'), primary_key=True)
+
+
+class Image(CoreModel):
+    __tablename__ = 'ai_image'
+
+    user_id = Column(Integer, ForeignKey('system_users.id'), nullable=True)
+    public_status = Column(Boolean, default=False, nullable=False)
+
+    platform = Column(String(64), nullable=False)
+    model = Column(String(64), nullable=False)
+
+    prompt = Column(Text(length=2000), nullable=False)
+    width = Column(Integer, nullable=False)
+    height = Column(Integer, nullable=False)
+    options = Column(JSON, nullable=True)
+
+    status = Column(String(20), nullable=False)
+    pic_url = Column(String(2048), nullable=True)
+    error_message = Column(String(1024), nullable=True)
+
+    task_id = Column(String(1024), nullable=True)
+    buttons = Column(String(2048), nullable=True)
+
+    user = relationship("DjangoUser", backref="images")
+
+    def __str__(self):
+        return f"Image #{self.id} ({self.prompt[:30]})"

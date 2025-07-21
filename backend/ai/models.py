@@ -330,3 +330,35 @@ class ChatMessage(CoreModel):
 
     def __str__(self):
         return self.content[:30]
+
+
+class Image(CoreModel):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="用户",
+        db_comment="用户编号"
+    )
+    public_status = models.BooleanField(default=False, verbose_name='是否发布')
+
+    platform = models.CharField(max_length=64, verbose_name='平台')
+    model = models.CharField(max_length=64, verbose_name='模型')
+
+    prompt = models.TextField(max_length=2000, verbose_name='提示词')
+    width = models.IntegerField(verbose_name='图片宽度')
+    height = models.IntegerField(verbose_name='图片高度')
+    options = models.JSONField(null=True, verbose_name='绘制参数')
+
+    status = models.CharField(max_length=20, verbose_name='绘画状态')
+    pic_url = models.URLField(max_length=2048, null=True, verbose_name='图片地址')
+    error_message = models.CharField(max_length=1024, null=True, verbose_name='错误信息')
+
+    task_id = models.CharField(max_length=1024, null=True, verbose_name='任务编号')
+    buttons = models.CharField(max_length=2048, null=True, verbose_name='mj buttons 按钮')
+
+    class Meta:
+        db_table = 'ai_image'
+        verbose_name = 'AI 绘画表'
+        verbose_name_plural = verbose_name
