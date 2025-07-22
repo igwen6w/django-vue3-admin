@@ -10,6 +10,7 @@ from langchain.chains import ConversationChain
 
 from api.v1.chat.vo import MessageVO
 from deps.auth import get_current_user
+from llm.factory import get_adapter
 from services.chat_service import ChatDBService
 from db.session import get_db
 from models.ai import ChatConversation, ChatMessage
@@ -31,9 +32,16 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     body = await request.json()
     content = body.get('content')
     conversation_id = body.get('conversation_id')
-    model = 'deepseek-chat'
-    api_key = os.getenv("DEEPSEEK_API_KEY")
-    llm = get_deepseek_llm(SecretStr(api_key), model)
+    platform = body.get('platform')
+    # 未来改从配置文件中获取
+    if platform == 'tongyi':
+        model = 'qwen-plus'
+        api_key = os.getenv("DASHSCOPE_API_KEY")
+    else:
+        # 默认使用 DeepSeek
+        model = 'deepseek-chat'
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+    llm = get_adapter(platform, api_key=api_key, model=model)
 
     if not content or not isinstance(content, str):
         from fastapi.responses import JSONResponse
@@ -50,7 +58,7 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     # 2. 插入当前消息
     ChatDBService.add_message(db, conversation, user_id, content)
     context = [
-        ("system", "You are a helpful assistant. Answer all questions to the best of your ability in {language}.")
+        ("system", "You are a helpful assistant")
     ]
     # 3. 查询历史消息，组装上下文
     history = ChatDBService.get_history(db, conversation.id)
@@ -66,7 +74,7 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     ai_reply = ""
     async def event_generator():
         nonlocal ai_reply
-        async for chunk in llm.astream(context):
+        async for chunk in llm.stream_chat(context):
             if hasattr(chunk, 'content'):
                 ai_reply += chunk.content
                 yield f"data: {chunk.content}\n\n"
@@ -81,9 +89,15 @@ async def chat_stream(request: Request, user=Depends(get_current_user), db: Sess
     return StreamingResponse(event_generator(), media_type='text/event-stream')
 
 @router.post("/conversations")
-def create_conversation(db: Session = Depends(get_db), user=Depends(get_current_user),):
+async def create_conversation(request: Request, db: Session = Depends(get_db), user=Depends(get_current_user),):
+    body = await request.json()
+    platform = body.get('platform')
+    if platform == 'tongyi':
+        model = 'qwen-plus'
+    else:
+        # 默认使用 DeepSeek
+        model = 'deepseek-chat'
     user_id = user["user_id"]
-    model = 'deepseek-chat'
     conversation = ChatDBService.get_or_create_conversation(db, None, user_id, model, '新对话')
     return resp_success(data=conversation.id)
     

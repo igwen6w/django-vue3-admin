@@ -40,13 +40,13 @@ const chatList = ref<ChatItem[]>([]);
 const messages = ref<Message[]>([]);
 
 // 模型列表
-const modelOptions = [
+const platformOptions = [
   { label: 'deepseek', value: 'deepseek' },
-  { label: 'GPT-4', value: 'gpt-4' },
+  { label: '通义千问', value: 'tongyi' },
 ];
 
 const selectedChatId = ref<null | number>(chatList.value[0]?.id ?? null);
-const selectedModel = ref(modelOptions[0]?.value);
+const selectedPlatform = ref(platformOptions[0]?.value);
 const search = ref('');
 const input = ref('');
 const messagesRef = ref<HTMLElement | null>(null);
@@ -67,7 +67,7 @@ async function selectChat(id: number) {
 
 async function handleNewChat() {
   // 调用后端新建对话
-  const { data } = await createConversation();
+  const { data } = await createConversation(selectedPlatform.value!);
   // 刷新对话列表
   await fetchConversations();
   // 选中新建的对话
@@ -97,6 +97,7 @@ async function handleSend() {
 
   const stream = await fetchAIStream({
     content: input.value,
+    platform: selectedPlatform.value,
     conversation_id: selectedChatId.value, // 新增
   });
   if (chatList.value.length > 0) {
@@ -192,10 +193,10 @@ onMounted(() => {
         <div class="content-header">
           <div class="model-select-wrap">
             <Select
-              v-model:value="selectedModel"
+              v-model:value="selectedPlatform"
               style="width: 220px"
-              :options="modelOptions"
-              placeholder="选择AI模型"
+              :options="platformOptions"
+              placeholder="选择平台"
             />
           </div>
         </div>

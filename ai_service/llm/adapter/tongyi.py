@@ -1,4 +1,4 @@
-from langchain_deepseek import ChatDeepSeek
+from langchain_community.chat_models import ChatTongyi
 from http import HTTPStatus
 from urllib.parse import urlparse, unquote
 from pathlib import PurePosixPath
@@ -13,7 +13,7 @@ class TongYiAdapter(MultiModalAICapability):
     def __init__(self, api_key, model, **kwargs):
         self.api_key = api_key
         self.model = model
-        self.llm = ChatDeepSeek(api_key=api_key, model=model, streaming=True)
+        self.llm = ChatTongyi(api_key=api_key, model=model, streaming=True)
 
     async def chat(self, messages, **kwargs):
         # 兼容 DeepSeek 的调用方式

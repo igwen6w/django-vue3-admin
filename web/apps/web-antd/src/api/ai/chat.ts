@@ -5,9 +5,10 @@ export async function getConversations() {
   return await res.json();
 }
 
-export async function createConversation() {
+export async function createConversation(platform: string) {
   const response = await fetchWithAuth('chat/conversations', {
     method: 'POST',
+    body: JSON.stringify({ platform }),
   });
   if (!response.ok) {
     throw new Error('创建对话失败');
@@ -25,16 +26,18 @@ export async function getMessages(conversationId: number) {
 // 你原有的fetchAIStream方法保留
 export interface FetchAIStreamParams {
   content: string;
+  platform: string;
   conversation_id?: null | number;
 }
 
 export async function fetchAIStream({
   content,
+  platform,
   conversation_id,
 }: FetchAIStreamParams) {
   const res = await fetchWithAuth('chat/stream', {
     method: 'POST',
-    body: JSON.stringify({ content, conversation_id }),
+    body: JSON.stringify({ content, platform, conversation_id }),
   });
   if (!res.body) throw new Error('No stream body');
   const reader = res.body.getReader();
