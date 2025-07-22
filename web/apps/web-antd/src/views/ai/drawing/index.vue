@@ -109,7 +109,7 @@ async function handleDraw() {
 // 轮询获取图片详情
 const pollDrawingDetail = async (id: number) => {
   fetchDrawingDetail(id).then((res) => {
-    if (res && res.status === 'RUNNING') {
+    if (res && res.data.status === 'RUNNING') {
       setTimeout(() => pollDrawingDetail(id), 5000);
     }
   });
@@ -124,9 +124,7 @@ async function fetchDrawingList(pageNum = 1, pageSize = 9) {
     total.value = res.total;
     // 检查每个 item 的状态
     for (const item of res.items) {
-      if (item.status === 'PENDING') {
-        fetchDrawingDetail(item.id);
-      } else if (item.status === 'RUNNING') {
+      if (item.status === 'PENDING' || item.status === 'RUNNING') {
         pollDrawingDetail(item.id);
       }
     }
@@ -170,7 +168,7 @@ onMounted(() => {
             <Form.Item label="画画描述">
               <Input.TextArea
                 v-model:value="form.prompt"
-                :autosize="true"
+                :auto-size="true"
                 placeholder="请输入画面描述"
               />
             </Form.Item>
