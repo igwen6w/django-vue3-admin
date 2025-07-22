@@ -24,7 +24,6 @@ class TongYiAdapter(MultiModalAICapability):
             yield chunk
 
     def create_drawing_task(self, prompt: str, style='watercolor', size='1024*1024', n=1, **kwargs):
-        print(self.model, self.api_key, 'key')
         """创建异步图片生成任务"""
         rsp = ImageSynthesis.async_call(
             api_key=self.api_key,
@@ -34,14 +33,12 @@ class TongYiAdapter(MultiModalAICapability):
             style=f'<{style}>',
             size=size
         )
-        print(rsp, 'rsp')
+        return rsp
 
     def fetch_drawing_task_status(self, task):
         """获取异步图片任务状态"""
-        status = ImageSynthesis.fetch(task)
-        if status.status_code == HTTPStatus.OK:
-            return status.output.task_status
-        else:
-            raise Exception(f"Failed, status_code: {status.status_code}, code: {status.code}, message: {status.message}")
+        rsp = ImageSynthesis.fetch(task, api_key=self.api_key)
+        return rsp
+
 
     

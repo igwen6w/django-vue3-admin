@@ -23,10 +23,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         obj_in_data = obj_in.model_dump()  # 解构Pydantic模型为字典
 
         # 自动填充时间字段（如果模型有created_at/updated_at）
-        if hasattr(self.model, "created_at"):
-            obj_in_data["created_at"] = datetime.now()
-        if hasattr(self.model, "updated_at"):
-            obj_in_data["updated_at"] = datetime.now()
+        if hasattr(self.model, "create_time"):
+            obj_in_data["create_time"] = datetime.now()
+        if hasattr(self.model, "update_time"):
+            obj_in_data["update_time"] = datetime.now()
 
         db_obj = self.model(**obj_in_data)  # 实例化模型
         db.add(db_obj)

@@ -9,7 +9,7 @@ export interface CreateImageTaskParams {
   n?: number;
 }
 
-export async function createImageTask(params: CreateImageTaskParams) {
+export async function createDrawing(params: CreateImageTaskParams) {
   const res = await fetchWithAuth('drawing/', {
     method: 'POST',
     body: JSON.stringify(params),
@@ -20,7 +20,7 @@ export async function createImageTask(params: CreateImageTaskParams) {
   return await res.json();
 }
 
-export async function fetchImageTaskStatus(id: number) {
+export async function getDrawingDetail(id: number) {
   const res = await fetchWithAuth(`drawing/${id}/`);
   if (!res.ok) {
     throw new Error('查询图片任务状态失败');
@@ -33,12 +33,12 @@ export interface GetImagePageParams {
   page_size?: number;
 }
 
-export async function getImagePage(params: GetImagePageParams = {}) {
+export async function getDrawingPage(params: GetImagePageParams = {}) {
   const query = new URLSearchParams();
   if (params.page) query.append('page', String(params.page));
   if (params.page_size) query.append('page_size', String(params.page_size));
   const res = await fetchWithAuth(
-    `drawing${query.toString() ? `?${query.toString()}` : ''}`,
+    `drawing/${query.toString() ? `?${query.toString()}` : ''}`,
   );
   if (!res.ok) {
     throw new Error('获取图片分页失败');
