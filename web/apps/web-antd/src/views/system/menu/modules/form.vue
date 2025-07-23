@@ -87,6 +87,7 @@ const schema: VbenFormSchema[] = [
       resultField: 'items',
       labelField: 'meta.title',
       showSearch: true,
+      allowClear: true,
       treeDefaultExpandAll: true,
       valueField: 'id',
       childrenField: 'children',

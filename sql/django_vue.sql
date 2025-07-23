@@ -11,7 +11,7 @@
  Target Server Version : 90300 (9.3.0)
  File Encoding         : 65001
 
- Date: 22/07/2025 15:07:13
+ Date: 22/07/2025 15:24:04
 */
 
 SET NAMES utf8mb4;
@@ -73,7 +73,7 @@ CREATE TABLE `ai_chat_conversation` (
   CONSTRAINT `ai_chat_conversation_model_id_9c5fae9a_fk_ai_model_id` FOREIGN KEY (`model_id`) REFERENCES `ai_model` (`id`),
   CONSTRAINT `ai_chat_conversation_role_id_131abc00_fk_ai_chat_role_id` FOREIGN KEY (`role_id`) REFERENCES `ai_chat_role` (`id`),
   CONSTRAINT `ai_chat_conversation_user_id_665a1c32_fk_system_users_id` FOREIGN KEY (`user_id`) REFERENCES `system_users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of ai_chat_conversation
@@ -92,6 +92,7 @@ INSERT INTO `ai_chat_conversation` (`id`, `remark`, `creator`, `modifier`, `upda
 INSERT INTO `ai_chat_conversation` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `pinned`, `pinned_time`, `model`, `system_message`, `temperature`, `max_tokens`, `max_contexts`, `model_id`, `user_id`, `role_id`) VALUES (16, NULL, NULL, NULL, '2025-07-18 00:45:04.380332', '2025-07-18 00:45:04.380325', 0, '新对话', 0, NULL, 'deepseek-chat', NULL, 0.7, 2048, 10, NULL, 1, NULL);
 INSERT INTO `ai_chat_conversation` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `pinned`, `pinned_time`, `model`, `system_message`, `temperature`, `max_tokens`, `max_contexts`, `model_id`, `user_id`, `role_id`) VALUES (17, NULL, NULL, NULL, '2025-07-22 15:02:31.233828', '2025-07-22 15:02:57.599687', 0, '你是谁', 0, NULL, 'deepseek-chat', NULL, 0.7, 2048, 10, NULL, 1, NULL);
 INSERT INTO `ai_chat_conversation` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `pinned`, `pinned_time`, `model`, `system_message`, `temperature`, `max_tokens`, `max_contexts`, `model_id`, `user_id`, `role_id`) VALUES (18, NULL, NULL, NULL, '2025-07-22 15:03:53.809764', '2025-07-22 15:04:15.106919', 0, '你是谁', 0, NULL, 'deepseek-chat', NULL, 0.7, 2048, 10, NULL, 1, NULL);
+INSERT INTO `ai_chat_conversation` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `title`, `pinned`, `pinned_time`, `model`, `system_message`, `temperature`, `max_tokens`, `max_contexts`, `model_id`, `user_id`, `role_id`) VALUES (19, NULL, NULL, NULL, '2025-07-22 15:10:57.567352', '2025-07-22 15:13:18.976513', 0, '的撒接口好', 0, NULL, 'qwen-plus', NULL, 0.7, 2048, 10, NULL, 1, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -123,7 +124,7 @@ CREATE TABLE `ai_chat_message` (
   CONSTRAINT `ai_chat_message_model_id_93e26b23_fk_ai_model_id` FOREIGN KEY (`model_id`) REFERENCES `ai_model` (`id`),
   CONSTRAINT `ai_chat_message_role_id_c202a7d5_fk_ai_chat_role_id` FOREIGN KEY (`role_id`) REFERENCES `ai_chat_role` (`id`),
   CONSTRAINT `ai_chat_message_user_id_6decfb1e_fk_system_users_id` FOREIGN KEY (`user_id`) REFERENCES `system_users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of ai_chat_message
@@ -180,6 +181,7 @@ INSERT INTO `ai_chat_message` (`id`, `remark`, `creator`, `modifier`, `update_ti
 INSERT INTO `ai_chat_message` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `conversation_id`, `model`, `type`, `reply_id`, `content`, `use_context`, `segment_ids`, `model_id`, `user_id`, `role_id`) VALUES (76, NULL, NULL, NULL, '2025-07-22 15:06:19.345108', '2025-07-22 15:06:19.345096', 0, 17, 'deepseek-chat', 'assistant', NULL, '我是 **DeepSeek Chat**，由深度求索（DeepSeek）公司开发的智能 AI 助手！😊  \n\n我可以帮你解答各种问题，包括学习、工作、编程、写作、翻译等，还能陪你聊天、提供创意灵感。无论是严肃的学术讨论，还是轻松的日常话题，我都会尽力帮助你！  \n\n有什么想问的，尽管告诉我吧！✨', 1, NULL, NULL, 1, NULL);
 INSERT INTO `ai_chat_message` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `conversation_id`, `model`, `type`, `reply_id`, `content`, `use_context`, `segment_ids`, `model_id`, `user_id`, `role_id`) VALUES (77, NULL, NULL, NULL, '2025-07-22 15:06:24.609546', '2025-07-22 15:06:24.609538', 0, 17, 'deepseek-chat', 'user', NULL, '你是谁', 1, NULL, NULL, 1, NULL);
 INSERT INTO `ai_chat_message` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `conversation_id`, `model`, `type`, `reply_id`, `content`, `use_context`, `segment_ids`, `model_id`, `user_id`, `role_id`) VALUES (78, NULL, NULL, NULL, '2025-07-22 15:06:26.066757', '2025-07-22 15:06:26.066743', 0, 17, 'qwen-plus', 'assistant', NULL, '我是通义千问，阿里巴巴集团旗下的通义实验室自主研发的超大规模语言模型。我可以帮助你回答问题、创作文字，比如写故事、写公文、写邮件、写剧本、逻辑推理、编程等等，还能表达观点，玩游戏等。如果你有任何问题或需要帮助，欢迎随时告诉我！', 1, NULL, NULL, 1, NULL);
+INSERT INTO `ai_chat_message` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `conversation_id`, `model`, `type`, `reply_id`, `content`, `use_context`, `segment_ids`, `model_id`, `user_id`, `role_id`) VALUES (79, NULL, NULL, NULL, '2025-07-22 15:13:39.888450', '2025-07-22 15:13:39.888445', 0, 19, 'qwen-plus', 'user', NULL, '的撒接口好', 1, NULL, NULL, 1, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -913,7 +915,7 @@ CREATE TABLE `system_login_log` (
   `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
   `user_agent` varchar(512) NOT NULL COMMENT '浏览器 UA',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of system_login_log
@@ -969,6 +971,7 @@ INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_t
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (48, NULL, NULL, NULL, '2025-07-22 01:23:45.495125', '2025-07-22 01:23:45.495151', 0, 'admin', 1, '36.40.129.142', 'Mozilla/5.0 (Linux; Android 15; V2366GA Build/AP3A.240905.015.A1_MOD1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/138.0.7204.63 Mobile Safari/537.36 XWEB/1380045 MMWEBSDK/20250503 MMWEBID/4192 MicroMessenger/8.0.61.2880(0x28003D50) WeChat/arm64 Weixin NetType/5G Language/zh_CN ABI/arm64');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (49, NULL, NULL, NULL, '2025-07-22 01:24:43.971086', '2025-07-22 01:24:43.971113', 0, 'admin', 1, '223.104.39.175', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.61(0x18003d2e) NetType/4G Language/zh_CN');
 INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (50, NULL, NULL, NULL, '2025-07-22 01:45:44.385996', '2025-07-22 01:45:44.386021', 0, 'admin', 1, '223.104.42.131', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.59(0x18003b2e) NetType/4G Language/zh_CN');
+INSERT INTO `system_login_log` (`id`, `remark`, `creator`, `modifier`, `update_time`, `create_time`, `is_deleted`, `username`, `result`, `user_ip`, `user_agent`) VALUES (51, NULL, NULL, NULL, '2025-07-22 06:55:44.399461', '2025-07-22 06:55:44.399491', 0, 'admin', 1, '14.112.131.223', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0');
 COMMIT;
 
 -- ----------------------------
