@@ -7,7 +7,7 @@ import type { SystemDictTypeApi } from '#/api/system/dict_type';
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
 import { format_datetime } from '#/utils/date';
-import { op } from "#/utils/permission";
+import { op } from '#/utils/permission';
 
 /**
  * 获取编辑表单的字段配置。如果没有使用多语言，可以直接export一个数组常量
@@ -30,6 +30,13 @@ export function useSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'value',
       label: '字典类型',
+      rules: z
+        .string()
+        .min(2, $t('ui.formRules.minLength', [$t('system.dict_type.value'), 2]))
+        .max(
+          20,
+          $t('ui.formRules.maxLength', [$t('system.dict_type.value'), 20]),
+        ),
     },
     {
       component: 'RadioGroup',

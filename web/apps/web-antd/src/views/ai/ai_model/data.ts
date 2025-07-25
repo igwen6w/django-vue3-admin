@@ -28,7 +28,7 @@ export function useSchema(): VbenFormSchema[] {
       },
       fieldName: 'key',
       label: 'API 秘钥',
-      rules: z.number(),
+      rules: z.number().nullable(),
     },
     {
       component: 'ApiSelect',
@@ -142,9 +142,22 @@ export function useGridFormSchema(): VbenFormSchema[] {
       },
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'platform',
-      label: '模型平台',
+      label: '平台',
+      componentProps: {
+        allowClear: true,
+        options: useDictOptions('ai_platform'),
+      },
+    },
+    {
+      component: 'Select',
+      fieldName: 'model_type',
+      label: '模型类型',
+      componentProps: {
+        allowClear: true,
+        options: useDictOptions('ai_model_type'),
+      },
     },
   ];
 }
@@ -165,10 +178,6 @@ export function useColumns(
     {
       field: 'name',
       title: '模型名字',
-    },
-    {
-      field: 'sort',
-      title: '排序',
     },
     {
       cellRender: {
@@ -194,6 +203,10 @@ export function useColumns(
     {
       field: 'model',
       title: '模型标识',
+    },
+    {
+      field: 'sort',
+      title: '排序',
     },
     {
       field: 'temperature',

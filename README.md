@@ -18,6 +18,7 @@
 <table>
  <tr>
     <td><strong>AI对话</strong><br><img src="images/ai_chat.png" alt="AI对话" width="400"></td>
+    <td><strong>AI绘画</strong><br><img src="images/ai_drawing.png" alt="AI对话" width="400"></td>
   </tr>
   <tr>
     <td><strong>部门管理</strong><br><img src="images/dj_dept.png" alt="部门管理" width="400"></td>

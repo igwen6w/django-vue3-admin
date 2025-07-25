@@ -5,6 +5,7 @@ import type { OnActionClickFn } from '#/adapter/vxe-table';
 import type { AiAIApiKeyApi } from '#/models/ai/ai_api_key';
 
 import { z } from '#/adapter/form';
+import { dictFormatter, useDictOptions } from '#/hooks/useDictOptions';
 import { $t } from '#/locales';
 import { op } from '#/utils/permission';
 
@@ -23,14 +24,13 @@ export function useSchema(): VbenFormSchema[] {
         .max(100, $t('ui.formRules.maxLength', ['名称', 100])),
     },
     {
-      component: 'Select',
+      component: 'ApiSelect',
       fieldName: 'platform',
-      label: '平台',
       componentProps: {
-        options: PLATFORM_OPTIONS,
+        options: useDictOptions('ai_platform'),
         class: 'w-full',
-        placeholder: '请选择',
       },
+      label: '模型平台',
       rules: z.string(),
     },
     {
@@ -85,7 +85,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '平台',
       componentProps: {
         allowClear: true,
-        options: PLATFORM_OPTIONS,
+        options: useDictOptions('ai_platform'),
       },
     },
     {
@@ -127,9 +127,11 @@ export function useColumns(
       },
       field: 'platform',
       title: '平台',
-      formatter: ({ cellValue }: { cellValue: string }) => {
-        return PLATFORM_MAP[String(cellValue)] || String(cellValue);
-      },
+      formatter: dictFormatter('ai_platform'),
+    },
+    {
+      field: 'api_key',
+      title: '密钥',
     },
     {
       field: 'url',
@@ -167,27 +169,3 @@ export function useColumns(
     },
   ];
 }
-
-// 平台选项和映射常量
-export const PLATFORM_OPTIONS = [
-  { label: 'OpenAI 微软', value: 'AzureOpenAI' },
-  { label: 'OpenAI', value: 'OpenAI' },
-  { label: 'Ollama', value: 'Ollama' },
-  { label: '文心一言', value: 'YiYan' },
-  { label: '讯飞星火', value: 'XingHuo' },
-  { label: '通义千问', value: 'TongYi' },
-  { label: 'StableDiffusion', value: 'StableDiffusion' },
-  { label: 'Midjourney', value: 'Midjourney' },
-  { label: 'Suno', value: 'Suno' },
-  { label: 'DeepSeek', value: 'DeepSeek' },
-  { label: '字节豆包', value: 'DouBao' },
-  { label: '腾讯混元', value: 'HunYuan' },
-  { label: '硅基流动', value: 'SiliconFlow' },
-  { label: '智谱', value: 'ZhiPu' },
-  { label: 'MiniMax', value: 'MiniMax' },
-  { label: '月之暗灭', value: 'Moonshot' },
-  { label: '百川智能', value: 'BaiChuan' },
-];
-export const PLATFORM_MAP: Record<string, string> = Object.fromEntries(
-  PLATFORM_OPTIONS.map((opt) => [opt.value, opt.label]),
-);
