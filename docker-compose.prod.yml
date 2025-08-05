@@ -26,7 +26,9 @@ services:
     env_file:
       - ./docker/.env.prod
       - ./docker/.env.local
+
   backend:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -47,6 +49,7 @@ services:
       - app_net
 
   celery_worker:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -61,6 +64,7 @@ services:
       - app_net
 
   celery_beat:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -75,6 +79,7 @@ services:
       - app_net
 
   flower:
+    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -91,6 +96,7 @@ services:
       - app_net
 
   ai_service:
+    restart: always
     build:
       context: ./ai_service
       dockerfile: Dockerfile  # 复用 backend 的 Dockerfile
@@ -109,6 +115,7 @@ services:
       - ./docker/.env.local
 
   frontend:
+    restart: always
     build:
       context: ./web
       dockerfile: Dockerfile
