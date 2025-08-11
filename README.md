@@ -192,6 +192,9 @@ gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8010 --workers
 2. 构建并启动所有开发服务：
    ```bash
    docker compose -f docker-compose.dev.yml up -d --build
+
+   # 不在容器服务内额外构建 mysql 和 redis
+   docker compose -f docker-compose.local.yml up -d --build
    ```
 3. 关闭所有开发服务：
    ```bash

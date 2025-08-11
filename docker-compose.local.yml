@@ -1,0 +1,107 @@
+services:
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend worker -l info
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+    depends_on:
+      - backend
+      # - redis
+    networks:
+      - 1panel-network
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend beat -l info
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+    depends_on:
+      - backend
+      # - redis
+    networks:
+      - 1panel-network
+
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A backend flower --port=5555
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+    depends_on:
+      - backend
+      # - redis
+    ports:
+      - "45555:5555"
+    networks:
+      - 1panel-network
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    volumes:
+      - ./backend:/app
+    ports:
+      - "48000:8000"
+    networks:
+      - 1panel-network
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+    environment:
+      DATABASE_HOST: "1Panel-mysql-ngpS"
+    # depends_on:
+      # db:
+        # condition: service_healthy
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  web:
+    build:
+      context: ./web
+      target: dev
+    volumes:
+      - ./web:/app
+    ports:
+      - "45678:5678"
+    depends_on:
+      - backend
+      - ai_service
+    networks:
+      - 1panel-network
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./ai_service:/app
+    ports:
+      - "48010:8010"
+    # depends_on:
+      # - db
+      # - redis
+    networks:
+      - 1panel-network
+    env_file:
+      - ./docker/.env.dev
+      - ./docker/.env.local
+    command: uvicorn main:app --host 0.0.0.0 --port 8010 --reload
+
+networks:
+  1panel-network:
+    external: true

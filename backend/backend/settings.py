@@ -100,7 +100,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_vue',
+        'NAME': os.getenv('DB_NAME', 'django_vue'),
         'USER': os.getenv('DB_USER', 'chenze'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'my-secret-pw'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
