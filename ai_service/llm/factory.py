@@ -2,22 +2,23 @@ from .adapter.deepseek import DeepSeekAdapter
 from .adapter.genai import GoogleGenAIAdapter
 from .adapter.openai import OpenAIAdapter
 from .adapter.tongyi import TongYiAdapter
+from .enums import LLMProvider
 
 
-def get_adapter(provider, api_key, model, **kwargs):
-    if provider == 'deepseek':
+def get_adapter(provider: LLMProvider, api_key, model, **kwargs):
+    if provider == LLMProvider.DEEPSEEK:
         return DeepSeekAdapter(api_key, model, **kwargs)
-    elif provider == 'tongyi':
+    elif provider == LLMProvider.TONGYI:
         return TongYiAdapter(api_key, model, **kwargs)
-    elif provider == 'openai':
+    elif provider == LLMProvider.OPENAI:
         return OpenAIAdapter(api_key, model, **kwargs)
-    elif provider == 'google-genai':
+    elif provider == LLMProvider.GOOGLE_GENAI:
         return GoogleGenAIAdapter(api_key, model, **kwargs)
     else:
         raise ValueError('不支持的服务商')
 
 #  使用示例
-# adapter = get_adapter('tongyi', api_key='xxx', model='wanx_v1')
+# adapter = get_adapter(LLMProvider.TONGYI, api_key='xxx', model='wanx_v1')
 
 # 对话
 # try:
