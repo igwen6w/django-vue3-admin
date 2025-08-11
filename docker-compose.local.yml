@@ -69,11 +69,11 @@ services:
   web:
     build:
       context: ./web
-      target: prod
+      target: dev
     volumes:
       - ./web:/app
     ports:
-      - "45678:80"
+      - "45678:5678"
     depends_on:
       - backend
       - ai_service

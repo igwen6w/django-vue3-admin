@@ -45,7 +45,7 @@ EXPOSE 5678
 #CMD ["tail", "-f", "/dev/null"]
 
 # 启动开发服务器
-CMD ["npm", "run", "dev:antd"]
+CMD ["sh", "-c", "pnpm install --frozen-lockfile && npm run dev:antd"]
 
 # --- 构建阶段 ---
 FROM base AS build
