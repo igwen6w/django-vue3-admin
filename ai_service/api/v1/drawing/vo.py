@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from llm.enums import LLMProvider
 
 
 class CreateDrawingTaskRequest(BaseModel):
@@ -6,5 +7,5 @@ class CreateDrawingTaskRequest(BaseModel):
     style: str = 'auto'
     size: str = '1024*1024'
     model: str = 'wanx_v1'
-    platform: str = 'tongyi'
+    platform: str = LLMProvider.TONGYI
     n: int = 1

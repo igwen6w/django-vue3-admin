@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship, declarative_base
 from db.session import Base
 from models.base import CoreModel
 from models.user import DjangoUser  # 确保导入 DjangoUser
+from llm.enums import LLMProvider
 
 # 状态选择类（示例）
 class CommonStatus:
@@ -19,12 +20,12 @@ class CommonStatus:
 
 # 平台选择类（示例）
 class PlatformChoices:
-    OPENAI = 'openai'
+    OPENAI = LLMProvider.OPENAI
     ALIMNS = 'alimns'
 
     @staticmethod
     def choices():
-        return [('openai', 'OpenAI'), ('alimns', '阿里云MNS')]
+        return [(LLMProvider.OPENAI, 'OpenAI'), ('alimns', '阿里云MNS')]
 
 
 # 消息类型选择类（示例）

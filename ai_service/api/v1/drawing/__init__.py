@@ -8,6 +8,7 @@ from api.v1.drawing.vo import CreateDrawingTaskRequest
 from db.session import get_db
 from deps.auth import get_current_user
 from llm.factory import get_adapter
+from llm.enums import LLMProvider
 from services.drawing_service import get_drawing_page, create_drawing_task, fetch_drawing_task_status
 from utils.resp import resp_error, resp_success
 
@@ -50,7 +51,7 @@ def api_create_image_task(
     prompt = req.prompt
     model = req.model
     api_key = os.getenv("DASHSCOPE_API_KEY")
-    adapter = get_adapter('tongyi', api_key=api_key, model=model)
+    adapter = get_adapter(LLMProvider.TONGYI, api_key=api_key, model=model)
     try:
         rsp = adapter.create_drawing_task(prompt=prompt, n=n, style=style, size=size)
         # rsp = {

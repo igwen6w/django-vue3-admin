@@ -7,6 +7,7 @@ from http import HTTPStatus
 from sqlalchemy import desc
 
 from llm.factory import get_adapter
+from llm.enums import LLMProvider
 from models.ai import Drawing
 from sqlalchemy.orm import Session
 
@@ -40,7 +41,7 @@ def fetch_drawing_task_status(db: Session, drawing_id: int):
         return None, "任务不存在"
     if drawing.status in ("PENDING", 'RUNNING'):
         api_key = os.getenv("DASHSCOPE_API_KEY")
-        adapter = get_adapter('tongyi', api_key=api_key, model='')
+        adapter = get_adapter(LLMProvider.TONGYI, api_key=api_key, model='')
         rsp = adapter.fetch_drawing_task_status(drawing.task_id)
         if rsp['status_code'] == HTTPStatus.OK:
             # 可根据 status.output.task_status 更新数据库
