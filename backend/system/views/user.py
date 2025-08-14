@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 from django_filters import rest_framework as filters
+from ip2geotools.databases.noncommercial import DbIpCity
 
 from system.models import User, Menu, LoginLog, Dept
 from utils.ip_utils import get_client_ip
@@ -59,7 +60,10 @@ class UserLogin(ObtainAuthToken):
         
         # 获取真实IP地址
         client_ip = get_client_ip(request)
-        
+
+        # 获取IP地址的地理位置信息
+        location_info = self.get_location_from_ip(client_ip)
+
         # 更新登录IP和登录时间
         user.login_ip = client_ip
         user.last_login = timezone.now()
@@ -70,6 +74,7 @@ class UserLogin(ObtainAuthToken):
             username=user.username,
             result=LoginLog.LoginResult.SUCCESS,
             user_ip=client_ip,
+            location=location_info,
             user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
         # 在序列化后的数据中加入 accessToken
@@ -81,6 +86,33 @@ class UserLogin(ObtainAuthToken):
             "message": "ok"
         })
 
+    def get_location_from_ip(self, ip_address):
+        """根据IP地址获取地理位置信息"""
+        try:
+            # 对于本地IP地址，返回默认值
+            if ip_address in ['127.0.0.1', 'localhost']:
+                return "本地网络"
+
+            # 查询IP地址信息
+            response = DbIpCity.get(ip_address, api_key='free')
+
+            # 构建地区信息字符串
+            location_parts = []
+            if response.city:
+                location_parts.append(response.city)
+            if response.region:
+                location_parts.append(response.region)
+            if response.country:
+                location_parts.append(response.country)
+
+            return ', '.join(location_parts) if location_parts else "未知位置"
+
+        except Exception as e:
+            # 记录错误日志
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"获取IP地址位置信息失败: {str(e)}")
+            return "位置获取失败"
 
 class UserInfo(APIView):
 

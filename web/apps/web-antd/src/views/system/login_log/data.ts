@@ -79,7 +79,12 @@ export function useColumns(): VxeTableGridOptions<SystemLoginLogApi.SystemLoginL
     },
     {
       field: 'user_ip',
-      title: '登录地址',
+      title: '登录ip',
+      width: 150,
+    },
+    {
+      field: 'location',
+      title: '登录地区',
       width: 150,
     },
     {
