@@ -296,6 +296,7 @@ class LoginLog(CoreModel):
     result = models.IntegerField(choices=LoginResult.choices, default=LoginResult.SUCCESS, db_comment='登录结果')
     user_ip = models.CharField(max_length=50, db_comment='用户 IP')
     user_agent = models.CharField(max_length=512, db_comment='浏览器 UA')
+    location = models.CharField(max_length=200, db_comment='<IP> 地理位置', blank=True, default='')
 
     class Meta:
         db_table = 'system_login_log'
