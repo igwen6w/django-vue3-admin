@@ -203,9 +203,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
 CELERY_BEAT_SCHEDULE = {
-    'every-1-minutes': {
-        'task': 'system.tasks.sync_temu_order',  # 任务路径
-        'schedule': 60,  # 每1分钟执行一次
+    'sync-work-orders-every-5-minutes': {
+        'task': 'work_order.tasks.sync_work_order_data',  # 工单同步任务
+        'schedule': 300,  # 每5分钟执行一次
+    },
+    'clean-sync-logs-daily': {
+        'task': 'work_order.tasks.clean_old_sync_logs',  # 清理同步日志任务
+        'schedule': 86400,  # 每24小时执行一次
     },
 }
 # celery 配置结束
