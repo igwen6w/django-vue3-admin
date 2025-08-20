@@ -1,5 +1,23 @@
 from django.db import models
 
+from work_order.choices import (
+    ExternalSrcWayChoices,
+    ExternalNote14Choices,
+    ExternalPayrollTypeChoices,
+    ExternalProductIdsChoices,
+    ExternalAddr2Choices,
+    ExternalCompanyAddressChoices,
+    ExternalOrderNumberChoices,
+    ExternalAddr3Choices,
+    ExternalNote1Choices,
+    ExternalNote4Choices,
+    ExternalHandlingQualityChoices,
+    ExternalNote12Choices,
+    ExternalNote2Choices,
+    ExternalNote3Choices,
+    ExternalNote16Choices,
+)
+
 from utils.models import CoreModel
 from utils.utils import validate_mobile
 
@@ -38,7 +56,41 @@ class Base(Common):
         verbose_name = '工单表'
         verbose_name_plural = verbose_name
         ordering = ['-update_time']
-    ...
+    
+    # 基础工单信息
+    external_roll_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
+    external_handle_rel_expire_time = models.DateTimeField(blank=True, null=True, db_comment='处置实际到期时间', verbose_name='处置实际到期时间')
+    external_src_way = models.CharField(max_length=50, choices=ExternalSrcWayChoices.choices, blank=True, null=True, db_comment='受理方式', verbose_name='受理方式')
+    external_payroll_name = models.CharField(max_length=100, blank=True, null=True, db_comment='姓名', verbose_name='姓名')
+    external_company_tel = models.CharField(max_length=100, blank=True, null=True, db_comment='联系方式', verbose_name='联系方式')
+    external_addr = models.CharField(max_length=500, blank=True, null=True, db_comment='地址', verbose_name='地址')
+    external_region_district_id = models.CharField(max_length=100, blank=True, null=True, db_comment='区域', verbose_name='区域')
+    external_note14 = models.CharField(max_length=50, choices=ExternalNote14Choices.choices, blank=True, null=True, db_comment='是否回访', verbose_name='是否回访')
+    external_distribute_way = models.CharField(max_length=200, blank=True, null=True, db_comment='企业名称', verbose_name='企业名称')
+    external_payroll_type = models.CharField(max_length=50, choices=ExternalPayrollTypeChoices.choices, blank=True, null=True, db_comment='业务类别', verbose_name='业务类别')
+    external_event_type2_id = models.CharField(max_length=200, blank=True, null=True, db_comment='事件类型', verbose_name='事件类型')
+    external_roll_content = models.TextField(blank=True, null=True, db_comment='事件描述', verbose_name='事件描述')
+    external_note = models.TextField(blank=True, null=True, db_comment='备注', verbose_name='备注')
+    
+    # 复核相关字段
+    external_product_ids = models.CharField(max_length=50, choices=ExternalProductIdsChoices.choices, blank=True, null=True, db_comment='三级复核', verbose_name='三级复核')
+    external_addr2 = models.CharField(max_length=50, choices=ExternalAddr2Choices.choices, blank=True, null=True, db_comment='区县复核', verbose_name='区县复核')
+    external_company_address = models.CharField(max_length=50, choices=ExternalCompanyAddressChoices.choices, blank=True, null=True, db_comment='满意研判', verbose_name='满意研判')
+    external_order_number = models.CharField(max_length=50, choices=ExternalOrderNumberChoices.choices, blank=True, null=True, db_comment='解决研判', verbose_name='解决研判')
+    external_normal_payroll_title = models.TextField(blank=True, null=True, db_comment='复核原因', verbose_name='复核原因')
+    external_addr3 = models.CharField(max_length=50, choices=ExternalAddr3Choices.choices, blank=True, null=True, db_comment='满意复核', verbose_name='满意复核')
+    external_note1 = models.CharField(max_length=100, choices=ExternalNote1Choices.choices, blank=True, null=True, db_comment='解决复核', verbose_name='解决复核')
+    external_note15 = models.TextField(blank=True, null=True, db_comment='市复核意见', verbose_name='市复核意见')
+    external_attachments = models.CharField(max_length=500, blank=True, null=True, db_comment='附件', verbose_name='附件')
+    
+    # 考核和满意度相关字段
+    external_note4 = models.CharField(max_length=100, choices=ExternalNote4Choices.choices, blank=True, null=True, db_comment='是否考核', verbose_name='是否考核')
+    external_handling_quality = models.CharField(max_length=100, choices=ExternalHandlingQualityChoices.choices, blank=True, null=True, db_comment='办理满意', verbose_name='办理满意')
+    external_note12 = models.CharField(max_length=100, choices=ExternalNote12Choices.choices, blank=True, null=True, db_comment='过程满意', verbose_name='过程满意')
+    external_note2 = models.CharField(max_length=100, choices=ExternalNote2Choices.choices, blank=True, null=True, db_comment='是否解决', verbose_name='是否解决')
+    external_note3 = models.CharField(max_length=100, choices=ExternalNote3Choices.choices, blank=True, null=True, db_comment='办理回复', verbose_name='办理回复')
+    external_note16 = models.CharField(max_length=10, choices=ExternalNote16Choices.choices, blank=True, null=True, db_comment='自主研判', verbose_name='自主研判')
+    external_note17 = models.TextField(blank=True, null=True, db_comment='研判原因', verbose_name='研判原因') 
 
 
 # 办理单位
