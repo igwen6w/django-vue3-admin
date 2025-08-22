@@ -46,6 +46,7 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: local.Dockerfile
       target: dev
     volumes:
       - ./backend:/app

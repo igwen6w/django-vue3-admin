@@ -1,0 +1,504 @@
+[
+    {
+        "fd_name": "roll_number",
+        "type": "1",
+        "name": "工单编号",
+        "value": "",
+        "choice_value": "250820101227137809",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "handle_rel_expire_time",
+        "type": "1",
+        "name": "处置实际到期时间",
+        "value": "",
+        "choice_value": "2025-08-29 23:59:59",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "2"
+    },
+    {
+        "fd_name": "src_way",
+        "type": "3",
+        "name": "受理方式",
+        "value": [
+            "电话",
+            "网站",
+            "微博",
+            "微信",
+            "爱山东APP",
+            "电子信箱",
+            "省平台",
+            "接诉即办",
+            "省网站",
+            "企业专员",
+            "政民互动",
+            "市110",
+            "闪电新闻",
+            "企业市长直通车"
+        ],
+        "choice_value": "微信",
+        "value_t": "",
+        "attr": "86",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "payroll_name",
+        "type": "1",
+        "name": "姓名",
+        "value": "",
+        "choice_value": "****",
+        "choice_yesno": "1",
+        "flag": "1",
+        "enabled_flag": "1",
+        "value_t": "",
+        "attr": "100",
+        "rows": ""
+    },
+    {
+        "fd_name": "company_tel",
+        "type": "1",
+        "name": "联系方式",
+        "encrypt_info": "twHcuIRjFYRhFyu3IrD/Xg==",
+        "encrypt_enable": "1",
+        "encrypt_type": "3",
+        "value": "",
+        "choice_value": "****",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "1",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "addr",
+        "type": "1",
+        "name": "地址",
+        "value": "",
+        "choice_value": "****",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1",
+        "value_t": "",
+        "attr": "313",
+        "rows": ""
+    },
+    {
+        "fd_name": "region_district_id",
+        "type": "14",
+        "name": "区域",
+        "value": "",
+        "choice_value": "泰山区",
+        "value_t": "",
+        "attr": "110",
+        "rows": "",
+        "choice_yesno": "1",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note14",
+        "type": "3",
+        "name": "是否回访",
+        "value": [
+            "",
+            "回访",
+            "不回访"
+        ],
+        "choice_value": "回访",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "1",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "distribute_way",
+        "type": "1",
+        "name": "企业名称",
+        "value": "",
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "payroll_type",
+        "type": "3",
+        "name": "业务类别",
+        "value": [
+            "求助",
+            "咨询",
+            "投诉",
+            "举报",
+            "建议",
+            "感谢",
+            "撤单",
+            "骚扰",
+            "无效"
+        ],
+        "choice_value": "投诉",
+        "value_t": "",
+        "attr": "86",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "event_type2_id",
+        "type": "14",
+        "name": "事件类型",
+        "value": "",
+        "choice_value": [
+            "城乡建设-园林绿化-城市绿化-绿地附属设施"
+        ],
+        "value_t": "",
+        "attr": "313",
+        "rows": "",
+        "choice_yesno": "1",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "roll_content",
+        "type": "4",
+        "name": "事件描述",
+        "value": "",
+        "choice_value": "（微信）来信人反映泰山区天烛峰路与擂鼓石大街交界路口御蓝山小区东北角外围市政绿化带内杂草丛生无人管理，甚至有人开荒种地搭建窝棚！给附近小区居民生活造成困扰，严重影响创城工作，给卫生文明城市摸黑！希望有关部门调查，予以清理杂草拆除窝棚。",
+        "value_t": "",
+        "attr": "40",
+        "rows": "10",
+        "choice_yesno": "1",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note",
+        "type": "4",
+        "name": "备注",
+        "value": "",
+        "choice_value": "",
+        "value_t": "",
+        "attr": "40",
+        "rows": "6",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "product_ids",
+        "type": "3",
+        "name": "三级复核",
+        "value": [
+            "",
+            "申请复核",
+            "通过",
+            "不通过"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "addr2",
+        "type": "3",
+        "name": "区县复核",
+        "value": [
+            "",
+            "申请复核",
+            "通过",
+            "不通过"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "company_address",
+        "type": "3",
+        "name": "满意研判",
+        "value": [
+            "",
+            "复核通过",
+            "超职责范围"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "order_number",
+        "type": "3",
+        "name": "解决研判",
+        "value": [
+            "",
+            "复核通过",
+            "超职责范围"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "normal_payroll_title",
+        "type": "4",
+        "name": "复核原因",
+        "value": "",
+        "choice_value": "",
+        "value_t": "",
+        "attr": "83",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "addr3",
+        "type": "3",
+        "name": "满意复核",
+        "value": [
+            "",
+            "待复核",
+            "未接通1",
+            "未接通2",
+            "复核完成",
+            "复核通过",
+            "复核不通过",
+            "不在范围通过",
+            "撤单通过"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note1",
+        "type": "3",
+        "name": "解决复核",
+        "value": [
+            "",
+            "待复核",
+            "未接通1",
+            "未接通2",
+            "复核完成",
+            "解决",
+            "基本解决",
+            "不在范围通过"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note15",
+        "type": "4",
+        "name": "市复核意见",
+        "value": "",
+        "choice_value": "",
+        "value_t": "",
+        "attr": "40",
+        "rows": "10",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "attachments",
+        "type": "10",
+        "name": "附件",
+        "value": "",
+        "choice_value": [
+            [
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/0207bfce415c06028128c87949d8fe1f.jpg",
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/0207bfce415c06028128c87949d8fe1f_thumb.jpg",
+                "jpg"
+            ],
+            [
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/ce5081fec71f4bf92fcf4969d4045ba2.jpg",
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/ce5081fec71f4bf92fcf4969d4045ba2_thumb.jpg",
+                "jpg"
+            ],
+            [
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/c1b1f34f250f704e20e3f6a9675aa2ed.jpg",
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/c1b1f34f250f704e20e3f6a9675aa2ed_thumb.jpg",
+                "jpg"
+            ],
+            [
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/9a20b23b2e5778e58da3c899b8706d90.jpg",
+                "http://120.224.9.18:8004/payroll3/file/2025-08-20/9a20b23b2e5778e58da3c899b8706d90_thumb.jpg",
+                "jpg"
+            ]
+        ],
+        "value_t": "",
+        "attr": "200",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note4",
+        "type": "3",
+        "name": "是否考核",
+        "value": [
+            "",
+            "计入考核",
+            "不计入考核",
+            "合理诉求",
+            "不合理诉求"
+        ],
+        "choice_value": null,
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "handling_quality",
+        "type": "3",
+        "name": "办理满意",
+        "value": [
+            "",
+            "满意",
+            "基本满意",
+            "不满意",
+            "无法回访",
+            "无人接听"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note12",
+        "type": "3",
+        "name": "过程满意",
+        "value": [
+            "",
+            "满意",
+            "基本满意",
+            "不满意"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note2",
+        "type": "3",
+        "name": "是否解决 ",
+        "value": [
+            "",
+            "解决",
+            "基本解决",
+            "未解决",
+            "办成",
+            "未办成"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note3",
+        "type": "3",
+        "name": "办理回复",
+        "value": [
+            "",
+            "回复",
+            "未回复"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "100",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "1",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note16",
+        "type": "3",
+        "name": "自主研判",
+        "value": [
+            "",
+            "是",
+            "否"
+        ],
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    },
+    {
+        "fd_name": "note17",
+        "type": "4",
+        "name": "研判原因",
+        "value": "",
+        "choice_value": "",
+        "value_t": "",
+        "attr": "10",
+        "rows": "",
+        "choice_yesno": "2",
+        "flag": "2",
+        "enabled_flag": "1"
+    }
+]
