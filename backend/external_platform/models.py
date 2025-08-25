@@ -1,0 +1,139 @@
+from django.db import models
+
+from external_platform.choices import PlatformAuthStatus, ApiMethod
+
+from utils.models import CoreModel
+
+class Platform(CoreModel):
+    class Meta:
+        db_table = 'external_platform'
+        verbose_name = '外部平台'
+        verbose_name_plural = verbose_name
+        unique_together = [
+            ['sign']
+        ]
+    
+    name = models.CharField(db_comment='名称', max_length=50)
+    sign = models.CharField(db_comment='标识', max_length=50)
+
+class AuthSession(CoreModel):
+    class Meta:
+        db_table = 'external_auth_session'
+        ordering = ['update_time']
+        verbose_name = '外部系统鉴权会话'
+        verbose_name_plural = verbose_name
+        unique_together = [['platform', 'account']]
+
+    platform = models.ForeignKey(
+        Platform, 
+        db_comment='关联外部平台',
+        verbose_name='外部平台', 
+        on_delete=models.CASCADE,
+        db_column='external_platform_id'
+    )
+    account = models.CharField(verbose_name='账号', max_length=50)
+    auth = models.JSONField(verbose_name='鉴权信息', null=True, blank=True)
+    status = models.CharField(
+        verbose_name='鉴权状态', 
+        max_length=50, 
+        choices=PlatformAuthStatus.choices, 
+        default=PlatformAuthStatus.EXPIRED
+    )
+    expire_time = models.DateTimeField(
+        null=True, 
+        blank=True, 
+        help_text="过期时间",
+        verbose_name="过期时间"
+    )
+    login_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name = '登录时间'
+    )
+    
+    
+
+class RequestLog(CoreModel):
+    class Meta:
+        db_table = 'external_request_log'
+        ordering = ['create_time']
+        verbose_name = '外部系统请求日志'
+        verbose_name_plural = verbose_name
+        indexes = [
+            models.Index(fields=['platform', 'create_time']),
+            models.Index(fields=['endpoint', 'status_code'])
+        ]
+
+    platform = models.ForeignKey(
+        Platform, 
+        db_comment='关联外部平台',
+        verbose_name='外部平台', 
+        on_delete=models.CASCADE,
+        db_column='external_platform_id'
+    )
+    api_endpoint = models.ForeignKey(
+        ApiEndpoint, 
+        verbose_name='API端点', 
+        on_delete=models.CASCADE,
+        db_column='external_api_endpoint_id'
+    )
+    account = models.CharField(verbose_name='账号', max_length=50)
+    endpoint = models.CharField(max_length=255, verbose_name='端点')
+    method = models.CharField(
+        max_length=10, 
+        verbose_name='方法', 
+        choices=ApiMethod.choices,
+        default=ApiMethod.GET
+    )
+    payload = models.JSONField(null=True, verbose_name='请求参数')
+    status_code = models.IntegerField(default=200, verbose_name='响应状态码')
+    response_time_ms = models.IntegerField(default=0, verbose_name='响应耗时')
+    response_body = models.JSONField(null=True, blank=True, verbose_name='响应体')
+    hook = models.JSONField(null=True, blank=True, verbose_name='请求后钩子')
+    hook_result = models.JSONField(null=True, blank=True, verbose_name='钩子结果')
+    error_message = models.TextField(null=True, blank=True, verbose_name='请求错误消息')
+    tag = models.JSONField(verbose_name='标签', null=True, blank=True)
+
+class ApiEndpoint(CoreModel):
+    class Meta:
+        db_table = 'external_api_endpoint'
+        verbose_name = '外部系统API端点'
+        verbose_name_plural = verbose_name
+        unique_together = [
+            ['platform', 'url', 'http_method']
+        ]
+    
+    platform = models.ForeignKey(
+        Platform, 
+        verbose_name="外部平台", 
+        on_delete=models.CASCADE,
+        db_column='external_platform_id'
+    )
+    name = models.CharField(verbose_name='接口名称', max_length=50)
+    url = models.CharField(verbose_name='URL', max_length=50)
+    http_method = models.CharField(
+        verbose_name='请求方式', 
+        max_length=50, 
+        choices=ApiMethod.choices,
+        default=ApiMethod.GET
+    )
+    require_auth = models.BooleanField(verbose_name='是否需要鉴权', default=False)
+    description = models.TextField(verbose_name='接口说明', null=True, blank=True)
+
+
+class ExternalAuthCaptchaLog(CoreModel):
+    class Meta:
+        db_table = 'external_auth_captcha_log'
+        ordering = ['create_time']
+        verbose_name = '外部系统验证码识别结果日志'
+        verbose_name_plural = verbose_name
+        indexes = [
+            models.Index(fields=['external_request_log_id'], name='request_log_id_idx')
+        ]
+    
+    request_log = models.ForeignKey(
+        RequestLog, 
+        verbose_name='请求记录', 
+        on_delete=models.CASCADE,
+        db_column='external_request_log_id'
+    )
