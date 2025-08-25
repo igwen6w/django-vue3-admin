@@ -59,7 +59,7 @@ class Base(Common):
         ordering = ['-update_time']
     
     # 基础工单信息
-    external_id = models.BigIntegerField(db_comment='工单ID', verbose_name='工单ID')
+    external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     external_roll_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
     external_handle_rel_expire_time = models.DateTimeField(blank=True, null=True, db_comment='处置实际到期时间', verbose_name='处置实际到期时间')
     external_src_way = models.CharField(max_length=50, choices=ExternalSrcWayChoices.choices, blank=True, null=True, db_comment='受理方式', verbose_name='受理方式')
@@ -106,7 +106,7 @@ class BaseEditRecord(CoreModel):
     # payroll_result = '待处置'
     api_endpoint = models.JSONField(default=ApiEndpoint.EDIT, blank=True, null=True, db_comment='API_ENDPOINT', verbose_name='API_ENDPOINT')
     act = models.CharField(max_length=50, default='save_payroll_edit', verbose_name='动作标识', db_comment='动作标识')
-    external_id = models.BigIntegerField(db_comment='工单ID', verbose_name='工单ID')
+    external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     external_payroll_result = models.CharField(max_length=50, default='待处置', db_comment='工单状态', verbose_name='工单状态')
     external_roll_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
     external_product_ids = models.CharField(max_length=50, choices=ExternalProductIdsChoices.choices, blank=True, null=True, db_comment='三级复核', verbose_name='三级复核')
@@ -136,37 +136,10 @@ class BaseEditRecord(CoreModel):
 
 # 督办
 
-# 外部工单系统
-
-class ExternalAuthSession(CoreModel):
-    class Meta:
-        db_table = 'external_auth_session'
-        ordering = ['update_time']
-        verbose_name = '外部系统鉴权会话'
-        verbose_name_plural = verbose_name
-    
-    pass
-
-class ExternalApiLog(CoreModel):
-    class Meta:
-        db_table = 'external_api_log'
-        ordering = ['create_time']
-        verbose_name = '外部系统API端点访问日志'
-        verbose_name_plural = verbose_name
-    
-    pass
-
-class ExternalAuthCaptchaLog(CoreModel):
-    class Meta:
-        db_table = 'external_auth_captcha_log'
-        ordering = ['create_time']
-        verbose_name = '外部系统验证码识别结果日志'
-        verbose_name_plural = verbose_name
-    pass
 
 class Demo(CoreModel):
-    title = models.CharField(max_length=100, db_comment='标题')
-    mobile = models.CharField(max_length=15, validators=[validate_mobile], db_comment='手机号')
+    title = models.CharField(max_length=100, default='', db_comment='标题')
+    mobile = models.CharField(max_length=15, default='', validators=[validate_mobile], db_comment='手机号')
     sort = models.IntegerField(default=0, db_comment='排序')
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
