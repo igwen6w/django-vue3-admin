@@ -130,7 +130,7 @@ export function useColumns(
       formatter: dictFormatter('ai_platform'),
     },
     {
-      field: 'api_key',
+      field: 'api_key_desensitized',
       title: '密钥',
     },
     {
