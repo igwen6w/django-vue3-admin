@@ -1,11 +1,15 @@
 from ai.models import AIApiKey
-from utils.serializers import CustomModelSerializer
+from utils.serializers import CustomModelSerializer, DesensitizationMixin
 from utils.custom_model_viewSet import CustomModelViewSet
 
-class AIApiKeySerializer(CustomModelSerializer):
+
+class AIApiKeySerializer(DesensitizationMixin, CustomModelSerializer):
     """
     AI API 密钥 序列化器
     """
+    # 指定需要脱敏的字段
+    desensitize_fields = ['api_key']
+    
     class Meta:
         model = AIApiKey
         fields = '__all__'

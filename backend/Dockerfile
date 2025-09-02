@@ -16,7 +16,7 @@ COPY . .
 RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 # 入口命令由 docker-compose 控制
 # 数据库迁移
-RUN python manage.py migrate
+#RUN python manage.py migrate
 # 收集静态文件
 RUN python manage.py collectstatic --noinput
 
