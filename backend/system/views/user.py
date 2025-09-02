@@ -62,7 +62,8 @@ class UserLogin(ObtainAuthToken):
         client_ip = get_client_ip(request)
 
         # 获取IP地址的地理位置信息
-        location_info = self.get_location_from_ip(client_ip)
+        # location_info = self.get_location_from_ip(client_ip)
+        location_info = ''
 
         # 更新登录IP和登录时间
         user.login_ip = client_ip
