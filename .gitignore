@@ -15,6 +15,7 @@ docs/_build/
 *.env
 **/local_settings.py
 static/
+.venv
 
 node_modules
 dist
