@@ -1,268 +1,217 @@
 # 设计文档
 
-## 概述
+## 系统架构概述
 
-外部平台认证系统是一个基于Django和Celery的异步认证管理系统，专门用于处理市中心工单系统等外部平台的自动化登录和会话管理。系统采用异步任务架构，集成超级鹰验证码识别服务，提供可靠的认证状态维护和API访问能力。
+本系统采用基于Celery异步任务的外部平台认证管理架构，主要包含以下核心组件：
 
-## 架构
+1. **认证服务层** - 提供统一的认证接口
+2. **异步任务层** - 处理登录和状态维护的Celery任务
+3. **验证码识别服务** - 集成超级鹰平台的验证码识别
+4. **数据持久化层** - 管理认证会话和日志数据
+5. **API端点管理** - 动态配置外部平台接口
 
-### 系统架构图
+## 核心组件设计
 
-```mermaid
-graph TB
-    A[API调用方] --> B[认证服务接口]
-    B --> C{检查本地会话}
-    C -->|有效| D[返回认证凭据]
-    C -->|无效/过期| E[触发Celery登录任务]
-    E --> F[登录任务队列]
-    F --> G[异步登录处理器]
-    G --> H[获取验证码]
-    H --> I[超级鹰识别服务]
-    I --> J[提交登录请求]
-    J --> K[更新会话状态]
-    K --> L[持久化到数据库]
-    
-    M[定时任务调度器] --> N[会话检查任务]
-    N --> O[批量检查会话状态]
-    O --> P[更新过期会话]
-    
-    Q[请求日志记录器] --> R[RequestLog表]
-    S[验证码日志记录器] --> T[ExternalAuthCaptchaLog表]
-```
+### 1. 认证服务 (AuthService)
 
-### 核心组件
+**职责：** 提供统一的认证状态管理接口
 
-1. **认证服务层 (AuthService)**
-   - 提供统一的认证接口
-   - 管理会话生命周期
-   - 协调异步任务执行
-
-2. **异步任务层 (Celery Tasks)**
-   - 登录任务处理器
-   - 定时会话检查任务
-   - 会话清理任务
-
-3. **验证码识别服务 (CaptchaClient)**
-   - 集成超级鹰API
-   - 处理验证码图片识别
-   - 管理识别结果
-
-4. **数据访问层 (Models)**
-   - Platform: 外部平台配置
-   - AuthSession: 认证会话管理
-   - ApiEndpoint: API端点配置
-   - RequestLog: 请求日志记录
-   - ExternalAuthCaptchaLog: 验证码识别日志
-
-## 组件和接口
-
-### 1. 认证服务接口 (AuthService)
-
-```python
-class AuthService:
-    def get_valid_session(self, platform_sign: str, account: str) -> Optional[AuthSession]
-    def trigger_login_task(self, platform_sign: str, account: str, password: str) -> str
-    def check_session_validity(self, session: AuthSession) -> bool
-    def refresh_session_if_needed(self, session: AuthSession) -> AuthSession
-```
+**主要方法：**
+- `get_valid_session(platform_sign, account)` - 获取有效认证会话
+- `trigger_login_task(platform_sign, account)` - 触发异步登录任务
+- `check_session_validity(session)` - 检查会话有效性
 
 ### 2. Celery异步任务
 
+#### 2.1 登录任务 (login_task)
 ```python
 @shared_task(bind=True, max_retries=3)
-def perform_login_task(self, platform_sign: str, account: str, password: str)
-
-@periodic_task(run_every=crontab(minute='*/10'))
-def check_sessions_status()
-
-@periodic_task(run_every=crontab(hour=2, minute=0))
-def cleanup_expired_sessions()
+def login_task(self, platform_sign: str, account: str, password: str)
 ```
 
-### 3. 验证码识别客户端
+**流程：**
+1. 获取验证码图片和初始Cookie
+2. 调用超级鹰识别验证码
+3. 提交登录请求
+4. 保存认证会话到数据库
+5. 记录请求日志
+
+#### 2.2 状态维护任务 (maintain_auth_status_task)
+```python
+@periodic_task(run_every=crontab(minute='*/10'))
+def maintain_auth_status_task()
+```
+
+**流程：**
+1. 查询所有活跃的认证会话
+2. 检查会话是否接近过期
+3. 对即将过期的会话触发刷新
+4. 更新过期会话状态为EXPIRED
+
+### 3. 验证码识别服务 (CaptchaService)
+
+**基于超级鹰平台的验证码识别服务**
 
 ```python
-class CaptchaClient:
+class CaptchaService:
     def __init__(self, username: str, password: str, software_id: str)
-    def post_image(self, image_data: bytes, captcha_type: int) -> dict
-    def get_balance(self) -> dict
+    def recognize_captcha(self, image_data: bytes, captcha_type: int) -> dict
     def report_error(self, pic_id: str) -> dict
 ```
 
-### 4. API端点管理器
+### 4. 外部平台客户端 (ExternalPlatformClient)
 
-```python
-class EndpointManager:
-    def get_endpoint_config(self, platform_sign: str, endpoint_name: str) -> Optional[ApiEndpoint]
-    def get_fallback_config(self, platform_sign: str, endpoint_name: str) -> dict
-    def make_authenticated_request(self, endpoint_config: dict, session: AuthSession, **kwargs) -> dict
+**职责：** 封装与外部平台的HTTP交互
+
+**主要方法：**
+- `get_captcha()` - 获取验证码图片
+- `login(username, password, captcha, cookies)` - 执行登录
+- `check_login_status(cookies)` - 检查登录状态
+- `make_authenticated_request()` - 发送认证请求
+
+## 数据流设计
+
+### 登录流程数据流
+
+```
+1. API调用 -> AuthService.get_valid_session()
+2. 检查本地会话 -> 如果无效 -> 触发login_task
+3. login_task -> 获取验证码 -> CaptchaService.recognize_captcha()
+4. login_task -> 提交登录 -> ExternalPlatformClient.login()
+5. login_task -> 保存会话 -> AuthSession.save()
+6. login_task -> 记录日志 -> RequestLog.create()
 ```
 
-## 数据模型
+### 状态维护数据流
 
-### 会话数据结构 (AuthSession.auth字段)
+```
+1. 定时任务 -> maintain_auth_status_task()
+2. 查询活跃会话 -> AuthSession.objects.filter(status='active')
+3. 检查过期时间 -> 触发刷新或标记过期
+4. 更新会话状态 -> AuthSession.save()
+```
 
-```json
+## API设计
+
+### 认证接口
+
+```python
+# 获取认证状态
+GET /api/external-platform/auth-status/{platform_sign}/{account}/
+
+# 触发登录任务
+POST /api/external-platform/login/
 {
-    "cookies": {
-        "JSESSIONID": "xxx",
-        "PHPSESSID": "yyy"
-    },
-    "headers": {
-        "User-Agent": "Mozilla/5.0...",
-        "Referer": "https://example.com"
-    },
-    "tokens": {
-        "csrf_token": "abc123",
-        "access_token": "def456"
-    },
-    "login_info": {
-        "last_login_ip": "192.168.1.1",
-        "login_method": "captcha"
-    }
+    "platform_sign": "city_center_workorder",
+    "account": "username",
+    "password": "password"
 }
+
+# 查询任务状态
+GET /api/external-platform/task-status/{task_id}/
 ```
 
-### 请求日志标签结构 (RequestLog.tag字段)
+## 错误处理设计
 
-```json
-{
-    "request_type": "login|api_call|captcha",
-    "retry_count": 0,
-    "task_id": "celery-task-uuid",
-    "captcha_type": 1004,
-    "captcha_cost": 0.1
-}
-```
+### 错误分类
 
-## 错误处理
+1. **网络错误** - 连接超时、DNS解析失败
+2. **认证错误** - 用户名密码错误、验证码错误
+3. **验证码识别错误** - 超级鹰识别失败
+4. **系统错误** - 数据库连接失败、配置错误
 
-### 错误类型定义
+### 重试策略
+
+- **登录任务重试：** 最大3次，指数退避
+- **验证码识别重试：** 最大2次，立即重试
+- **网络请求重试：** 最大3次，固定间隔
+
+## 日志设计
+
+### 日志级别
+
+- **DEBUG：** 详细的执行流程和变量值
+- **INFO：** 关键操作的开始和完成
+- **WARNING：** 可恢复的错误和异常情况
+- **ERROR：** 不可恢复的错误和异常
+
+### 日志内容
 
 ```python
-class AuthenticationError(Exception):
-    """认证相关错误基类"""
-    pass
+# 登录开始
+logger.info(f"开始登录任务 - 平台: {platform_sign}, 账户: {account}, 任务ID: {task_id}")
 
-class SessionExpiredError(AuthenticationError):
-    """会话过期错误"""
-    pass
+# 验证码识别
+logger.info(f"验证码识别成功 - 平台: {platform_sign}, 识别结果: {captcha_result}, 耗时: {duration}ms")
 
-class CaptchaRecognitionError(AuthenticationError):
-    """验证码识别错误"""
-    pass
+# 登录成功
+logger.info(f"登录成功 - 平台: {platform_sign}, 账户: {account}, 会话ID: {session_id}")
 
-class PlatformUnavailableError(AuthenticationError):
-    """平台不可用错误"""
-    pass
+# 错误日志
+logger.error(f"登录失败 - 平台: {platform_sign}, 账户: {account}, 错误: {error_msg}", exc_info=True)
 ```
 
-### 错误处理策略
+## 配置设计
 
-1. **网络错误**: 指数退避重试，最多3次
-2. **验证码错误**: 重新获取验证码，最多5次尝试
-3. **认证失败**: 记录错误，暂停该账户10分钟
-4. **平台维护**: 标记平台状态，延迟重试
-
-## 测试策略
-
-### 单元测试
-
-1. **模型测试**
-   - 数据验证和约束测试
-   - 关系完整性测试
-   - 软删除功能测试
-
-2. **服务层测试**
-   - 认证逻辑测试
-   - 会话管理测试
-   - 错误处理测试
-
-3. **异步任务测试**
-   - 任务执行逻辑测试
-   - 重试机制测试
-   - 并发安全测试
-
-### 集成测试
-
-1. **端到端认证流程测试**
-2. **验证码识别集成测试**
-3. **数据库事务一致性测试**
-4. **Celery任务队列测试**
-
-### 性能测试
-
-1. **并发登录测试**
-2. **大量会话管理测试**
-3. **数据库查询性能测试**
-4. **内存使用监控测试**
-
-## 配置管理
-
-### Django设置
+### 平台配置
 
 ```python
-# Celery配置
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-# 超级鹰配置
-CHAOJIYING_CONFIG = {
-    'username': 'your_username',
-    'password': 'your_password',
-    'software_id': 'your_software_id',
-    'default_captcha_type': 1004
-}
-
-# 认证配置
-AUTH_CONFIG = {
-    'session_timeout_hours': 24,
-    'max_retry_attempts': 3,
-    'captcha_retry_limit': 5,
-    'session_check_interval_minutes': 10
-}
-```
-
-### 临时端点配置 (开发阶段)
-
-```python
-TEMP_ENDPOINTS = {
-    'city_center_work_order': {
-        'captcha_url': 'https://example.com/captcha',
-        'login_url': 'https://example.com/login',
-        'check_url': 'https://example.com/check_session',
-        'base_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+EXTERNAL_PLATFORMS = {
+    'city_center_workorder': {
+        'name': '市中心工单系统',
+        'base_url': 'https://workorder.citycenter.gov.cn',
+        'captcha_type': 1004,  # 超级鹰验证码类型
+        'session_timeout': 3600,  # 会话超时时间(秒)
+        'retry_limit': 3,
+        'endpoints': {
+            'captcha': '/captcha',
+            'login': '/login',
+            'check_status': '/user/info'
         }
     }
 }
 ```
 
-## 部署考虑
+### 超级鹰配置
 
-### 依赖服务
+```python
+CHAOJIYING_CONFIG = {
+    'username': 'your_username',
+    'password': 'your_password', 
+    'software_id': 'your_software_id',
+    'timeout': 30
+}
+```
 
-1. **Redis**: Celery消息队列和结果存储
-2. **PostgreSQL/MySQL**: 主数据库
-3. **超级鹰API**: 验证码识别服务
+## 性能考虑
+
+### 缓存策略
+
+- **会话缓存：** Redis缓存活跃会话，减少数据库查询
+- **配置缓存：** 内存缓存平台配置，避免重复读取
+
+### 并发控制
+
+- **登录任务：** 同一账户同时只能有一个登录任务
+- **状态检查：** 使用分布式锁避免重复检查
 
 ### 监控指标
 
-1. **业务指标**
-   - 登录成功率
-   - 验证码识别准确率
-   - 会话有效时长
-   - API调用响应时间
+- 登录成功率
+- 验证码识别成功率
+- 平均登录耗时
+- 会话有效期分布
 
-2. **技术指标**
-   - Celery任务队列长度
-   - 数据库连接池状态
-   - 内存和CPU使用率
-   - 错误日志频率
+## 安全考虑
 
-### 扩展性考虑
+### 敏感信息保护
 
-1. **水平扩展**: 支持多个Celery worker节点
-2. **数据分片**: 按平台或时间分片存储日志
-3. **缓存策略**: Redis缓存热点会话数据
-4. **负载均衡**: API接口支持负载均衡部署
+- 密码加密存储
+- Cookie安全传输
+- 日志脱敏处理
+
+### 访问控制
+
+- API接口权限验证
+- 任务执行权限控制
+- 敏感操作审计日志

@@ -13,8 +13,17 @@ class Platform(CoreModel):
             ['sign']
         ]
     
-    name = models.CharField(db_comment='名称', max_length=50)
-    sign = models.CharField(db_comment='标识', max_length=50)
+    name = models.CharField(db_comment='名称', max_length=100)
+    sign = models.CharField(db_comment='标识', max_length=50, unique=True)
+    base_url = models.URLField(db_comment='基础URL', max_length=200)
+    captcha_type = models.IntegerField(db_comment='验证码类型', default=1004, help_text='超级鹰验证码类型')
+    session_timeout_hours = models.IntegerField(db_comment='会话超时时间(小时)', default=24)
+    retry_limit = models.IntegerField(db_comment='重试次数限制', default=3)
+    is_active = models.BooleanField(db_comment='是否启用', default=True)
+    description = models.TextField(db_comment='平台描述', null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.name}({self.sign})"
 
 class AuthSession(CoreModel):
     class Meta:
@@ -51,7 +60,78 @@ class AuthSession(CoreModel):
         verbose_name = '登录时间'
     )
     
+class PlatformEndpoint(CoreModel):
+    """平台端点配置"""
+    class Meta:
+        db_table = 'external_platform_endpoint'
+        verbose_name = '平台端点配置'
+        verbose_name_plural = verbose_name
+        unique_together = [
+            ['platform', 'endpoint_type']
+        ]
     
+    ENDPOINT_TYPES = [
+        ('captcha', '验证码'),
+        ('login', '登录'),
+        ('check_status', '状态检查'),
+        ('workorder_list', '工单列表'),
+        ('logout', '登出'),
+        ('custom', '自定义'),
+    ]
+    
+    platform = models.ForeignKey(
+        Platform,
+        verbose_name='外部平台',
+        on_delete=models.CASCADE,
+        db_column='external_platform_id'
+    )
+    endpoint_type = models.CharField(
+        verbose_name='端点类型',
+        max_length=50,
+        choices=ENDPOINT_TYPES
+    )
+    name = models.CharField(verbose_name='端点名称', max_length=100, null=True, blank=True)
+    path = models.CharField(verbose_name='路径', max_length=200)
+    http_method = models.CharField(
+        verbose_name='请求方式',
+        max_length=10,
+        choices=ApiMethod.choices,
+        default=ApiMethod.GET
+    )
+    require_auth = models.BooleanField(verbose_name='是否需要鉴权', default=False)
+    description = models.TextField(verbose_name='端点说明', null=True, blank=True)
+    
+    def __str__(self):
+        if self.name:
+            return f"{self.platform.name} - {self.name}"
+        return f"{self.platform.name} - {self.get_endpoint_type_display()}"
+
+
+class PlatformConfig(CoreModel):
+    """平台额外配置"""
+    class Meta:
+        db_table = 'external_platform_config'
+        verbose_name = '平台配置'
+        verbose_name_plural = verbose_name
+        unique_together = [
+            ['platform', 'config_key']
+        ]
+    
+    platform = models.ForeignKey(
+        Platform,
+        verbose_name='外部平台',
+        on_delete=models.CASCADE,
+        db_column='external_platform_id'
+    )
+    config_key = models.CharField(verbose_name='配置键', max_length=100)
+    config_value = models.JSONField(verbose_name='配置值')
+    description = models.TextField(verbose_name='配置说明', null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.platform.name} - {self.config_key}"
+
+
+
 
 class RequestLog(CoreModel):
     class Meta:
@@ -61,7 +141,8 @@ class RequestLog(CoreModel):
         verbose_name_plural = verbose_name
         indexes = [
             models.Index(fields=['platform', 'create_time']),
-            models.Index(fields=['endpoint', 'status_code'])
+            models.Index(fields=['endpoint_path', 'status_code']),
+            models.Index(fields=['account', 'create_time'])
         ]
 
     platform = models.ForeignKey(
@@ -71,14 +152,16 @@ class RequestLog(CoreModel):
         on_delete=models.CASCADE,
         db_column='external_platform_id'
     )
-    api_endpoint = models.ForeignKey(
-        ApiEndpoint, 
-        verbose_name='API端点', 
+    platform_endpoint = models.ForeignKey(
+        PlatformEndpoint, 
+        verbose_name='平台端点', 
         on_delete=models.CASCADE,
-        db_column='external_api_endpoint_id'
+        db_column='external_platform_endpoint_id',
+        null=True,
+        blank=True
     )
     account = models.CharField(verbose_name='账号', max_length=50)
-    endpoint = models.CharField(max_length=255, verbose_name='端点')
+    endpoint_path = models.CharField(max_length=255, verbose_name='端点路径')
     method = models.CharField(
         max_length=10, 
         verbose_name='方法', 
@@ -94,33 +177,6 @@ class RequestLog(CoreModel):
     error_message = models.TextField(null=True, blank=True, verbose_name='请求错误消息')
     tag = models.JSONField(verbose_name='标签', null=True, blank=True)
 
-class ApiEndpoint(CoreModel):
-    class Meta:
-        db_table = 'external_api_endpoint'
-        verbose_name = '外部系统API端点'
-        verbose_name_plural = verbose_name
-        unique_together = [
-            ['platform', 'url', 'http_method']
-        ]
-    
-    platform = models.ForeignKey(
-        Platform, 
-        verbose_name="外部平台", 
-        on_delete=models.CASCADE,
-        db_column='external_platform_id'
-    )
-    name = models.CharField(verbose_name='接口名称', max_length=50)
-    url = models.CharField(verbose_name='URL', max_length=50)
-    http_method = models.CharField(
-        verbose_name='请求方式', 
-        max_length=50, 
-        choices=ApiMethod.choices,
-        default=ApiMethod.GET
-    )
-    require_auth = models.BooleanField(verbose_name='是否需要鉴权', default=False)
-    description = models.TextField(verbose_name='接口说明', null=True, blank=True)
-
-
 class ExternalAuthCaptchaLog(CoreModel):
     class Meta:
         db_table = 'external_auth_captcha_log'
@@ -128,7 +184,7 @@ class ExternalAuthCaptchaLog(CoreModel):
         verbose_name = '外部系统验证码识别结果日志'
         verbose_name_plural = verbose_name
         indexes = [
-            models.Index(fields=['external_request_log_id'], name='request_log_id_idx')
+            models.Index(fields=['request_log'], name='request_log_id_idx')
         ]
     
     request_log = models.ForeignKey(

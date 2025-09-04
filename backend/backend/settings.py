@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "system",
     "ai",
     "work_order",
+    "external_platform",
 ]
 
 MIDDLEWARE = [
@@ -207,8 +208,51 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'system.tasks.sync_temu_order',  # 任务路径
         'schedule': 60,  # 每1分钟执行一次
     },
+    # 外部平台认证状态维护任务 - 每10分钟执行一次
+    'maintain-auth-status': {
+        'task': 'external_platform.tasks.maintain_auth_status_task',
+        'schedule': 600,  # 每10分钟执行一次
+        'options': {
+            'expires': 300,  # 任务过期时间5分钟
+        }
+    },
+    # 清理过期会话任务 - 每小时执行一次
+    'cleanup-expired-sessions': {
+        'task': 'external_platform.tasks.maintain_auth_status_task',
+        'schedule': 3600,  # 每小时执行一次
+        'options': {
+            'expires': 1800,  # 任务过期时间30分钟
+        }
+    },
 }
 # celery 配置结束
+
+# ================= 外部平台配置 =================
+# 超级鹰验证码配置
+CHAOJIYING_CONFIG = {
+    'username': os.getenv('CHAOJIYING_USERNAME', ''),
+    'password': os.getenv('CHAOJIYING_PASSWORD', ''),
+    'software_id': os.getenv('CHAOJIYING_SOFTWARE_ID', ''),
+    'timeout': 30
+}
+
+# 外部平台配置现在从数据库读取，无需静态配置
+
+# 外部平台任务配置
+EXTERNAL_PLATFORM_TASK_CONFIG = {
+    'login_task': {
+        'max_retries': 3,
+        'retry_delay': 60,  # 重试延迟(秒)
+        'timeout': 300  # 任务超时时间(秒)
+    },
+    'maintain_auth_status': {
+        'check_interval_minutes': 10,  # 检查间隔(分钟)
+        'refresh_before_hours': 2,  # 过期前多少小时刷新
+        'batch_size': 50  # 批处理大小
+    }
+}
+
+
 
 LOGGING = {
     'version': 1,

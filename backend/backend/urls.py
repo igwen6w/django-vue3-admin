@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/admin/system/', include('system.urls')),
     path('api/admin/ai/', include('ai.urls')),
     path('api/admin/work_order/', include('work_order.urls')),
+    path('api/admin/external_platform/', include('external_platform.urls')),
 ]
 
 # 演示环境下禁用 admin 路由
