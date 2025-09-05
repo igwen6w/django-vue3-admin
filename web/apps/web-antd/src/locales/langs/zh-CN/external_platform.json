@@ -1,0 +1,9 @@
+{
+    "title": "外部平台",
+    "platform":{
+        "name": "外部平台"
+    },
+    "request_log": {
+        "name": "请求日志"
+    }
+}
