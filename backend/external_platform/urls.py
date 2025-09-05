@@ -9,6 +9,7 @@ router.register(r'external_auth_captcha_log', views.ExternalAuthCaptchaLogViewSe
 router.register(r'platform', views.PlatformViewSet)
 router.register(r'auth_session', views.AuthSessionViewSet)
 router.register(r'platform_endpoint', views.PlatformEndpointViewSet)
+router.register(r'platform_config', views.PlatformConfigViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
