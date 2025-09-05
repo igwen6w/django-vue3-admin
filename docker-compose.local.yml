@@ -50,6 +50,7 @@ services:
       target: dev
     volumes:
       - ./backend:/app
+      - ./web-tmp:/web
     ports:
       - "48000:8000"
     networks:

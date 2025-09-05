@@ -204,6 +204,11 @@ gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8010 --workers
    docker compose -f docker-compose.dev.yml down
    ```
 
+4. 进入容器终端
+   ```
+   docker compose -f docker-compose.local.yml exec -u root backend bash
+   ```
+
 > 如需自定义端口、数据库、Redis 密码等，请修改 `docker/.env.local` 文件。
 
 ## 生产环境一键启动
