@@ -5,5 +5,11 @@
     },
     "request_log": {
         "name": "请求日志"
+    },
+    "platform_endpoint": {
+        "name": "外部平台API"
+    },
+    "platform_config": {
+        "name": "外部平台配置"
     }
 }
