@@ -13,6 +13,7 @@ import { Button, message } from 'ant-design-vue';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { $t } from '#/locales';
 import { ExternalPlatformPlatformModel } from '#/models/external_platform/platform';
+import { login } from '#/api/external_platform/platform';
 
 import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
@@ -36,6 +37,31 @@ function onEdit(row: ExternalPlatformPlatformApi.ExternalPlatformPlatform) {
  */
 function onCreate() {
   formModalApi.setData(null).open();
+}
+
+/**
+* 登录外部平台
+*/
+function onLogin(data) {
+  login({
+    platform_sign: data.sign,
+    account: 'demo',
+    password: 'demo'
+  })
+    .then(() => {
+      message.success({
+        content: '请求成功',
+        key: 'action_process_msg',
+      });
+      onRefresh();
+    })
+    .catch((e) => {
+      hideLoading();
+      console.log(e)
+    })
+    .finally(() => {
+      console.log('login external platform')
+    });
 }
 
 /**
@@ -69,6 +95,10 @@ function onActionClick({
   row,
 }: OnActionClickParams<ExternalPlatformPlatformApi.ExternalPlatformPlatform>) {
   switch (code) {
+    case 'login': {
+      onLogin(row);
+      break;
+    }
     case 'delete': {
       onDelete(row);
       break;

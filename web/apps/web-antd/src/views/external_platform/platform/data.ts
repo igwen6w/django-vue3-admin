@@ -137,6 +137,7 @@ export function useColumns(
     {
       field: 'id',
       title: 'ID',
+      visible: false,
     },
     {
       field: 'name',
@@ -208,6 +209,7 @@ export function useColumns(
         },
         name: 'CellOperation',
         options: [
+          op('external_platform:platform:login', 'login'),
           op('external_platform:platform:edit', 'edit'),
           op('external_platform:platform:delete', 'delete'),
         ],
