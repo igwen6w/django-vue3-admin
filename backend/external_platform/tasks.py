@@ -279,16 +279,28 @@ def _log_request_failure(platform: Platform, account: str, endpoint: str,
         logger.error(f"记录请求失败日志异常: {str(e)}", exc_info=True)
 
 
-def _log_captcha_request(platform: Platform, account: str, endpoint: str, 
+def _log_captcha_request(platform: Platform, account: str, endpoint_path: str, 
                         captcha_result: Dict) -> Optional[RequestLog]:
     """记录验证码请求日志"""
     try:
+        # 尝试获取对应的平台端点配置
+        platform_endpoint = None
+        try:
+            platform_endpoint = PlatformEndpoint.objects.get(
+                platform=platform, 
+                endpoint_type='captcha'
+            )
+        except PlatformEndpoint.DoesNotExist:
+            pass
+        
         request_log = RequestLog.objects.create(
             platform=platform,
+            platform_endpoint=platform_endpoint,
             account=account,
-            endpoint=endpoint,
+            endpoint_path=endpoint_path,
             method=ApiMethod.GET,
             status_code=200 if captcha_result.get('err_no') == 0 else 400,
+            response_time_ms=0,  # 验证码请求通常不记录响应时间
             response_body=captcha_result,
             tag={'type': 'captcha_request'}
         )
