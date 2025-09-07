@@ -12,15 +12,6 @@ router.register(r'platform_endpoint', views.PlatformEndpointViewSet)
 router.register(r'platform_config', views.PlatformConfigViewSet)
 
 urlpatterns = [
+    path('login/', views.PlatformLogin.as_view(), name='platform_login'),
     path('', include(router.urls)),
-    
-#     # 认证相关API
-#     path('auth-status/<str:platform_sign>/<str:account>/', 
-#          auth_views.get_auth_status, name='get_auth_status'),
-#     path('login/', auth_views.trigger_login, name='trigger_login'),
-#     path('task-status/<str:task_id>/', 
-#          auth_views.get_task_status, name='get_task_status'),
-#     path('sessions/', auth_views.list_sessions, name='list_sessions'),
-#     path('refresh-session/<str:platform_sign>/<str:account>/', 
-#          auth_views.refresh_session, name='refresh_session'),
 ]
