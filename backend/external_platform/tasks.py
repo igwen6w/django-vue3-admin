@@ -11,7 +11,7 @@ from celery import shared_task
 from django.utils import timezone
 from django.db import transaction
 
-from external_platform.models import Platform, AuthSession, RequestLog, ExternalAuthCaptchaLog
+from external_platform.models import Platform, AuthSession, RequestLog, ExternalAuthCaptchaLog, PlatformEndpoint
 from external_platform.choices import PlatformAuthStatus, ApiMethod
 from external_platform.services.captcha_service import get_captcha_service
 from external_platform.services.external_client import ExternalPlatformClient
