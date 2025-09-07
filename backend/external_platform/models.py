@@ -21,6 +21,7 @@ class Platform(CoreModel):
     retry_limit = models.IntegerField(db_comment='重试次数限制', default=3)
     is_active = models.BooleanField(db_comment='是否启用', default=True)
     description = models.TextField(db_comment='平台描述', null=True, blank=True)
+    login_config = models.TextField(db_comment='登录配置(json 加密)', verbose_name='登录配置', null=True, blank=True)
     
     def __str__(self):
         return f"{self.name}({self.sign})"
