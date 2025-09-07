@@ -179,10 +179,21 @@ REST_FRAMEWORK = {
 }
 
 # ================= Redis 缓存配置 =================
+# 构建 Redis URL，支持有密码和无密码的情况
+def build_redis_url(db=0):
+    redis_host = os.environ.get('REDIS_HOST', 'localhost')
+    redis_port = os.environ.get('REDIS_PORT', 6379)
+    redis_password = os.environ.get('REDIS_PASSWORD', '')
+    
+    if redis_password:
+        return f"redis://:{redis_password}@{redis_host}:{redis_port}/{db}"
+    else:
+        return f"redis://{redis_host}:{redis_port}/{db}"
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{os.environ.get('REDIS_USER', 'redis')}:{os.environ.get('REDIS_PASSWORD', '')}@{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', 6379)}/1",
+        "LOCATION": build_redis_url(1),  # 使用数据库1作为缓存
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -194,7 +205,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 # ================= Celery 配置（适配环境变量） =================
-CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_USER', 'redis')}:{os.environ.get('REDIS_PASSWORD', '')}@{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', 6379)}/0"
+CELERY_BROKER_URL = build_redis_url(0)  # 使用数据库0作为消息队列
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 # 时区设置
 CELERY_TIMEZONE = 'Asia/Shanghai'
