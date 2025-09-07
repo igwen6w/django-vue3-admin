@@ -69,6 +69,13 @@ export function useSchema(): VbenFormSchema[] {
       rules: z.string().max(500, $t('ui.formRules.maxLength', ['description', 500])).optional(),
     },
     {
+      component: 'Textarea',
+      componentProps: { rows: 3, showCount: true },
+      fieldName: 'login_config',
+      label: '登录配置',
+      rules: z.string().max(500, $t('ui.formRules.maxLength', ['login_config', 500])).optional(),
+    },
+    {
       component: 'Input',
       fieldName: 'remark',
       label: '备注',
@@ -122,6 +129,11 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'description',
       label: '描述',
     },
+    {
+      component: 'Textarea',
+      fieldName: 'login_config',
+      label: '登录配置',
+    },
   ];
 }
 
@@ -170,6 +182,10 @@ export function useColumns(
     {
       field: 'description',
       title: '描述',
+    },
+    {
+      field: 'login_config',
+      title: '登录配置',
     },
     {
       field: 'remark',

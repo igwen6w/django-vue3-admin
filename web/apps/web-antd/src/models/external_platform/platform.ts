@@ -17,6 +17,7 @@ export namespace ExternalPlatformPlatformApi {
     retry_limit: number;
     is_active: boolean;
     description: string;
+    login_condifg: string;
   }
 }
 
