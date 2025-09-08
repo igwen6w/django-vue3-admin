@@ -88,9 +88,12 @@ class ExternalPlatformClient:
         
         # 准备登录数据
         login_data = {
-            'username': username,
+            'act':'login',
+            'name': username,
             'password': password,
-            'captcha': captcha
+            'login_code': captcha,
+            'login_user_no': '0000',
+            'ck_autologin': ''
         }
         
         if additional_data:
@@ -245,7 +248,14 @@ class ExternalPlatformClient:
             try:
                 data = response.json()
                 # 根据实际API响应格式调整
-                return data.get('success', False) or data.get('code') == 0
+                # {
+                #     "status": "success",
+                #     "des": "登录成功",
+                #     "res": {
+                #         "code": 0
+                #     }
+                # }
+                return data.get('status') == 'success' or data.get('des') == '登录成功'
             except ValueError:
                 # 非JSON响应，检查是否包含成功标识
                 content = response.text.lower()

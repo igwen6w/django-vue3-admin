@@ -43,10 +43,11 @@ function onCreate() {
 * 登录外部平台
 */
 function onLogin(data) {
+  let login_config = JSON.parse(data.login_config)
   login({
     platform_sign: data.sign,
-    account: 'demo',
-    password: 'demo'
+    account: login_config.account,
+    password: login_config.password
   })
     .then(() => {
       message.success({

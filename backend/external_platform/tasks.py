@@ -261,19 +261,38 @@ def maintain_auth_status_task() -> Dict[str, Any]:
         return result
 
 
-def _log_request_failure(platform: Platform, account: str, endpoint: str, 
+def _log_request_failure(platform: Platform, account: str, endpoint_path: str, 
                         error_msg: str, response_time_ms: int = 0):
     """记录请求失败日志"""
     try:
+        # 尝试获取对应的平台端点配置
+        platform_endpoint = None
+        try:
+            # 根据endpoint_path推断端点类型
+            endpoint_type = None
+            if 'captcha' in endpoint_path.lower():
+                endpoint_type = 'captcha'
+            elif 'login' in endpoint_path.lower():
+                endpoint_type = 'login'
+            
+            if endpoint_type:
+                platform_endpoint = PlatformEndpoint.objects.get(
+                    platform=platform, 
+                    endpoint_type=endpoint_type
+                )
+        except PlatformEndpoint.DoesNotExist:
+            pass
+        
         RequestLog.objects.create(
             platform=platform,
+            platform_endpoint=platform_endpoint,
             account=account,
-            endpoint=endpoint,
+            endpoint_path=endpoint_path,
             method=ApiMethod.GET,
-            status_code=0,
-            response_time_ms=response_time_ms,
+            status_code=500,
             error_message=error_msg,
-            tag={'type': 'auth_failure'}
+            response_time_ms=response_time_ms,
+            tag={'type': 'request_failure'}
         )
     except Exception as e:
         logger.error(f"记录请求失败日志异常: {str(e)}", exc_info=True)
@@ -321,15 +340,26 @@ def _log_captcha_recognition(request_log: RequestLog, captcha_result: Dict):
         logger.error(f"记录验证码识别日志异常: {str(e)}", exc_info=True)
 
 
-def _log_login_request(platform: Platform, account: str, endpoint: str, 
+def _log_login_request(platform: Platform, account: str, endpoint_path: str, 
                       success: bool, error_msg: Optional[str], 
                       response_cookies: Optional[Dict]):
     """记录登录请求日志"""
     try:
+        # 尝试获取登录端点配置
+        platform_endpoint = None
+        try:
+            platform_endpoint = PlatformEndpoint.objects.get(
+                platform=platform, 
+                endpoint_type='login'
+            )
+        except PlatformEndpoint.DoesNotExist:
+            pass
+        
         RequestLog.objects.create(
             platform=platform,
+            platform_endpoint=platform_endpoint,
             account=account,
-            endpoint=endpoint,
+            endpoint_path=endpoint_path,
             method=ApiMethod.POST,
             status_code=200 if success else 400,
             response_body={'cookies': response_cookies} if response_cookies else None,
