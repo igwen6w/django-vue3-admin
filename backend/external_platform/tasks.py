@@ -448,7 +448,28 @@ def _log_status_check_request(session: 'AuthSession', platform_endpoint: Platfor
         logger.error(f"记录状态检查请求日志异常: {str(e)}", exc_info=True)
 
 
-# 批量获取工单
+# 批量获取市中心系统工单
+# 任务接收参数： 平台端点 PlatformEndpoint 和 发起端点请求参数 playload
+# 任务执行：
+# 1. 获取已鉴权会话句柄，未获得则尝试获取，延迟重新执行
+# 2. 请求端点获取工单列表
+# 3. 处理列表中的每个记录，创建获取单个工单详情任务
+# 4. 更新 playload（翻页或者更新search_{start/end}_time） 重新调度自身
+# platform_sign = city_center_workorder
+# endpoint_type = workorder_list
+# api /payroll3/payroll_sub_list_act_doris.php
+# payload 
+# act=search_payroll_list
+# search_ps_caption=处置
+# search_payroll_result_tmp=待处置
+# page=1
+# pagesize=20
+# end_pscaption_time_type=1
+# psr_ps_captio=处置
+# search_ps_captionName=处置
+# search_expire_time_type=1
+# search_start_time=2025-08-10 00:00:00
+# search_end_time=2025-09-08 23:59:59
 
 # 获取单个工单详情写入原始工单
 
