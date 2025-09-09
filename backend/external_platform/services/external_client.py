@@ -7,7 +7,7 @@
 
 import logging
 import requests
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Any
 from urllib.parse import urljoin
 import time
 
@@ -299,6 +299,155 @@ class ExternalPlatformClient:
         except ValueError:
             # 非JSON响应，返回状态码
             return f"HTTP {response.status_code}"
+
+    def execute_complete_login_flow(self, task_id: str, platform, platform_config: Dict) -> Dict[str, Any]:
+        """执行完整的登录流程（包含业务日志记录和会话管理）
+        
+        Args:
+            task_id: 任务ID
+            platform: 平台对象
+            platform_config: 平台配置字典
+            
+        Returns:
+            登录结果字典，包含：
+            - success: 是否成功
+            - session_id: 会话ID（成功时）
+            - platform_sign: 平台标识
+            - account: 账户名
+            - expire_time: 过期时间
+            - error: 错误信息（如果失败）
+        """
+
+        # 从配置中获取登录凭据
+        login_config = platform_config.get('login_config')
+        if not login_config:
+            error_msg = "平台登录配置不存在"
+            logger.error(f"登录配置验证失败 - 平台: {platform.sign}, 错误: {error_msg}")
+            return {'success': False, 'error': error_msg}
+        
+        # 确保 login_config 是字典类型
+        if isinstance(login_config, str):
+            try:
+                import json
+                login_config = json.loads(login_config)
+            except json.JSONDecodeError:
+                error_msg = "登录配置格式错误，无法解析JSON"
+                logger.error(f"登录配置解析失败 - 平台: {platform.sign}, 错误: {error_msg}")
+                return {'success': False, 'error': error_msg}
+        
+        account = login_config.get('account') if isinstance(login_config, dict) else None
+        password = login_config.get('password') if isinstance(login_config, dict) else None
+        
+        # 验证必要的登录配置
+        if not account or not password:
+            error_msg = "平台登录配置不完整：缺少账户名或密码"
+            logger.error(f"登录配置验证失败 - 平台: {platform.sign}, 账户: {account}, 错误: {error_msg}")
+            return {'success': False, 'error': error_msg}
+
+        logger.info(f"开始登录流程 - 任务ID: {task_id}, 平台: {platform.sign}, 账户: {account}")
+        
+        try:
+            # 步骤1: 获取验证码
+            captcha_endpoint = platform_config['endpoints']['captcha']
+            captcha_image, initial_cookies = self.get_captcha(captcha_endpoint)
+            
+            if not captcha_image or not initial_cookies:
+                error_msg = "获取验证码失败"
+                # 记录失败日志
+                from external_platform.services.request_log import log_request_failure
+                log_request_failure(platform, account, captcha_endpoint, error_msg)
+                return {'success': False, 'error': error_msg}
+            
+            logger.info(f"验证码获取成功 - 任务ID: {task_id}, 图片大小: {len(captcha_image)} bytes")
+            
+            # 步骤2: 获取验证码服务并识别验证码
+            from external_platform.services.captcha_service import get_captcha_service
+            captcha_service = get_captcha_service()
+            if not captcha_service:
+                error_msg = "验证码服务不可用"
+                logger.error(error_msg)
+                return {'success': False, 'error': error_msg}
+            
+            captcha_type = platform_config.get('captcha_type', 1004)
+            captcha_result = captcha_service.recognize_captcha(captcha_image, captcha_type)
+            
+            if captcha_result.get('err_no') != 0:
+                error_msg = f"验证码识别失败: {captcha_result.get('err_str', '未知错误')}"
+                logger.error(f"验证码识别失败 - 任务ID: {task_id}, 错误: {error_msg}")
+                return {'success': False, 'error': error_msg}
+            
+            captcha_text = captcha_result.get('pic_str', '')
+            pic_id = captcha_result.get('pic_id', '')
+            
+            logger.info(f"验证码识别成功 - 任务ID: {task_id}, 识别结果: {captcha_text}, pic_id: {pic_id}")
+            
+            # 步骤3: 执行登录
+            login_endpoint = platform_config['endpoints']['login']
+            additional_data = platform_config.get('login_data_extra', {})
+            
+            success, response_cookies, error_msg = self.login(
+                login_endpoint, account, password, captcha_text, 
+                initial_cookies, additional_data
+            )
+            
+            if not success:
+                # 如果是验证码错误且有pic_id，报告给超级鹰
+                if pic_id and ('验证码' in error_msg or 'captcha' in error_msg.lower()):
+                    captcha_service.report_error(pic_id)
+                    logger.info(f"已报告验证码错误 - pic_id: {pic_id}")
+                
+                return {'success': False, 'error': error_msg}
+            
+            # 步骤4: 记录成功日志
+            from external_platform.services.request_log import (
+                log_captcha_request, log_captcha_recognition, log_login_request
+            )
+            
+            # 记录验证码识别日志
+            request_log = log_captcha_request(platform, account, captcha_endpoint, captcha_result)
+            if request_log:
+                log_captcha_recognition(request_log, captcha_result)
+            
+            # 合并Cookie
+            all_cookies = {**initial_cookies, **response_cookies} if response_cookies else initial_cookies
+            
+            # 记录登录请求日志
+            log_login_request(platform, account, login_endpoint, True, None, all_cookies)
+            
+            # 步骤5: 保存认证会话
+            from django.utils import timezone
+            from external_platform.services.auth_service import AuthService
+            
+            auth_data = {
+                'cookies': all_cookies,
+                'login_time': timezone.now().isoformat(),
+                'task_id': task_id
+            }
+            
+            session_timeout = platform_config.get('session_timeout_hours', 24)
+            session = AuthService.create_or_update_session(
+                platform.sign, account, auth_data, session_timeout
+            )
+            
+            if not session:
+                error_msg = "保存认证会话失败"
+                logger.error(f"保存会话失败 - 任务ID: {task_id}")
+                return {'success': False, 'error': error_msg}
+            
+            logger.info(f"登录流程完成 - 任务ID: {task_id}, 会话ID: {session.id}")
+            
+            return {
+                'success': True,
+                'session_id': session.id,
+                'platform_sign': platform.sign,
+                'account': account,
+                'expire_time': session.expire_time.isoformat() if session.expire_time else None
+            }
+            
+        except Exception as e:
+            error_msg = f"登录流程异常: {str(e)}"
+            logger.error(f"完整登录流程异常 - 任务ID: {task_id}, 账户: {account}, 错误: {error_msg}", exc_info=True)
+            return {'success': False, 'error': error_msg}
 
     def close(self):
         """关闭客户端会话"""

@@ -11,30 +11,91 @@ from celery import shared_task
 from django.utils import timezone
 from django.db import transaction
 
-from external_platform.models import Platform, AuthSession, RequestLog, ExternalAuthCaptchaLog, PlatformEndpoint
-from external_platform.choices import PlatformAuthStatus, ApiMethod
-from external_platform.services.captcha_service import get_captcha_service
-from external_platform.services.external_client import ExternalPlatformClient
+from external_platform.models import Platform, AuthSession, PlatformEndpoint
+from external_platform.choices import PlatformAuthStatus
 from external_platform.services.auth_service import AuthService
+from external_platform.services.external_client import ExternalPlatformClient
+from external_platform.services.request_log import (
+    log_status_check_request, log_workorder_list_request,
+    log_workorder_detail_request
+)
 from external_platform.utils import get_platform_config, get_task_config
+
 
 logger = logging.getLogger(__name__)
 
 
+def handle_session_expiry(response_data: Dict[str, Any], session: AuthSession, 
+                         platform_sign: str, task_self=None, 
+                         retry_delay: int = 60) -> bool:
+    """
+    检查并处理会话失效响应
+    
+    Args:
+        response_data: API响应数据
+        session: 当前认证会话
+        platform_sign: 平台标识
+        task_self: Celery任务实例（用于重试）
+        retry_delay: 重试延迟秒数
+        
+    Returns:
+        bool: True表示检测到会话失效，False表示会话正常
+        
+    Raises:
+        Exception: 当需要重试任务时抛出异常
+    """
+    # 检查是否为会话失效响应
+    if (response_data.get('status') == 'fail' and 
+        response_data.get('des') == 'session失效' and 
+        response_data.get('res') == ''):
+        
+        logger.warning(f"检测到会话失效 - 会话ID: {session.id}, "
+                      f"平台: {platform_sign}")
+        
+        # 更新会话状态为过期
+        with transaction.atomic():
+            session.status = PlatformAuthStatus.EXPIRED
+            session.save(update_fields=['status', 'update_time'])
+        
+        logger.info(f"已更新会话状态为过期 - 会话ID: {session.id}")
+        
+        # 触发重新登录任务
+        login_task_id = AuthService.trigger_login_task(platform_sign)
+        
+        if login_task_id:
+            logger.info(f"已触发重新登录任务 - 登录任务ID: {login_task_id}, "
+                       f"平台: {platform_sign}")
+            
+            # 如果提供了任务实例且还有重试次数，则重试任务
+            if task_self and task_self.request.retries < task_self.max_retries:
+                task_id = task_self.request.id
+                logger.info(f"会话失效，将在登录完成后重试 - 任务ID: {task_id}, "
+                           f"重试次数: {task_self.request.retries + 1}, "
+                           f"延迟: {retry_delay}秒")
+                
+                error_msg = f"会话失效已触发重新登录，任务将重试 - 登录任务ID: {login_task_id}"
+                raise task_self.retry(countdown=retry_delay, exc=Exception(error_msg))
+            
+        else:
+            logger.error(f"触发重新登录失败 - 平台: {platform_sign}")
+        
+        return True
+    
+    return False
+
+
 @shared_task(bind=True, max_retries=3)
-def login_task(self, platform_sign: str, account: str, password: str) -> Dict[str, Any]:
+def login_task(self, platform_sign: str) -> Dict[str, Any]:
     """异步登录任务
     
     Args:
         platform_sign: 平台标识
-        account: 账户名
-        password: 密码
         
     Returns:
         任务执行结果
     """
     task_id = self.request.id
-    logger.info(f"开始执行登录任务 - 任务ID: {task_id}, 平台: {platform_sign}, 账户: {account}")
+    logger.info(f"开始执行登录任务 - 任务ID: {task_id}, 平台: {platform_sign}")
     
     start_time = time.time()
     platform = None
@@ -60,19 +121,18 @@ def login_task(self, platform_sign: str, account: str, password: str) -> Dict[st
         client = ExternalPlatformClient(platform_config['base_url'])
         
         # 执行登录流程
-        result = _execute_login_flow(
-            task_id, platform, account, password, 
-            platform_config, client
+        result = client.execute_complete_login_flow(
+            task_id, platform, platform_config
         )
         
         execution_time = int((time.time() - start_time) * 1000)
         
         if result['success']:
             logger.info(f"登录任务完成 - 任务ID: {task_id}, 平台: {platform_sign}, "
-                       f"账户: {account}, 耗时: {execution_time}ms")
+                       f"耗时: {execution_time}ms")
         else:
             logger.error(f"登录任务失败 - 任务ID: {task_id}, 平台: {platform_sign}, "
-                        f"账户: {account}, 耗时: {execution_time}ms, 错误: {result['error']}")
+                        f"耗时: {execution_time}ms, 错误: {result['error']}")
         
         return result
         
@@ -80,12 +140,8 @@ def login_task(self, platform_sign: str, account: str, password: str) -> Dict[st
         execution_time = int((time.time() - start_time) * 1000)
         error_msg = f"登录任务异常: {str(e)}"
         logger.error(f"登录任务异常 - 任务ID: {task_id}, 平台: {platform_sign}, "
-                    f"账户: {account}, 耗时: {execution_time}ms, 错误: {error_msg}", 
+                    f"耗时: {execution_time}ms, 错误: {error_msg}", 
                     exc_info=True)
-        
-        # 记录失败日志
-        if platform:
-            _log_request_failure(platform, account, 'login', error_msg, execution_time)
         
         # 重试逻辑
         if self.request.retries < self.max_retries:
@@ -99,110 +155,6 @@ def login_task(self, platform_sign: str, account: str, password: str) -> Dict[st
     finally:
         if client:
             client.close()
-
-
-def _execute_login_flow(task_id: str, platform: Platform, account: str, 
-                       password: str, platform_config: Dict, 
-                       client: ExternalPlatformClient) -> Dict[str, Any]:
-    """执行完整的登录流程
-    
-    Args:
-        task_id: 任务ID
-        platform: 平台对象
-        account: 账户名
-        password: 密码
-        platform_config: 平台配置
-        client: 外部平台客户端
-        
-    Returns:
-        登录结果
-    """
-    logger.info(f"开始登录流程 - 任务ID: {task_id}, 平台: {platform.sign}, 账户: {account}")
-    
-    # 步骤1: 获取验证码
-    captcha_endpoint = platform_config['endpoints']['captcha']
-    captcha_image, cookies = client.get_captcha(captcha_endpoint)
-    
-    if not captcha_image or not cookies:
-        error_msg = "获取验证码失败"
-        _log_request_failure(platform, account, captcha_endpoint, error_msg)
-        return {'success': False, 'error': error_msg}
-    
-    logger.info(f"验证码获取成功 - 任务ID: {task_id}, 图片大小: {len(captcha_image)} bytes")
-    
-    # 步骤2: 识别验证码
-    captcha_service = get_captcha_service()
-    if not captcha_service:
-        error_msg = "验证码服务不可用"
-        logger.error(error_msg)
-        return {'success': False, 'error': error_msg}
-    
-    captcha_type = platform_config.get('captcha_type', 1004)
-    captcha_result = captcha_service.recognize_captcha(captcha_image, captcha_type)
-    
-    # 记录验证码识别日志
-    request_log = _log_captcha_request(platform, account, captcha_endpoint, captcha_result)
-    
-    if captcha_result.get('err_no') != 0:
-        error_msg = f"验证码识别失败: {captcha_result.get('err_str', '未知错误')}"
-        logger.error(f"验证码识别失败 - 任务ID: {task_id}, 错误: {error_msg}")
-        return {'success': False, 'error': error_msg}
-    
-    captcha_text = captcha_result.get('pic_str', '')
-    pic_id = captcha_result.get('pic_id', '')
-    
-    logger.info(f"验证码识别成功 - 任务ID: {task_id}, 识别结果: {captcha_text}, pic_id: {pic_id}")
-    
-    # 记录验证码识别结果
-    if request_log:
-        _log_captcha_recognition(request_log, captcha_result)
-    
-    # 步骤3: 执行登录
-    login_endpoint = platform_config['endpoints']['login']
-    additional_data = platform_config.get('login_data_extra', {})
-    
-    success, response_cookies, error_msg = client.login(
-        login_endpoint, account, password, captcha_text, cookies, additional_data
-    )
-    
-    # 记录登录请求日志
-    _log_login_request(platform, account, login_endpoint, success, error_msg, response_cookies)
-    
-    if not success:
-        # 如果是验证码错误，报告给超级鹰
-        if pic_id and ('验证码' in error_msg or 'captcha' in error_msg.lower()):
-            captcha_service.report_error(pic_id)
-            logger.info(f"已报告验证码错误 - pic_id: {pic_id}")
-        
-        return {'success': False, 'error': error_msg}
-    
-    # 步骤4: 合并Cookie并保存会话
-    all_cookies = {**cookies, **response_cookies} if response_cookies else cookies
-    auth_data = {
-        'cookies': all_cookies,
-        'login_time': timezone.now().isoformat(),
-        'task_id': task_id
-    }
-    
-    session_timeout = platform_config.get('session_timeout_hours', 24)
-    session = AuthService.create_or_update_session(
-        platform.sign, account, auth_data, session_timeout
-    )
-    
-    if not session:
-        error_msg = "保存认证会话失败"
-        logger.error(f"保存会话失败 - 任务ID: {task_id}")
-        return {'success': False, 'error': error_msg}
-    
-    logger.info(f"登录流程完成 - 任务ID: {task_id}, 会话ID: {session.id}")
-    
-    return {
-        'success': True,
-        'session_id': session.id,
-        'platform_sign': platform.sign,
-        'account': account,
-        'expire_time': session.expire_time.isoformat() if session.expire_time else None
-    }
 
 
 @shared_task
@@ -269,23 +221,36 @@ def maintain_auth_status_task() -> Dict[str, Any]:
                     )
                     
                     # 记录请求日志
-                    _log_status_check_request(session, check_endpoint, success, response_data, error_msg)
+                    log_status_check_request(session, check_endpoint, success, response_data, error_msg)
                     
                     if success and response_data:
-                        # 检查响应中的 card_number 字段
-                        res_data = response_data.get('res', {})
-                        card_number = res_data.get('card_number', '')
-                        
-                        if not card_number:
-                            # card_number 为空表示会话过期，更新会话状态
-                            session.status = PlatformAuthStatus.EXPIRED
-                            session.save(update_fields=['status', 'update_time'])
-                            logger.info(f"会话已过期 - 会话ID: {session.id}, "
-                                       f"平台: {session.platform.sign}, 账户: {session.account}")
+                        # 首先检查是否为会话失效响应
+                        if handle_session_expiry(response_data, session, session.platform.sign):
+                            # 会话失效已处理，无需进一步检查
+                            pass
                         else:
-                            logger.info(f"会话状态正常 - 会话ID: {session.id}, "
-                                       f"平台: {session.platform.sign}, 账户: {session.account}, "
-                                       f"card_number: {card_number}")
+                            # 检查响应中的 card_number 字段
+                            res_data = response_data.get('res', {})
+                            card_number = res_data.get('card_number', '')
+                            
+                            if not card_number:
+                                # card_number 为空表示会话过期，更新会话状态
+                                session.status = PlatformAuthStatus.EXPIRED
+                                session.save(update_fields=['status', 'update_time'])
+                                logger.info(f"会话已过期（card_number为空） - 会话ID: {session.id}, "
+                                           f"平台: {session.platform.sign}, 账户: {session.account}")
+                                
+                                # 触发重新登录任务
+                                login_task_id = AuthService.trigger_login_task(session.platform.sign)
+                                if login_task_id:
+                                    logger.info(f"已触发重新登录任务 - 登录任务ID: {login_task_id}, "
+                                               f"平台: {session.platform.sign}")
+                                else:
+                                    logger.error(f"触发重新登录失败 - 平台: {session.platform.sign}")
+                            else:
+                                logger.info(f"会话状态正常 - 会话ID: {session.id}, "
+                                           f"平台: {session.platform.sign}, 账户: {session.account}, "
+                                           f"card_number: {card_number}")
                     else:
                         logger.warning(f"状态检查失败 - 会话ID: {session.id}, "
                                      f"错误: {error_msg}")
@@ -319,164 +284,379 @@ def maintain_auth_status_task() -> Dict[str, Any]:
         return result
 
 
-def _log_request_failure(platform: Platform, account: str, endpoint_path: str, 
-                        error_msg: str, response_time_ms: int = 0):
-    """记录请求失败日志"""
+@shared_task(bind=True, max_retries=3)
+def batch_fetch_workorders_task(self) -> Dict[str, Any]:
+    """定时任务:批量获取市中心系统工单
+    
+    任务执行流程：
+    0. 从 PlatformEndpoint endpoint_type = workorder_list 获取API端点和请求参数
+    1. 构建请求参数
+    2. 获取已鉴权会话句柄
+    3. 请求端点获取工单列表
+    4. 处理列表中的每个记录，创建获取单个工单详情任务
+    5. 结束任务
+    
+    Returns:
+        任务执行结果
+    """
+    task_id = self.request.id
+    platform_sign = 'city_center_workorder'
+    
+    logger.info(f"开始执行批量获取工单任务 - 任务ID: {task_id}, 平台: {platform_sign}")
+    
+    start_time = time.time()
+    result = {
+        'success': False,
+        'platform_sign': platform_sign,
+        'task_id': task_id,
+        'fetched_count': 0,
+        'created_tasks': 0,
+        'error': None
+    }
+    
     try:
-        # 尝试获取对应的平台端点配置
-        platform_endpoint = None
+        # 步骤0: 获取平台和工单列表端点配置
         try:
-            # 根据endpoint_path推断端点类型
-            endpoint_type = None
-            if 'captcha' in endpoint_path.lower():
-                endpoint_type = 'captcha'
-            elif 'login' in endpoint_path.lower():
-                endpoint_type = 'login'
+            platform = Platform.objects.get(sign=platform_sign, is_deleted=False)
+        except Platform.DoesNotExist:
+            error_msg = f"平台不存在: {platform_sign}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        try:
+            workorder_endpoint = PlatformEndpoint.objects.get(
+                platform=platform,
+                endpoint_type='workorder_list'
+            )
+        except PlatformEndpoint.DoesNotExist:
+            error_msg = f"平台 {platform_sign} 未配置工单列表端点"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 步骤1: 构建请求参数
+        base_payload = workorder_endpoint.payload or {}
+        
+        # 获取当前时间范围（默认获取最近30天的工单）
+        from datetime import timedelta
+        
+        end_time = timezone.now()
+        start_time_param = end_time - timedelta(days=30)
+        
+        request_payload = {
+            **base_payload,
+            'search_start_time': start_time_param.strftime('%Y-%m-%d %H:%M:%S'),
+            'search_end_time': end_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'page': 1,
+            'pagesize': 50  # 每页获取50条记录
+        }
+        
+        logger.info(f"构建请求参数完成 - 时间范围: {request_payload['search_start_time']} 到 {request_payload['search_end_time']}")
+        
+        # 步骤2: 获取已鉴权会话句柄
+        try:
+            active_session = AuthSession.objects.filter(
+                platform=platform,
+                status=PlatformAuthStatus.ACTIVE,
+                expire_time__gt=timezone.now()
+            ).first()
             
-            if endpoint_type:
-                platform_endpoint = PlatformEndpoint.objects.get(
-                    platform=platform, 
-                    endpoint_type=endpoint_type
+            if not active_session:
+                # 发起登录
+                AuthService.trigger_login_task(platform_sign)
+                # 记录日志
+                error_msg = "未找到有效的认证会话，请先执行登录任务"
+                logger.warning(error_msg)
+                result['error'] = error_msg
+                return result
+                
+        except Exception as e:
+            error_msg = f"获取认证会话失败: {str(e)}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 步骤3: 请求端点获取工单列表
+        platform_config = get_platform_config(platform_sign)
+        if not platform_config:
+            error_msg = f"获取平台配置失败: {platform_sign}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        client = ExternalPlatformClient(platform_config['base_url'])
+        
+        try:
+            # 从会话中获取认证信息
+            auth_data = active_session.auth or {}
+            cookies = auth_data.get('cookies', {})
+            
+            # 发送工单列表请求
+            success, response_data, error_msg = client.make_authenticated_request(
+                method=workorder_endpoint.http_method,
+                endpoint=workorder_endpoint.path,
+                cookies=cookies,
+                data=request_payload if workorder_endpoint.http_method == 'POST' else None,
+                params=request_payload if workorder_endpoint.http_method == 'GET' else None
+            )
+            
+            # 记录请求日志
+            log_workorder_list_request(active_session, workorder_endpoint, success, response_data, error_msg, request_payload)
+            
+            # 检查会话失效响应
+            if success and response_data:
+                try:
+                    retry_delay = get_task_config('batch_fetch_workorders_task').get('retry_delay', 300)
+                    if handle_session_expiry(response_data, active_session, platform_sign, 
+                                           task_self=self, retry_delay=retry_delay):
+                        # 如果检测到会话失效但无法重试，返回错误
+                        error_msg = "会话失效且已达到最大重试次数或触发重新登录失败"
+                        result['error'] = error_msg
+                        return result
+                except Exception as e:
+                    # 如果是重试异常，重新抛出
+                    if "会话失效已触发重新登录" in str(e):
+                        raise
+                    else:
+                        error_msg = f"处理会话失效异常: {str(e)}"
+                        logger.error(error_msg)
+                        result['error'] = error_msg
+                        return result
+            
+            if not success:
+                error_msg = f"获取工单列表失败: {error_msg}"
+                logger.error(error_msg)
+                result['error'] = error_msg
+                return result
+            
+            # 步骤4: 处理工单列表数据
+            workorder_list = []
+            if response_data and 'res' in response_data:
+                res_data = response_data['res']
+                if isinstance(res_data, dict) and 'list' in res_data:
+                    workorder_list = res_data['list']
+                elif isinstance(res_data, list):
+                    workorder_list = res_data
+            
+            result['fetched_count'] = len(workorder_list)
+            logger.info(f"获取到工单列表 - 数量: {result['fetched_count']}")
+            
+            # 步骤5: 为每个工单创建详情获取任务
+            created_tasks = 0
+            for workorder in workorder_list:
+                try:
+                    workorder_id = workorder.get('id') or workorder.get('payroll_id')
+                    if workorder_id:
+                        # 创建获取单个工单详情的任务
+                        fetch_single_workorder_task.delay(
+                            platform_sign=platform_sign,
+                            workorder_id=workorder_id,
+                            batch_task_id=task_id
+                        )
+                        created_tasks += 1
+                        logger.debug(f"创建工单详情任务 - 工单ID: {workorder_id}")
+                    
+                except Exception as e:
+                    logger.error(f"创建工单详情任务失败 - 工单数据: {workorder}, 错误: {str(e)}")
+            
+            result['created_tasks'] = created_tasks
+            result['success'] = True
+            
+            execution_time = int((time.time() - start_time) * 1000)
+            logger.info(f"批量获取工单任务完成 - 任务ID: {task_id}, 耗时: {execution_time}ms, "
+                       f"获取数量: {result['fetched_count']}, 创建任务: {result['created_tasks']}")
+            
+        finally:
+            client.close()
+        
+        return result
+        
+    except Exception as e:
+        execution_time = int((time.time() - start_time) * 1000)
+        error_msg = f"批量获取工单任务异常: {str(e)}"
+        logger.error(f"批量获取工单任务异常 - 任务ID: {task_id}, 耗时: {execution_time}ms, "
+                    f"错误: {error_msg}", exc_info=True)
+        
+        result['error'] = error_msg
+        
+        # 重试逻辑
+        if self.request.retries < self.max_retries:
+            retry_delay = get_task_config('batch_fetch_workorders_task').get('retry_delay', 300)  # 5分钟后重试
+            logger.info(f"批量获取工单任务重试 - 任务ID: {task_id}, 重试次数: {self.request.retries + 1}, "
+                       f"延迟: {retry_delay}秒")
+            raise self.retry(countdown=retry_delay, exc=e)
+        
+        return result
+
+
+@shared_task(bind=True, max_retries=3)
+def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, batch_task_id: str = None) -> Dict[str, Any]:
+    """获取单个工单详情任务
+    
+    Args:
+        platform_sign: 平台标识
+        workorder_id: 工单ID
+        batch_task_id: 批量任务ID（可选）
+        
+    Returns:
+        任务执行结果
+    """
+    task_id = self.request.id
+    logger.info(f"开始获取单个工单详情 - 任务ID: {task_id}, 平台: {platform_sign}, 工单ID: {workorder_id}")
+    
+    start_time = time.time()
+    result = {
+        'success': False,
+        'platform_sign': platform_sign,
+        'workorder_id': workorder_id,
+        'task_id': task_id,
+        'batch_task_id': batch_task_id,
+        'error': None
+    }
+    
+    try:
+        # 获取平台配置
+        try:
+            platform = Platform.objects.get(sign=platform_sign, is_deleted=False)
+        except Platform.DoesNotExist:
+            error_msg = f"平台不存在: {platform_sign}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 获取工单详情端点（假设端点类型为 workorder_detail）
+        try:
+            detail_endpoint = PlatformEndpoint.objects.get(
+                platform=platform,
+                endpoint_type='workorder_detail'
+            )
+        except PlatformEndpoint.DoesNotExist:
+            error_msg = f"平台 {platform_sign} 未配置工单详情端点"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 获取认证会话
+        try:
+            active_session = AuthSession.objects.filter(
+                platform=platform,
+                status=PlatformAuthStatus.ACTIVE,
+                expire_time__gt=timezone.now()
+            ).first()
+            
+            if not active_session:
+                error_msg = "未找到有效的认证会话"
+                logger.warning(error_msg)
+                result['error'] = error_msg
+                return result
+                
+        except Exception as e:
+            error_msg = f"获取认证会话失败: {str(e)}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 构建请求参数
+        base_payload = detail_endpoint.payload or {}
+        request_payload = {
+            **base_payload,
+            'payroll_id': workorder_id
+        }
+        
+        # 获取平台配置并发送请求
+        platform_config = get_platform_config(platform_sign)
+        if not platform_config:
+            error_msg = f"获取平台配置失败: {platform_sign}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        client = ExternalPlatformClient(platform_config['base_url'])
+        
+        try:
+            # 从会话中获取认证信息
+            auth_data = active_session.auth or {}
+            cookies = auth_data.get('cookies', {})
+            
+            # 发送工单详情请求
+            success, response_data, error_msg = client.make_authenticated_request(
+                method=detail_endpoint.http_method,
+                endpoint=detail_endpoint.path,
+                cookies=cookies,
+                data=request_payload if detail_endpoint.http_method == 'POST' else None,
+                params=request_payload if detail_endpoint.http_method == 'GET' else None
+            )
+            
+            # 记录请求日志
+            log_workorder_detail_request(active_session, detail_endpoint, success, response_data, error_msg, request_payload)
+            
+            # 检查会话失效响应
+            if success and response_data:
+                try:
+                    retry_delay = get_task_config('fetch_single_workorder_task').get('retry_delay', 60)
+                    if handle_session_expiry(response_data, active_session, platform_sign, 
+                                           task_self=self, retry_delay=retry_delay):
+                        # 如果检测到会话失效但无法重试，返回错误
+                        error_msg = "会话失效且已达到最大重试次数或触发重新登录失败"
+                        result['error'] = error_msg
+                        return result
+                except Exception as e:
+                    # 如果是重试异常，重新抛出
+                    if "会话失效已触发重新登录" in str(e):
+                        raise
+                    else:
+                        error_msg = f"处理会话失效异常: {str(e)}"
+                        logger.error(error_msg)
+                        result['error'] = error_msg
+                        return result
+            
+            if not success:
+                error_msg = f"获取工单详情失败: {error_msg}"
+                logger.error(error_msg)
+                result['error'] = error_msg
+                return result
+            
+            # 保存原始工单数据
+            if response_data:
+                from work_order.models import Meta as WorkOrderMeta
+                
+                # 创建原始工单记录
+                meta_record = WorkOrderMeta.objects.create(
+                    version='1.0',
+                    source_system=platform_sign,
+                    sync_task_id=int(task_id.replace('-', '')[:10], 16),  # 将任务ID转换为数字
+                    raw_data=response_data,
+                    pull_task_id=int(batch_task_id.replace('-', '')[:10], 16) if batch_task_id else 0
                 )
-        except PlatformEndpoint.DoesNotExist:
-            pass
+                
+                logger.info(f"保存原始工单成功 - 工单ID: {workorder_id}, 记录ID: {meta_record.id}")
+                result['meta_record_id'] = meta_record.id
+            
+            result['success'] = True
+            
+            execution_time = int((time.time() - start_time) * 1000)
+            logger.info(f"获取单个工单详情完成 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
+                       f"耗时: {execution_time}ms")
+            
+        finally:
+            client.close()
         
-        RequestLog.objects.create(
-            platform=platform,
-            platform_endpoint=platform_endpoint,
-            account=account,
-            endpoint_path=endpoint_path,
-            method=ApiMethod.GET,
-            status_code=500,
-            error_message=error_msg,
-            response_time_ms=response_time_ms,
-            tag={'type': 'request_failure'}
-        )
-    except Exception as e:
-        logger.error(f"记录请求失败日志异常: {str(e)}", exc_info=True)
-
-
-def _log_captcha_request(platform: Platform, account: str, endpoint_path: str, 
-                        captcha_result: Dict) -> Optional[RequestLog]:
-    """记录验证码请求日志"""
-    try:
-        # 尝试获取对应的平台端点配置
-        platform_endpoint = None
-        try:
-            platform_endpoint = PlatformEndpoint.objects.get(
-                platform=platform, 
-                endpoint_type='captcha'
-            )
-        except PlatformEndpoint.DoesNotExist:
-            pass
+        return result
         
-        request_log = RequestLog.objects.create(
-            platform=platform,
-            platform_endpoint=platform_endpoint,
-            account=account,
-            endpoint_path=endpoint_path,
-            method=ApiMethod.GET,
-            status_code=200 if captcha_result.get('err_no') == 0 else 400,
-            response_time_ms=0,  # 验证码请求通常不记录响应时间
-            response_body=captcha_result,
-            tag={'type': 'captcha_request'}
-        )
-        return request_log
     except Exception as e:
-        logger.error(f"记录验证码请求日志异常: {str(e)}", exc_info=True)
-        return None
-
-
-def _log_captcha_recognition(request_log: RequestLog, captcha_result: Dict):
-    """记录验证码识别结果"""
-    try:
-        ExternalAuthCaptchaLog.objects.create(
-            request_log=request_log,
-            # 这里可以添加更多验证码识别相关的字段
-        )
-    except Exception as e:
-        logger.error(f"记录验证码识别日志异常: {str(e)}", exc_info=True)
-
-
-def _log_login_request(platform: Platform, account: str, endpoint_path: str, 
-                      success: bool, error_msg: Optional[str], 
-                      response_cookies: Optional[Dict]):
-    """记录登录请求日志"""
-    try:
-        # 尝试获取登录端点配置
-        platform_endpoint = None
-        try:
-            platform_endpoint = PlatformEndpoint.objects.get(
-                platform=platform, 
-                endpoint_type='login'
-            )
-        except PlatformEndpoint.DoesNotExist:
-            pass
+        execution_time = int((time.time() - start_time) * 1000)
+        error_msg = f"获取单个工单详情异常: {str(e)}"
+        logger.error(f"获取单个工单详情异常 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
+                    f"耗时: {execution_time}ms, 错误: {error_msg}", exc_info=True)
         
-        RequestLog.objects.create(
-            platform=platform,
-            platform_endpoint=platform_endpoint,
-            account=account,
-            endpoint_path=endpoint_path,
-            method=ApiMethod.POST,
-            status_code=200 if success else 400,
-            response_body={'cookies': response_cookies} if response_cookies else None,
-            error_message=error_msg if not success else None,
-            tag={'type': 'login_request', 'success': success}
-        )
-    except Exception as e:
-        logger.error(f"记录登录请求日志异常: {str(e)}", exc_info=True)
-
-
-def _log_status_check_request(session: 'AuthSession', platform_endpoint: PlatformEndpoint, 
-                             success: bool, response_data: Optional[Dict], 
-                             error_msg: Optional[str]):
-    """记录状态检查请求日志"""
-    try:
-        RequestLog.objects.create(
-            platform=session.platform,
-            platform_endpoint=platform_endpoint,
-            account=session.account,
-            endpoint_path=platform_endpoint.path,
-            method=platform_endpoint.http_method,
-            status_code=200 if success else 400,
-            response_body=response_data,
-            error_message=error_msg if not success else None,
-            tag={'type': 'status_check', 'success': success, 'session_id': session.id}
-        )
-    except Exception as e:
-        logger.error(f"记录状态检查请求日志异常: {str(e)}", exc_info=True)
-
-
-# 批量获取市中心系统工单
-# 任务接收参数： 平台端点 PlatformEndpoint 和 发起端点请求参数 playload
-# 任务执行：
-# 1. 获取已鉴权会话句柄，未获得则尝试获取，延迟重新执行
-# 2. 请求端点获取工单列表
-# 3. 处理列表中的每个记录，创建获取单个工单详情任务
-# 4. 更新 playload（翻页或者更新search_{start/end}_time） 重新调度自身
-# platform_sign = city_center_workorder
-# endpoint_type = workorder_list
-# api /payroll3/payroll_sub_list_act_doris.php
-# payload 
-# act=search_payroll_list
-# search_ps_caption=处置
-# search_payroll_result_tmp=待处置
-# page=1
-# pagesize=20
-# end_pscaption_time_type=1
-# psr_ps_captio=处置
-# search_ps_captionName=处置
-# search_expire_time_type=1
-# search_start_time=2025-08-10 00:00:00
-# search_end_time=2025-09-08 23:59:59
-
-# 获取单个工单详情写入原始工单
-
-# 读取原始工单写入基础工单
-
-# 对工单进行分类
-
-# 读取编辑工单
-
-# 工单操作1 2 3
+        result['error'] = error_msg
+        
+        # 重试逻辑
+        if self.request.retries < self.max_retries:
+            retry_delay = get_task_config('fetch_single_workorder_task').get('retry_delay', 60)
+            logger.info(f"获取单个工单详情重试 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
+                       f"重试次数: {self.request.retries + 1}, 延迟: {retry_delay}秒")
+            raise self.retry(countdown=retry_delay, exc=e)
+        
+        return result

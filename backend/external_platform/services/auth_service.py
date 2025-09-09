@@ -277,33 +277,31 @@ class AuthService:
         }
 
     @staticmethod
-    def trigger_login_task(platform_sign: str, account: str, password: str) -> Optional[str]:
+    def trigger_login_task(platform_sign: str) -> Optional[str]:
         """触发异步登录任务
         
         Args:
             platform_sign: 平台标识
-            account: 账户名
-            password: 密码
             
         Returns:
             任务ID，失败返回None
         """
-        logger.info(f"触发登录任务 - 平台: {platform_sign}, 账户: {account}")
+        logger.info(f"触发登录任务 - 平台: {platform_sign}")
         
         try:
             # 导入任务函数（避免循环导入）
             from external_platform.tasks import login_task
             
             # 异步执行登录任务
-            result = login_task.delay(platform_sign, account, password)
+            result = login_task.delay(platform_sign)
             task_id = result.id
             
             logger.info(f"登录任务已触发 - 任务ID: {task_id}, "
-                       f"平台: {platform_sign}, 账户: {account}")
+                       f"平台: {platform_sign}")
             
             return task_id
             
         except Exception as e:
-            logger.error(f"触发登录任务失败 - 平台: {platform_sign}, 账户: {account}, "
+            logger.error(f"触发登录任务失败 - 平台: {platform_sign}, "
                         f"错误: {str(e)}", exc_info=True)
             return None

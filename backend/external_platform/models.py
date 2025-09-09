@@ -77,6 +77,18 @@ class PlatformEndpoint(CoreModel):
         ('login', '登录'),
         ('check_status', '状态检查'),
         ('workorder_list', '工单列表'),
+        ('workorder_detail', '工单详情'),
+        ('workorder_related_record', '工单关联'),
+        ('workorder_work_unit_record', '工单办理单位'),
+        ('workorder_poerate_record', '工单办理单位'),
+        ('workorder_attachment_record', '工单附件'),
+        ('workorder_flow_record', '工单流程'),
+        ('workorder_action_edit', '编辑工单'),
+        ('workorder_action_disposal', '处置工单'),
+        ('workorder_action_send', '下派工单'),
+        ('workorder_action_back', '退回工单'),
+        ('workorder_action_postpone', '延期工单'),
+        ('workorder_action_supervise', '督办工单'),
         ('logout', '登出'),
         ('custom', '自定义'),
     ]
@@ -102,6 +114,7 @@ class PlatformEndpoint(CoreModel):
     )
     require_auth = models.BooleanField(verbose_name='是否需要鉴权', default=False)
     description = models.TextField(verbose_name='端点说明', null=True, blank=True)
+    payload = models.JSONField(verbose_name='载荷', null=True, blank=True, default=dict)
     
     def __str__(self):
         if self.name:

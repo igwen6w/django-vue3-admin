@@ -135,7 +135,7 @@ class PlatformLogin(APIView):
             password = validated_data['password']
             
             # 触发登录任务
-            task_id = AuthService.trigger_login_task(platform_sign, account, password)
+            task_id = AuthService.trigger_login_task(platform_sign)
             
             if task_id:
                 logger.info(f"登录任务触发成功 - 任务ID: {task_id}, 平台: {platform_sign}, "

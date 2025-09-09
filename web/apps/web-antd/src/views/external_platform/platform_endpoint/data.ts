@@ -58,11 +58,18 @@ export function useSchema(): VbenFormSchema[] {
       label: '是否需要鉴权',
     },
     {
-      component: 'Input',
+      component: 'Textarea',
       componentProps: { rows: 3, showCount: true },
       fieldName: 'description',
       label: '端点说明',
       rules: z.string().max(500, $t('ui.formRules.maxLength', ['端点说明', 500])).optional(),
+    },
+    {
+      component: 'Textarea',
+      componentProps: { rows: 3, showCount: true },
+      fieldName: 'payload',
+      label: '请求载荷',
+      rules: z.string().max(500, $t('ui.formRules.maxLength', ['请求载荷', 500])).optional(),
     },
     {
       component: 'Input',
@@ -109,9 +116,14 @@ export function useGridFormSchema(): VbenFormSchema[] {
       label: '是否需要鉴权',
     },
     {
-      component: 'Input',
+      component: 'Textarea',
       fieldName: 'description',
       label: '端点说明',
+    },
+    {
+      component: 'Textarea',
+      fieldName: 'payload',
+      label: '载荷',
     },
   ];
 }

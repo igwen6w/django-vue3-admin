@@ -91,6 +91,7 @@ def get_platform_config(platform_sign: str) -> dict:
             'captcha_type': platform.captcha_type,
             'session_timeout_hours': platform.session_timeout_hours,
             'retry_limit': platform.retry_limit,
+            'login_config': platform.login_config,
             'endpoints': {}
         }
         
