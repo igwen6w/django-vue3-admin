@@ -2,9 +2,6 @@
 
 """
 外部平台认证相关的Celery异步任务
-
-为了保持向后兼容性，这个文件导入所有任务
-实际的任务实现已经拆分到 tasks/ 目录下的独立文件中
 """
 
 # 导入所有任务，确保Celery能够发现它们
@@ -15,7 +12,6 @@ from external_platform.tasks.fetch_single_workorder_task import fetch_single_wor
 from external_platform.tasks.sync_data_2_base_order import sync_data_2_base_order
 from external_platform.tasks.utils import handle_session_expiry
 
-# 保持向后兼容性
 __all__ = [
     'login_task',
     'maintain_auth_status_task', 

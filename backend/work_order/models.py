@@ -62,7 +62,7 @@ class Base(Common):
     # 基础工单信息
     external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     external_roll_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
-    external_handle_rel_expire_time = models.DateTimeField(blank=True, null=True, db_comment='处置实际到期时间', verbose_name='处置实际到期时间')
+    external_handle_rel_expire_time = models.CharField(max_length=50, blank=True, null=True, db_comment='处置实际到期时间', verbose_name='处置实际到期时间')
     external_src_way = models.CharField(max_length=50, choices=ExternalSrcWayChoices.choices, blank=True, null=True, db_comment='受理方式', verbose_name='受理方式')
     external_payroll_name = models.CharField(max_length=100, blank=True, null=True, db_comment='姓名', verbose_name='姓名')
     external_company_tel = models.CharField(max_length=100, blank=True, null=True, db_comment='联系方式', verbose_name='联系方式')
