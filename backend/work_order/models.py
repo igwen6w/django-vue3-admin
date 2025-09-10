@@ -32,7 +32,7 @@ class Common(CoreModel):
 
     version = models.CharField(max_length=32, db_comment='版本', verbose_name='版本')
     source_system = models.CharField(max_length=20, db_comment='来源标识', verbose_name='来源标识')
-    sync_task_id = models.BigIntegerField(db_comment='同步任务ID', verbose_name='同步任务ID')
+    sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID')
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
 
@@ -46,8 +46,9 @@ class Meta(Common):
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
 
-    raw_data = models.JSONField(db_comment='原始工单数据', verbose_name='工单信息')
-    pull_task_id = models.BigIntegerField(db_comment='拉取任务ID', verbose_name='拉取任务ID')
+    raw_data = models.JSONField(db_comment='原始工单数据', verbose_name='工单信息', default=dict)
+    pull_task_id = models.CharField(max_length=36, db_comment='拉取任务ID', verbose_name='拉取任务ID')
+    external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
 
 
 class Base(Common):

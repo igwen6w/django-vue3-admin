@@ -6,10 +6,13 @@
 
 import logging
 import time
+import hashlib
+import json
 from typing import Dict, Any, Optional
 from celery import shared_task
 from django.utils import timezone
 from django.db import transaction
+
 
 from external_platform.models import Platform, AuthSession, PlatformEndpoint
 from external_platform.choices import PlatformAuthStatus
@@ -311,6 +314,9 @@ def batch_fetch_workorders_task(self) -> Dict[str, Any]:
         'task_id': task_id,
         'fetched_count': 0,
         'created_tasks': 0,
+        'saved_records': 0,
+        'updated_records': 0,
+        'skipped_records': 0,
         'error': None
     }
     
@@ -430,11 +436,14 @@ def batch_fetch_workorders_task(self) -> Dict[str, Any]:
                 result['error'] = error_msg
                 return result
             
-            # 步骤4: 处理工单列表数据
+            # 步骤4: 处理工单列表数据并存储到数据库
             workorder_list = []
             if response_data and 'res' in response_data:
                 res_data = response_data['res']
-                if isinstance(res_data, dict) and 'list' in res_data:
+                # 根据实际数据结构，工单列表在 tbody 字段中
+                if isinstance(res_data, dict) and 'tbody' in res_data:
+                    workorder_list = res_data['tbody']
+                elif isinstance(res_data, dict) and 'list' in res_data:
                     workorder_list = res_data['list']
                 elif isinstance(res_data, list):
                     workorder_list = res_data
@@ -442,30 +451,84 @@ def batch_fetch_workorders_task(self) -> Dict[str, Any]:
             result['fetched_count'] = len(workorder_list)
             logger.info(f"获取到工单列表 - 数量: {result['fetched_count']}")
             
-            # 步骤5: 为每个工单创建详情获取任务
+            # 步骤5: 存储工单数据到数据库并创建详情获取任务
+            from work_order.models import Meta as WorkOrderMeta
+            
             created_tasks = 0
+            saved_records = 0
+            skipped_records = 0
+            
             for workorder in workorder_list:
                 try:
-                    workorder_id = workorder.get('id') or workorder.get('payroll_id')
-                    if workorder_id:
-                        # 创建获取单个工单详情的任务
-                        fetch_single_workorder_task.delay(
-                            platform_sign=platform_sign,
-                            workorder_id=workorder_id,
-                            batch_task_id=task_id
-                        )
-                        created_tasks += 1
-                        logger.debug(f"创建工单详情任务 - 工单ID: {workorder_id}")
+                    # 根据实际数据结构，工单ID在 id 字段中
+                    workorder_id = workorder.get('id')
+                    if not workorder_id:
+                        logger.warning(f"工单缺少ID字段 - 工单数据: {workorder}")
+                        continue
+                    
+                    # 计算工单数据的MD5版本号
+                    workorder_json = json.dumps(workorder, sort_keys=True, ensure_ascii=False)
+                    current_version = hashlib.md5(workorder_json.encode('utf-8')).hexdigest()
+                    
+                    # 检查是否已存在相同工单ID的最新记录
+                    existing_record = WorkOrderMeta.objects.filter(
+                        external_id=int(workorder_id),
+                        source_system=platform_sign
+                    ).order_by('-create_time').first()
+                    
+                    should_save = False
+                    
+                    if not existing_record:
+                        # 没有现有记录，直接创建新记录
+                        should_save = True
+                        logger.debug(f"工单ID {workorder_id} 无现有记录，将创建新记录")
+                    elif existing_record.version != current_version:
+                        # 版本不同，直接创建新记录
+                        should_save = True
+                        logger.info(f"工单ID {workorder_id} 版本不同，将创建新记录 - 旧版本: {existing_record.version[:8]}..., 新版本: {current_version[:8]}...")
+                    else:
+                        # 版本相同，跳过
+                        skipped_records += 1
+                        logger.debug(f"工单ID {workorder_id} 版本相同，跳过处理")
+                        continue
+                    
+                    # 执行数据库操作
+                    if should_save:
+                        with transaction.atomic():
+                            # 创建新记录
+                            meta_record = WorkOrderMeta.objects.create(
+                                version=current_version,
+                                source_system=platform_sign,
+                                sync_task_id=0,  # 将由fetch_single_workorder_task更新
+                                raw_data=workorder,
+                                pull_task_id=task_id,
+                                external_id=int(workorder_id)
+                            )
+                            
+                            saved_records += 1
+                            logger.info(f"保存新工单记录 - 工单ID: {workorder_id}, 记录ID: {meta_record.id}")
+                    
+                    # 创建获取单个工单详情的任务
+                    fetch_single_workorder_task.delay(
+                        platform_sign=platform_sign,
+                        workorder_id=workorder_id,
+                        batch_task_id=task_id
+                    )
+                    created_tasks += 1
+                    logger.debug(f"创建工单详情任务 - 工单ID: {workorder_id}, 工单类型: {workorder.get('payroll_type', '')}")
                     
                 except Exception as e:
-                    logger.error(f"创建工单详情任务失败 - 工单数据: {workorder}, 错误: {str(e)}")
+                    logger.error(f"处理工单数据失败 - 工单ID: {workorder.get('id', 'unknown')}, 错误: {str(e)}", exc_info=True)
             
             result['created_tasks'] = created_tasks
+            result['saved_records'] = saved_records
+            result['skipped_records'] = skipped_records
             result['success'] = True
             
             execution_time = int((time.time() - start_time) * 1000)
             logger.info(f"批量获取工单任务完成 - 任务ID: {task_id}, 耗时: {execution_time}ms, "
-                       f"获取数量: {result['fetched_count']}, 创建任务: {result['created_tasks']}")
+                       f"获取数量: {result['fetched_count']}, 保存: {result['saved_records']}, "
+                       f"跳过: {result['skipped_records']}, 创建任务: {result['created_tasks']}")
             
         finally:
             client.close()
