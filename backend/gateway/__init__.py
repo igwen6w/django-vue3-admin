@@ -6,7 +6,7 @@
 """
 
 __version__ = '1.0.0'
-__author__ = 'Django Vue3 Admin Team'
+__author__ = 'igwen6w@gmail.com'
 
 from .exceptions import (
     GatewayError,
@@ -17,8 +17,24 @@ from .exceptions import (
     PlatformAPIError,
     ConfigurationError,
 )
+from .api_wrappers import (
+    PlatformAPI,
+    get_api_instance,
+    reset_api_instance,
+    keepalive,
+    refresh_session,
+    custom_request,
+    batch_request,
+    upload_file,
+    download_file,
+    get_api_statistics,
+    health_check,
+)
+from .services import SessionManager
+from .config import get_gateway_config
 
 __all__ = [
+    # 异常类
     'GatewayError',
     'AuthenticationError', 
     'SessionExpiredError',
@@ -26,4 +42,20 @@ __all__ = [
     'CaptchaError',
     'PlatformAPIError',
     'ConfigurationError',
+    # API封装类
+    'PlatformAPI',
+    'get_api_instance',
+    'reset_api_instance',
+    # 便捷函数
+    'keepalive',
+    'refresh_session',
+    'custom_request',
+    'batch_request',
+    'upload_file',
+    'download_file',
+    'get_api_statistics',
+    'health_check',
+    # 核心组件
+    'SessionManager',
+    'get_gateway_config',
 ]
