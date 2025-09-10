@@ -361,7 +361,7 @@ class ExternalPlatformClient:
             logger.info(f"验证码获取成功 - 任务ID: {task_id}, 图片大小: {len(captcha_image)} bytes")
             
             # 步骤2: 获取验证码服务并识别验证码
-            from external_platform.services.captcha_service import get_captcha_service
+            from common.captcha_service import get_captcha_service
             captcha_service = get_captcha_service()
             if not captcha_service:
                 error_msg = "验证码服务不可用"
