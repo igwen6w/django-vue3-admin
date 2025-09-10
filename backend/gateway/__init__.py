@@ -32,6 +32,15 @@ from .api_wrappers import (
 )
 from .services import SessionManager
 from .config import get_gateway_config
+from .tasks import (
+    execute_keepalive_now,
+    execute_health_check_now, 
+    execute_cleanup_now,
+)
+from .celery_config import (
+    get_gateway_celery_config,
+    validate_celery_config,
+)
 
 __all__ = [
     # 异常类
@@ -58,4 +67,10 @@ __all__ = [
     # 核心组件
     'SessionManager',
     'get_gateway_config',
+    # Celery任务
+    'execute_keepalive_now',
+    'execute_health_check_now',
+    'execute_cleanup_now',
+    'get_gateway_celery_config',
+    'validate_celery_config',
 ]
