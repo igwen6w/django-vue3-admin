@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "ai",
     "work_order",
     "external_platform",
+    "gateway",  # 平台网关SDK
 ]
 
 MIDDLEWARE = [
@@ -219,6 +220,59 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
+# ================= Celery任务路由配置 =================
+CELERY_TASK_ROUTES = {
+    # 网关SDK任务路由
+    'gateway.tasks.keepalive_task': {
+        'queue': 'gateway',
+        'routing_key': 'gateway.keepalive'
+    },
+    'gateway.tasks.session_health_check_task': {
+        'queue': 'gateway',
+        'routing_key': 'gateway.health'
+    },
+    'gateway.tasks.session_cleanup_task': {
+        'queue': 'gateway',
+        'routing_key': 'gateway.cleanup'
+    },
+    'gateway.tasks.test_connectivity_task': {
+        'queue': 'gateway',
+        'routing_key': 'gateway.connectivity'
+    }
+}
+
+# ================= Celery任务配置注解 =================
+CELERY_TASK_ANNOTATIONS = {
+    # 网关保活任务
+    'gateway.tasks.keepalive_task': {
+        'rate_limit': '6/m',  # 每分钟最多6次
+        'time_limit': 120,    # 2分钟超时
+        'soft_time_limit': 90, # 90秒软超时
+        'retry_backoff': True,
+        'retry_backoff_max': 300,  # 最大重试间隔5分钟
+        'retry_jitter': True
+    },
+    # 网关健康检查任务
+    'gateway.tasks.session_health_check_task': {
+        'rate_limit': '10/m',
+        'time_limit': 60,
+        'soft_time_limit': 45,
+        'retry_backoff': True
+    },
+    # 网关会话清理任务
+    'gateway.tasks.session_cleanup_task': {
+        'rate_limit': '2/h',   # 每小时最多2次
+        'time_limit': 300,     # 5分钟超时
+        'soft_time_limit': 240
+    },
+    # 网关连通性测试任务
+    'gateway.tasks.test_connectivity_task': {
+        'rate_limit': '4/m',
+        'time_limit': 30,
+        'soft_time_limit': 20
+    }
+}
+
 CELERY_BEAT_SCHEDULE = {
     'every-1-minutes': {
         'task': 'system.tasks.sync_temu_order',  # 任务路径
@@ -246,6 +300,51 @@ CELERY_BEAT_SCHEDULE = {
         'options': {
             'expires': 1800,  # 任务过期时间30分钟
         }
+    },
+    # ================= 网关SDK任务 =================
+    # 网关保活任务
+    'gateway-keepalive': {
+        'task': 'gateway.tasks.keepalive_task',
+        'schedule': int(os.getenv('GATEWAY_KEEPALIVE_INTERVAL', '300')),
+        'options': {
+            'queue': 'gateway',
+            'routing_key': 'gateway.keepalive',
+            'priority': 8,
+            'expires': 120
+        }
+    },
+    # 网关健康检查任务
+    'gateway-health-check': {
+        'task': 'gateway.tasks.session_health_check_task',
+        'schedule': int(os.getenv('GATEWAY_HEALTH_CHECK_INTERVAL', '600')),
+        'options': {
+            'queue': 'gateway',
+            'routing_key': 'gateway.health',
+            'priority': 6,
+            'expires': 300
+        }
+    },
+    # 网关会话清理任务
+    'gateway-session-cleanup': {
+        'task': 'gateway.tasks.session_cleanup_task',
+        'schedule': int(os.getenv('GATEWAY_CLEANUP_INTERVAL', '3600')),
+        'options': {
+            'queue': 'gateway',
+            'routing_key': 'gateway.cleanup',
+            'priority': 3,
+            'expires': 1800
+        }
+    },
+    # 网关连通性测试任务
+    'gateway-connectivity-test': {
+        'task': 'gateway.tasks.test_connectivity_task',
+        'schedule': int(os.getenv('GATEWAY_CONNECTIVITY_TEST_INTERVAL', '1800')),
+        'options': {
+            'queue': 'gateway',
+            'routing_key': 'gateway.connectivity',
+            'priority': 4,
+            'expires': 900
+        }
     }
 }
 # celery 配置结束
@@ -257,6 +356,37 @@ CHAOJIYING_CONFIG = {
     'password': os.getenv('CHAOJIYING_PASSWORD', ''),
     'software_id': os.getenv('CHAOJIYING_SOFTWARE_ID', ''),
     'timeout': 30
+}
+
+# ================= 平台网关SDK配置 =================
+GATEWAY_SETTINGS = {
+    'username': os.getenv('GATEWAY_USERNAME', ''),
+    'password': os.getenv('GATEWAY_PASSWORD', ''),
+    'base_url': os.getenv('GATEWAY_BASE_URL', ''),
+    'captcha_base_url': os.getenv('GATEWAY_CAPTCHA_BASE_URL', ''),
+    'login_url': os.getenv('GATEWAY_LOGIN_URL', '/login'),
+    'request_timeout': int(os.getenv('GATEWAY_REQUEST_TIMEOUT', '30')),
+    'session_timeout': int(os.getenv('GATEWAY_SESSION_TIMEOUT', '3600')),
+    'max_retries': int(os.getenv('GATEWAY_MAX_RETRIES', '3')),
+    'redis_key_prefix': os.getenv('GATEWAY_REDIS_KEY_PREFIX', 'gateway:'),
+    'user_agent': os.getenv('GATEWAY_USER_AGENT', 
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'),
+    
+    # 验证码相关配置
+    'captcha_type': int(os.getenv('GATEWAY_CAPTCHA_TYPE', '1004')),
+    'captcha_max_retries': int(os.getenv('GATEWAY_CAPTCHA_MAX_RETRIES', '3')),
+    
+    # Celery任务调度配置
+    'keepalive_interval': int(os.getenv('GATEWAY_KEEPALIVE_INTERVAL', '300')),  # 5分钟
+    'health_check_interval': int(os.getenv('GATEWAY_HEALTH_CHECK_INTERVAL', '600')),  # 10分钟
+    'cleanup_interval': int(os.getenv('GATEWAY_CLEANUP_INTERVAL', '3600')),  # 1小时
+    'connectivity_test_interval': int(os.getenv('GATEWAY_CONNECTIVITY_TEST_INTERVAL', '1800')),  # 30分钟
+    
+    # 任务开关
+    'enable_keepalive_task': os.getenv('GATEWAY_ENABLE_KEEPALIVE_TASK', 'True').lower() in ('true', '1'),
+    'enable_health_check_task': os.getenv('GATEWAY_ENABLE_HEALTH_CHECK_TASK', 'True').lower() in ('true', '1'),
+    'enable_cleanup_task': os.getenv('GATEWAY_ENABLE_CLEANUP_TASK', 'True').lower() in ('true', '1'),
+    'enable_connectivity_test_task': os.getenv('GATEWAY_ENABLE_CONNECTIVITY_TEST_TASK', 'True').lower() in ('true', '1'),
 }
 
 # 外部平台配置现在从数据库读取，无需静态配置

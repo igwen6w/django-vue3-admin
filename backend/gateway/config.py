@@ -21,25 +21,33 @@ class GatewayConfig:
     负责加载、验证和管理网关相关的配置项
     """
     
-    # 必需的配置字段
+    # 必需的配置字段（对应Django settings中的小写字段）
     REQUIRED_FIELDS = [
-        'USERNAME',
-        'PASSWORD', 
-        'BASE_URL',
-        'CAPTCHA_BASE_URL'
+        'username',
+        'password', 
+        'base_url',
+        'captcha_base_url'
     ]
     
-    # 配置字段默认值
+    # 配置字段默认值（使用小写字段名）
     DEFAULT_VALUES = {
-        'LOGIN_URL': '/login',
-        'CAPTCHA_TYPE': 1004,  # 超级鹰英数字混合验证码类型
-        'CAPTCHA_MAX_RETRIES': 3,
-        'KEEPALIVE_INTERVAL': 300,  # 5分钟
-        'SESSION_TIMEOUT': 3600,    # 1小时
-        'MAX_RETRIES': 3,
-        'REDIS_KEY_PREFIX': 'gateway:',
-        'REQUEST_TIMEOUT': 30,      # 请求超时时间
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'login_url': '/login',
+        'captcha_type': 1004,  # 超级鹰英数字混合验证码类型
+        'captcha_max_retries': 3,
+        'keepalive_interval': 300,  # 5分钟
+        'health_check_interval': 600,  # 10分钟
+        'cleanup_interval': 3600,    # 1小时
+        'connectivity_test_interval': 1800,  # 30分钟
+        'session_timeout': 3600,    # 1小时
+        'max_retries': 3,
+        'redis_key_prefix': 'gateway:',
+        'request_timeout': 30,      # 请求超时时间
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        # 任务开关默认值
+        'enable_keepalive_task': True,
+        'enable_health_check_task': True,
+        'enable_cleanup_task': True,
+        'enable_connectivity_test_task': True,
     }
     
     def __init__(self):
@@ -100,17 +108,14 @@ class GatewayConfig:
         """合并用户配置和默认配置"""
         merged_config = {}
         
-        # 转换配置键名并设置值
+        # 直接使用Django settings中的小写字段名
         for key, value in config.items():
-            # 转换为小写下划线格式
-            config_key = key.lower()
-            merged_config[config_key] = value
+            merged_config[key] = value
         
         # 设置默认值
         for key, default_value in self.DEFAULT_VALUES.items():
-            config_key = key.lower()
-            if config_key not in merged_config:
-                merged_config[config_key] = default_value
+            if key not in merged_config:
+                merged_config[key] = default_value
         
         return merged_config
     
@@ -159,20 +164,23 @@ class GatewayConfig:
         
         # 验证数值类型配置
         numeric_configs = [
-            ('captcha_type', 'CAPTCHA_TYPE'),
-            ('captcha_max_retries', 'CAPTCHA_MAX_RETRIES'), 
-            ('keepalive_interval', 'KEEPALIVE_INTERVAL'),
-            ('session_timeout', 'SESSION_TIMEOUT'),
-            ('max_retries', 'MAX_RETRIES'),
-            ('request_timeout', 'REQUEST_TIMEOUT'),
+            ('captcha_type', 'captcha_type'),
+            ('captcha_max_retries', 'captcha_max_retries'), 
+            ('keepalive_interval', 'keepalive_interval'),
+            ('health_check_interval', 'health_check_interval'),
+            ('cleanup_interval', 'cleanup_interval'),
+            ('connectivity_test_interval', 'connectivity_test_interval'),
+            ('session_timeout', 'session_timeout'),
+            ('max_retries', 'max_retries'),
+            ('request_timeout', 'request_timeout'),
         ]
         
-        for config_key, original_key in numeric_configs:
+        for config_key, display_key in numeric_configs:
             value = self.get(config_key)
             if not isinstance(value, int) or value <= 0:
                 raise ConfigurationError(
-                    f"{original_key}必须是正整数",
-                    config_key=original_key
+                    f"{display_key}必须是正整数",
+                    config_key=display_key
                 )
     
     def get(self, key: str, default: Any = None) -> Any:
