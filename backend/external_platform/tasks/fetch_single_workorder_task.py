@@ -2,28 +2,96 @@
 
 """
 获取单个工单详情任务
+
+该模块负责获取单个工单的详细信息，使用gateway API获取数据，
+并将原始数据保存到Meta模型中，然后触发同步任务。
 """
 
 import logging
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from celery import shared_task
-from django.utils import timezone
 
-from external_platform.models import Platform, AuthSession, PlatformEndpoint
-from external_platform.choices import PlatformAuthStatus
-from external_platform.services.external_client import ExternalPlatformClient
-from external_platform.services.request_log import log_workorder_detail_request
-from external_platform.utils import get_platform_config, get_task_config
-from external_platform.tasks.utils import handle_session_expiry
+from external_platform.utils import get_task_config
 from external_platform.tasks.sync_data_2_base_order import sync_data_2_base_order
+from gateway import get_order_detail
+from utils.crypto import CryptoUtils
 
 logger = logging.getLogger(__name__)
 
 
+def _extract_order_detail_from_response(response_data: Dict[str, Any]) -> Optional[str]:
+    """从响应数据中提取工单详情
+    
+    Args:
+        response_data: API响应数据
+        
+    Returns:
+        工单详情，如果找不到则返回None
+    """
+    if not response_data or not response_data.get('success'):
+        return None
+    
+    data = response_data.get('data', {})
+    
+    # 检查是否有res字段
+    if 'res' in data and isinstance(data['res'], list):
+        # 返回res列表
+        return data['res']
+    
+    return None
+
+
+def _validate_response_data(response_data: Dict[str, Any]) -> bool:
+    """验证响应数据是否有效
+    
+    Args:
+        response_data: API响应数据
+        
+    Returns:
+        数据是否有效
+    """
+    if not response_data or not response_data.get('success'):
+        return False
+    
+    data = response_data.get('data', {})
+    
+    # 检查是否有预期的数据结构
+    if 'res' not in data:
+        return False
+    
+    res = data['res']
+    if not isinstance(res, list) or len(res) == 0:
+        return False
+    
+    return True
+
+
+def _get_task_config_with_defaults() -> Dict[str, Any]:
+    """获取任务配置，包含默认值
+    
+    Returns:
+        任务配置字典
+    """
+    try:
+        config = get_task_config('fetch_single_workorder_task')
+    except Exception:
+        config = {}
+    
+    defaults = {
+        'retry_delay': 60,
+        'timeout': 30
+    }
+    
+    return {**defaults, **config}
+
+
 @shared_task(bind=True, max_retries=3)
-def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, batch_task_id: str = None) -> Dict[str, Any]:
+def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, batch_task_id: Optional[str] = None) -> Dict[str, Any]:
     """获取单个工单详情任务
+    
+    使用gateway API获取工单详情，将完整的响应数据保存到Meta模型中，
+    然后触发同步任务将数据转换到Base模型。
     
     Args:
         platform_sign: 平台标识
@@ -31,9 +99,13 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
         batch_task_id: 批量任务ID（可选）
         
     Returns:
-        任务执行结果
+        任务执行结果字典，包含成功状态、Meta记录ID和错误信息
     """
     task_id = self.request.id
+    
+    # 获取配置
+    config = _get_task_config_with_defaults()
+    
     logger.info(f"开始获取单个工单详情 - 任务ID: {task_id}, 平台: {platform_sign}, 工单ID: {workorder_id}")
     
     start_time = time.time()
@@ -43,147 +115,91 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
         'workorder_id': workorder_id,
         'task_id': task_id,
         'batch_task_id': batch_task_id,
-        'error': None
+        'meta_record_id': None,
+        'sync_task_triggered': False,
+        'error': None,
+        'execution_time_ms': 0
     }
     
     try:
-        # 获取平台配置
-        try:
-            platform = Platform.objects.get(sign=platform_sign, is_deleted=False)
-        except Platform.DoesNotExist:
-            error_msg = f"平台不存在: {platform_sign}"
+        # 调用gateway API获取工单详情
+        logger.debug(f"调用get_order_detail - 工单ID: {workorder_id}")
+        response_data = get_order_detail(workorder_id)
+        
+        # 检查API响应
+        if not response_data:
+            error_msg = "获取工单详情失败：API返回空响应"
             logger.error(error_msg)
             result['error'] = error_msg
             return result
         
-        # 获取工单详情端点（假设端点类型为 workorder_detail）
-        try:
-            detail_endpoint = PlatformEndpoint.objects.get(
-                platform=platform,
-                endpoint_type='workorder_detail'
+        if not response_data.get('success', False):
+            error_msg = f"获取工单详情失败：{response_data.get('error', '未知错误')}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
+        # 验证响应数据结构
+        if not _validate_response_data(response_data):
+            error_msg = "获取工单详情失败：响应数据格式无效"
+            logger.error(f"{error_msg} - 响应数据: {response_data}")
+            result['error'] = error_msg
+            return result
+        
+        
+        # 保存原始工单数据到Meta模型
+        from work_order.models import Meta as WorkOrderMeta
+        
+        try:            
+            sync_task_id = task_id
+            pull_task_id = batch_task_id
+
+            raw_data = _extract_order_detail_from_response(response_data)
+            # 创建Meta记录
+            meta_record = WorkOrderMeta.objects.create(
+                version=CryptoUtils.md5(raw_data.encode('utf-8')).hexdigest(),
+                source_system=platform_sign,
+                sync_task_id=str(sync_task_id),
+                raw_data=raw_data,
+                pull_task_id=str(pull_task_id),
+                external_id=int(workorder_id) if workorder_id.isdigit() else 0
             )
-        except PlatformEndpoint.DoesNotExist:
-            error_msg = f"平台 {platform_sign} 未配置工单详情端点"
-            logger.error(error_msg)
-            result['error'] = error_msg
-            return result
-        
-        # 获取认证会话
-        try:
-            active_session = AuthSession.objects.filter(
-                platform=platform,
-                status=PlatformAuthStatus.ACTIVE,
-                expire_time__gt=timezone.now()
-            ).first()
             
-            if not active_session:
-                error_msg = "未找到有效的认证会话"
-                logger.warning(error_msg)
-                result['error'] = error_msg
-                return result
+            result['meta_record_id'] = meta_record.id
+            
+            logger.info(f"保存原始工单数据成功 - 工单ID: {workorder_id}, Meta记录ID: {meta_record.id}")
+            
+            # 触发同步到Base表的任务
+            try:
+                sync_data_2_base_order.delay(meta_record.id)
+                result['sync_task_triggered'] = True
+                logger.info(f"已触发同步任务 - Meta记录ID: {meta_record.id}")
+            except Exception as e:
+                logger.warning(f"触发同步任务失败 - Meta记录ID: {meta_record.id}, 错误: {e}")
+                # 同步任务触发失败不影响主任务成功
                 
         except Exception as e:
-            error_msg = f"获取认证会话失败: {str(e)}"
-            logger.error(error_msg)
+            error_msg = f"保存工单数据到Meta表失败: {str(e)}"
+            logger.error(error_msg, exc_info=True)
             result['error'] = error_msg
             return result
         
-        # 构建请求参数
-        base_payload = detail_endpoint.payload or {}
-        request_payload = {
-            **base_payload,
-            'act': 'payroll_view_module',
-            'id': workorder_id,
-            'module_name': '系统默认'
-        }
+        # 任务执行成功
+        result['success'] = True
         
-        # 获取平台配置并发送请求
-        platform_config = get_platform_config(platform_sign)
-        if not platform_config:
-            error_msg = f"获取平台配置失败: {platform_sign}"
-            logger.error(error_msg)
-            result['error'] = error_msg
-            return result
+        execution_time = int((time.time() - start_time) * 1000)
+        result['execution_time_ms'] = execution_time
         
-        client = ExternalPlatformClient(platform_config['base_url'])
-        
-        try:
-            # 从会话中获取认证信息
-            auth_data = active_session.auth or {}
-            cookies = auth_data.get('cookies', {})
-            
-            # 发送工单详情请求
-            success, response_data, error_msg = client.make_authenticated_request(
-                method=detail_endpoint.http_method,
-                endpoint=detail_endpoint.path,
-                cookies=cookies,
-                data=request_payload if detail_endpoint.http_method == 'POST' else None,
-                params=request_payload if detail_endpoint.http_method == 'GET' else None
-            )
-            
-            # 记录请求日志
-            log_workorder_detail_request(active_session, detail_endpoint, success, response_data, error_msg, request_payload)
-            
-            # 检查会话失效响应
-            if success and response_data:
-                try:
-                    retry_delay = get_task_config('fetch_single_workorder_task').get('retry_delay', 60)
-                    if handle_session_expiry(response_data, active_session, platform_sign, 
-                                           task_self=self, retry_delay=retry_delay):
-                        # 如果检测到会话失效但无法重试，返回错误
-                        error_msg = "会话失效且已达到最大重试次数或触发重新登录失败"
-                        result['error'] = error_msg
-                        return result
-                except Exception as e:
-                    # 如果是重试异常，重新抛出
-                    if "会话失效已触发重新登录" in str(e):
-                        raise
-                    else:
-                        error_msg = f"处理会话失效异常: {str(e)}"
-                        logger.error(error_msg)
-                        result['error'] = error_msg
-                        return result
-            
-            if not success:
-                error_msg = f"获取工单详情失败: {error_msg}"
-                logger.error(error_msg)
-                result['error'] = error_msg
-                return result
-            
-            # 保存原始工单数据
-            if response_data:
-                from work_order.models import Meta as WorkOrderMeta
-                
-                # 创建原始工单记录
-                meta_record = WorkOrderMeta.objects.create(
-                    version='1.0',
-                    source_system=platform_sign,
-                    sync_task_id=int(task_id.replace('-', '')[:10], 16),  # 将任务ID转换为数字
-                    raw_data=response_data,
-                    pull_task_id=int(batch_task_id.replace('-', '')[:10], 16) if batch_task_id else 0
-                )
-                
-                logger.info(f"保存原始工单成功 - 工单ID: {workorder_id}, 记录ID: {meta_record.id}")
-                result['meta_record_id'] = meta_record.id
-                
-                # 触发同步到基础表的任务
-                sync_data_2_base_order.delay(meta_record.id)
-                logger.info(f"已触发同步任务 - Meta记录ID: {meta_record.id}")
-            
-            result['success'] = True
-            
-            execution_time = int((time.time() - start_time) * 1000)
-            logger.info(f"获取单个工单详情完成 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
-                       f"耗时: {execution_time}ms")
-            
-        finally:
-            client.close()
+        logger.info(f"获取单个工单详情完成 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
+                   f"Meta记录ID: {result['meta_record_id']}, 耗时: {execution_time}ms")
         
         return result
         
     except Exception as e:
         execution_time = int((time.time() - start_time) * 1000)
+        result['execution_time_ms'] = execution_time
         error_msg = f"获取单个工单详情异常: {str(e)}"
+        
         logger.error(f"获取单个工单详情异常 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
                     f"耗时: {execution_time}ms, 错误: {error_msg}", exc_info=True)
         
@@ -191,9 +207,10 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
         
         # 重试逻辑
         if self.request.retries < self.max_retries:
-            retry_delay = get_task_config('fetch_single_workorder_task').get('retry_delay', 60)
-            logger.info(f"获取单个工单详情重试 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
-                       f"重试次数: {self.request.retries + 1}, 延迟: {retry_delay}秒")
+            retry_delay = config.get('retry_delay', 60)
+            logger.info(f"准备重试获取单个工单详情 - 任务ID: {task_id}, 工单ID: {workorder_id}, "
+                       f"重试次数: {self.request.retries + 1}/{self.max_retries}, "
+                       f"延迟: {retry_delay}秒")
             raise self.retry(countdown=retry_delay, exc=e)
         
         return result
