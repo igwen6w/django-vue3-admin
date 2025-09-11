@@ -420,13 +420,7 @@ class PlatformAPI:
             用户信息字典
         """
         try:
-            # 构建API路径
-            if user_id:
-                api_path = f"/api/user/{user_id}"
-            else:
-                api_path = "/api/user/current"
-            
-            logger.info(f"获取用户信息 - 路径: {api_path}")
+            api_path = "/personal_center/sub_act.php?act=list_my"
             
             # 执行API请求
             response = self.session_manager.request('GET', api_path)
@@ -479,7 +473,7 @@ class PlatformAPI:
             logger.debug("执行保活请求")
             
             # 执行保活请求
-            response = self.session_manager.request('GET', '/api/keepalive')
+            response = self.session_manager.request('GET', '/fresh_act.php')
             
             # 处理响应
             result = self._handle_api_response(response, 'keepalive')
@@ -510,7 +504,7 @@ class PlatformAPI:
             # 构建查询参数
             params = {
                 'page': page,
-                'page_size': page_size
+                'pagesize': page_size
             }
             
             if filters:
@@ -520,13 +514,60 @@ class PlatformAPI:
             
             # 执行API请求
             response = self.session_manager.request(
-                'GET',
-                '/api/orders',
+                'POST',
+                '/payroll3/payroll_sub_list_act_doris.php',
                 params=params
             )
             
             # 处理响应
             return self._handle_api_response(response, 'get_order_list')
+            
+        except Exception as e:
+            logger.error(f"获取订单列表失败: {e}")
+            raise
+
+
+    @_ensure_authenticated
+    def get_pending_disposal_order_list(self, page: int = 1, page_size: int = 20) -> Dict[str, Any]:
+        """获取待处置工单
+
+        Args:
+            page: 页码
+            page_size: 每页数量
+
+        Returns:
+            订单列表
+        """
+        try:
+            # 构建查询参数
+            # 获取当前时间范围（默认获取最近30天的工单）
+            end_time = timezone.now()
+            start_time_param = end_time - timedelta(days=30)
+
+            params = {
+                'page': page,
+                'pagesize': page_size,
+                'act': 'search_payroll_list',
+                'search_ps_caption': '处置',
+                'search_payroll_result_tmp': '待处置',
+                'end_pscaption_time_type': 1,
+                'psr_ps_caption': '处置',
+                'search_ps_captionName': '处置',
+                'search_expire_time_type': 1,
+                'search_start_time': start_time_param.strftime('%Y-%m-%d %H:%M:%S'),
+                'search_end_time': end_time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+
+            logger.info(f"获取待处置工单 - 页码: {page}, 每页: {page_size}, 时间范围: {start_time_param} 到 {end_time}")
+
+            # 执行API请求
+            response = self.session_manager.request(
+                'POST',
+                '/payroll3/payroll_sub_list_act_doris.php',
+                params=params
+            )
+
+            return self._handle_api_response(response, 'get_pending_disposal_order_list')
             
         except Exception as e:
             logger.error(f"获取订单列表失败: {e}")
@@ -549,7 +590,15 @@ class PlatformAPI:
             logger.info(f"获取订单详情 - 订单ID: {order_id}")
             
             # 执行API请求
-            response = self.session_manager.request('GET', f'/api/order/{order_id}')
+            response = self.session_manager.request(
+                'POST', 
+                '/payroll3/sub_act.php',
+                params={
+                    'act': 'payroll_view_module',
+                    'id': order_id,
+                    'module_name': '系统默认'
+                }
+            )
             
             # 处理响应
             return self._handle_api_response(response, 'get_order_detail')
@@ -1013,6 +1062,11 @@ def get_order_list(page: int = 1, page_size: int = 20,
     """便捷函数：获取订单列表"""
     api = get_api_instance()
     return api.get_order_list(page, page_size, filters)
+
+def get_pending_disposal_order_list(page: int = 1, page_size: int = 20) -> Dict[str, Any]:
+    """便捷函数：获取待处置工单列表"""
+    api = get_api_instance()
+    return api.get_pending_disposal_order_list(page, page_size)
 
 
 def get_order_detail(order_id: str) -> Dict[str, Any]:
