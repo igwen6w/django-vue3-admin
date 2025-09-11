@@ -275,7 +275,7 @@ CELERY_TASK_ANNOTATIONS = {
 
 CELERY_BEAT_SCHEDULE = {
     'batch_fetch_workorders': {
-        'task': 'external_platform.tasks.batch_fetch_workorders_task',
+        'task': 'external_platform.tasks.batch_fetch_workorders_task.batch_fetch_workorders_task',
         'schedule': 300,  # 每 5 分钟执行一次
         'options': {
             'expires': 1800,  # 任务过期时间30分钟

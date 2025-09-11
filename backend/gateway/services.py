@@ -76,25 +76,14 @@ class SessionManager:
             redis_config = getattr(settings, 'CACHES', {}).get('default', {})
             if redis_config.get('BACKEND') == 'django_redis.cache.RedisCache':
                 # 使用Django Redis缓存配置
-                location = redis_config.get('LOCATION', 'redis://127.0.0.1:6379/1')
-                # 解析Redis URL
-                if location.startswith('redis://'):
-                    # 简单解析，实际项目中可能需要更复杂的解析
-                    parts = location.replace('redis://', '').split('/')
-                    host_port = parts[0].split(':')
-                    host = host_port[0]
-                    port = int(host_port[1]) if len(host_port) > 1 else 6379
-                    db = int(parts[1]) if len(parts) > 1 else 0
-                else:
-                    host, port, db = '127.0.0.1', 6379, 1
+                redis_url = redis_config.get('LOCATION', 'redis://127.0.0.1:6379/1')
             else:
                 # 使用默认配置
-                host, port, db = '127.0.0.1', 6379, 1
+                redis_url = 'redis://127.0.0.1:6379/1'
             
-            client = redis.Redis(
-                host=host,
-                port=port,
-                db=db,
+            # 使用Redis.from_url()方法创建客户端，自动处理URL解析
+            client = redis.Redis.from_url(
+                redis_url,
                 decode_responses=True,
                 socket_timeout=5,
                 socket_connect_timeout=5,
@@ -104,17 +93,26 @@ class SessionManager:
             
             # 测试连接
             client.ping()
-            logger.info(f"Redis连接成功: {host}:{port}/{db}")
+            logger.info(f"Redis连接成功: {redis_url}")
             return client
             
         except Exception as e:
-            logger.error(f"Redis连接失败: {e}")
+            # 提供详细的错误信息用于调试
+            try:
+                from django.conf import settings
+                redis_config = getattr(settings, 'CACHES', {}).get('default', {})
+                redis_url = redis_config.get('LOCATION', 'redis://127.0.0.1:6379/1')
+                logger.error(f"Redis连接失败: {e}")
+                logger.error(f"Redis配置URL: {redis_url}")
+            except:
+                logger.error(f"Redis连接失败: {e}")
             raise ConfigurationError(f"Redis连接失败: {e}")
     
     def _create_http_session(self) -> requests.Session:
         """创建HTTP会话"""
         try:
             config_dict = self.config.to_dict() if hasattr(self.config, 'to_dict') else {}
+            # logger.warning(f"config_dict: {config_dict}")
             session = create_session_with_config(config_dict)
             
             # 设置超时
@@ -337,9 +335,16 @@ class SessionManager:
     def is_session_valid(self) -> bool:
         """检查会话是否有效
         
+        通过以下步骤验证会话：
+        1. 检查内存和Redis中的会话数据
+        2. 检查会话过期时间
+        3. 检查Cookie是否存在
+        4. 发送实际HTTP请求验证Cookie有效性
+        
         Returns:
             会话是否有效
         """
+        logger.debug(f"检查会话是否有效: {self._session_data}")
         try:
             # 检查内存中的会话数据
             if not self._session_data:
@@ -364,6 +369,11 @@ class SessionManager:
             cookies = self._session_data.get('cookies', {})
             if not cookies:
                 logger.debug("会话Cookie为空")
+                return False
+            
+            # 通过实际HTTP请求验证Cookie有效性
+            if not self._validate_session_with_request():
+                logger.info("HTTP请求验证显示会话已失效")
                 return False
             
             logger.debug("会话验证通过")
@@ -396,6 +406,62 @@ class SessionManager:
         except Exception as e:
             logger.error(f"加载会话数据时发生异常: {e}")
             self._session_data = {}
+    
+    def _validate_session_with_request(self) -> bool:
+        """通过实际HTTP请求验证会话有效性
+        
+        发送请求到 main.php 页面，检查响应内容：
+        - 如果响应是 <script>top.location.href='./';</script> 表示cookie已失效
+        - 其他响应表示cookie仍然有效
+        
+        Returns:
+            bool: cookie是否有效
+        """
+        try:
+
+            # 构建完整URL
+            full_url = self._build_full_url('/main.php')
+
+            logger.debug(f"发送请求验证会话有效性: {full_url}")
+                
+            # 执行请求
+            response = self._execute_request('GET', full_url, allow_redirects=False)
+            
+            # 检查响应内容
+            response_text = response.text.strip()
+
+            logger.debug(f"响应内容: {response_text}")
+            
+            # 检查是否是会话失效的标识响应
+            session_expired_indicator = "<script>top.location.href='./';</script>"
+            
+            if response_text == session_expired_indicator:
+                logger.info("检测到会话失效响应，cookie已过期")
+                return False
+            
+            # 检查HTTP状态码
+            # if response.status_code == 401:
+            #     logger.info("HTTP 401响应，会话未授权")
+            #     return False
+            
+            # 检查是否有其他重定向到登录页面的迹象
+            # if response.status_code in [302, 303, 307, 308]:
+            #     location = response.headers.get('Location', '')
+            #     if 'login' in location.lower() or location.endswith('./'):
+            #         logger.info(f"重定向到登录页面: {location}")
+            #         return False
+            
+            logger.debug("HTTP请求验证通过，会话仍然有效")
+            return True
+            
+        except requests.RequestException as e:
+            logger.warning(f"验证会话的HTTP请求失败: {e}")
+            # 网络请求失败时，我们不能确定会话状态，保守地返回True
+            # 避免因为网络问题导致频繁重新登录
+            return True
+        except Exception as e:
+            logger.error(f"验证会话时发生异常: {e}")
+            return True
     
     def close(self) -> None:
         """关闭会话管理器，清理资源"""
@@ -878,7 +944,7 @@ class SessionManager:
             if self.is_session_valid():
                 return True
             
-            logger.info("会话无效，尝试登录")
+            logger.warning("会话无效，尝试登录")
             
             # 尝试登录
             if self.login():
@@ -941,7 +1007,7 @@ class SessionManager:
             elif response.status_code >= 400:
                 error_msg = extract_error_message(response)
                 raise PlatformAPIError(
-                    f"API调用失败: {error_msg}",
+                    f"API调用失败: {url} {error_msg}",
                     status_code=response.status_code,
                     api_endpoint=url,
                     response_data=self._safe_get_response_data(response)

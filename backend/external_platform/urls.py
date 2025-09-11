@@ -12,6 +12,5 @@ router.register(r'platform_endpoint', views.PlatformEndpointViewSet)
 router.register(r'platform_config', views.PlatformConfigViewSet)
 
 urlpatterns = [
-    path('login/', views.PlatformLogin.as_view(), name='platform_login'),
     path('', include(router.urls)),
 ]

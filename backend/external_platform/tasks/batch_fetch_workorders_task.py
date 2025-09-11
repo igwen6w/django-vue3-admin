@@ -13,7 +13,7 @@ from typing import Dict, Any, List, Optional
 from celery import shared_task
 
 from external_platform.utils import get_task_config
-from external_platform.tasks import fetch_single_workorder_task
+from external_platform.tasks.fetch_single_workorder_task import fetch_single_workorder_task
 from gateway import get_pending_disposal_order_list
 
 logger = logging.getLogger(__name__)

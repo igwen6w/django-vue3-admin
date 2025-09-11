@@ -8,10 +8,14 @@
 import json
 import time
 import logging
+import mimetypes
+
 from typing import Dict, Any, Optional, Union, List
 from functools import wraps
+from datetime import timedelta
 import redis
 from django.conf import settings
+from django.utils import timezone
 
 from .services import SessionManager
 from .config import get_gateway_config
@@ -159,13 +163,16 @@ class PlatformAPI:
         """
         try:
             content_type = response.headers.get('content-type', '').lower()
-            
+
             if 'application/json' in content_type:
                 data = response.json()
                 return self._normalize_json_response(data)
             elif 'text/html' in content_type:
+                # 对方响应格式不正确，尝试解析为JSON
+                data = response.json()
+                return self._normalize_json_response(data)
                 # 对于HTML响应，尝试提取有用信息
-                return self._parse_html_response(response)
+                # return self._parse_html_response(response)
             elif 'text/' in content_type:
                 return self._parse_text_response(response)
             elif 'application/xml' in content_type:
@@ -473,7 +480,7 @@ class PlatformAPI:
             logger.debug("执行保活请求")
             
             # 执行保活请求
-            response = self.session_manager.request('GET', '/fresh_act.php')
+            response = self.session_manager.request('GET', '/personal_center/sub_act.php?act=list_my')
             
             # 处理响应
             result = self._handle_api_response(response, 'keepalive')
@@ -767,8 +774,8 @@ class PlatformAPI:
         return results
     
     @_ensure_authenticated
-    def upload_file(self, file_path: str, upload_url: str = '/api/upload',
-                   field_name: str = 'file', extra_data: Optional[Dict] = None) -> Dict[str, Any]:
+    def upload_file(self, file_path: str, upload_url: str = '/payroll3/upload_files.php',
+                   field_name: str = 'files[]', extra_data: Optional[Dict] = None) -> Dict[str, Any]:
         """上传文件
         
         Args:
@@ -788,21 +795,34 @@ class PlatformAPI:
             
             file_name = os.path.basename(file_path)
             file_size = os.path.getsize(file_path)
+            mime_type, _ = mimetypes.guess_type(file_name)
+            mime_type = mime_type or "application/octet-stream"
             
-            logger.info(f"上传文件 - 文件名: {file_name}, 大小: {file_size} bytes")
+            logger.warning(f"上传文件 - 文件名: {file_name}, 大小: {file_size} bytes, 类型: {mime_type}")
             
-            # 准备文件数据
+            # 准备表单数据
+            payload = {
+                'act': 'upload_files',
+                'roll_number': extra_data.get('roll_number') if extra_data else None
+            }
+
+            logger.warning(f"data: {payload}")
+            
+            # 准备文件数据并执行上传请求
             with open(file_path, 'rb') as f:
-                files = {field_name: (file_name, f, 'application/octet-stream')}
-                data = extra_data or {}
+                files = [
+                    (field_name, (file_name, f, mime_type))
+                ]
                 
                 # 执行上传请求
                 response = self.session_manager.request(
                     'POST',
                     upload_url,
-                    files=files,
-                    data=data
+                    data=payload,
+                    files=files
                 )
+
+                logger.warning(f"response: {response.content}")
             
             # 处理响应
             return self._handle_api_response(response, 'upload_file')
@@ -1126,7 +1146,7 @@ def get_order_detail(order_id: str) -> Dict[str, Any]:
 def edit_order(params: Dict[str, Any]) -> Dict[str, Any]:
     """便捷函数：编辑订单"""
     api = get_api_instance()
-    return api.edit_order(params: Dict[str, Any])
+    return api.edit_order(params)
 
 def update_order_status(order_id: str, status: str,
                        note: Optional[str] = None) -> Dict[str, Any]:
@@ -1147,8 +1167,8 @@ def batch_request(requests: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return api.batch_request(requests)
 
 
-def upload_file(file_path: str, upload_url: str = '/api/upload',
-               field_name: str = 'file', extra_data: Optional[Dict] = None) -> Dict[str, Any]:
+def upload_file(file_path: str, upload_url: str = '/payroll3/upload_files.php',
+               field_name: str = 'files[]', extra_data: Optional[Dict] = None) -> Dict[str, Any]:
     """便捷函数：上传文件"""
     api = get_api_instance()
     return api.upload_file(file_path, upload_url, field_name, extra_data)

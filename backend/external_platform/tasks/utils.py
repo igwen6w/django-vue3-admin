@@ -14,8 +14,6 @@ from external_platform.services.auth_service import AuthService
 
 logger = logging.getLogger(__name__)
 
-
-def handle_session_expiry(response_data: Dict[str, Any], session: AuthSession, 
                          platform_sign: str, task_self=None, 
                          retry_delay: int = 60) -> bool:
     """

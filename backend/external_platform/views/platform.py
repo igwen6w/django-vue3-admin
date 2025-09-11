@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from external_platform.models import Platform, AuthSession
-from external_platform.services.auth_service import AuthService
 from utils.serializers import CustomModelSerializer
 from utils.custom_model_viewSet import CustomModelViewSet
 from django_filters import rest_framework as filters
@@ -93,76 +92,6 @@ class PlatformViewSet(CustomModelViewSet):
     search_fields = ['name']  # 根据实际字段调整
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
-
-
-
-class PlatformLogin(APIView):
-    """
-    平台登录API视图
-    """
-    
-    def post(self, request):
-        """触发登录任务
-        
-        Request Body:
-            {
-                "platform_sign": "city_center_workorder",
-                "account": "username",
-                "password": "password"
-            }
-            
-        Returns:
-            任务信息
-        """
-        logger.info(f"触发登录任务请求 - 请求用户: {request.user.username}")
-        
-        try:
-            # 验证请求数据
-            serializer = LoginRequestSerializer(data=request.data)
-            if not serializer.is_valid():
-                logger.warning(f"登录任务参数验证失败 - 错误: {serializer.errors}")
-                
-                response_data = {
-                    'success': False,
-                    'error': '请求参数验证失败',
-                    'details': serializer.errors
-                }
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-            
-            validated_data = serializer.validated_data
-            platform_sign = validated_data['platform_sign']
-            account = validated_data['account']
-            password = validated_data['password']
-            
-            # 触发登录任务
-            task_id = AuthService.trigger_login_task(platform_sign)
-            
-            if task_id:
-                logger.info(f"登录任务触发成功 - 任务ID: {task_id}, 平台: {platform_sign}, "
-                           f"账户: {account}")
-                
-                return Response({
-                    'success': True,
-                    'task_id': task_id,
-                    'message': '登录任务已触发'
-                }, status=status.HTTP_202_ACCEPTED)
-            else:
-                error_msg = "触发登录任务失败"
-                logger.error(f"登录任务触发失败 - 平台: {platform_sign}, 账户: {account}")
-                
-                return Response({
-                    'success': False,
-                    'error': error_msg
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-        except Exception as e:
-            error_msg = f"触发登录任务异常: {str(e)}"
-            logger.error(f"登录任务触发异常 - 错误: {error_msg}", exc_info=True)
-            
-            return Response({
-                'success': False,
-                'error': error_msg
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # 移入urls中
