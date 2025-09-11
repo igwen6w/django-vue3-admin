@@ -1,6 +1,7 @@
 import os
 import json
 import base64
+import hashlib
 from typing import Optional, Union, Dict, Any
 
 from django.conf import settings
@@ -106,6 +107,24 @@ class CryptoUtils:
             return cls.decrypt(encrypted_data, key)
         except Exception as e:
             raise ValidationError(f'解密失败: {str(e)}')
+    
+    @classmethod
+    def md5(cls, data: Union[str, bytes]) -> 'hashlib._Hash':
+        """生成MD5哈希对象
+        
+        Args:
+            data: 要哈希的数据，可以是字符串或字节
+            
+        Returns:
+            MD5哈希对象，可以调用.hexdigest()获取十六进制字符串
+            
+        Example:
+            >>> CryptoUtils.md5("hello").hexdigest()
+            '5d41402abc4b2a76b9719d911017c592'
+        """
+        if isinstance(data, str):
+            data = data.encode('utf-8')
+        return hashlib.md5(data)
 
 
 # 便捷函数

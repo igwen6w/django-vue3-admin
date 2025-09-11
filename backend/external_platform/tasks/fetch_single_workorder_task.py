@@ -20,14 +20,14 @@ from utils.crypto import CryptoUtils
 logger = logging.getLogger(__name__)
 
 
-def _extract_order_detail_from_response(response_data: Dict[str, Any]) -> Optional[str]:
+def _extract_order_detail_from_response(response_data: Dict[str, Any]) -> Optional[Any]:
     """从响应数据中提取工单详情
     
     Args:
         response_data: API响应数据
         
     Returns:
-        工单详情，如果找不到则返回None
+        工单详情的Python对象，如果找不到则返回None
     """
     if not response_data or not response_data.get('success'):
         return None
@@ -36,7 +36,7 @@ def _extract_order_detail_from_response(response_data: Dict[str, Any]) -> Option
     
     # 检查是否有res字段
     if 'res' in data and isinstance(data['res'], list):
-        # 返回res列表
+        # 直接返回res列表，让JSONField自动处理序列化
         return data['res']
     
     return None
@@ -156,8 +156,10 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
 
             raw_data = _extract_order_detail_from_response(response_data)
             # 创建Meta记录
+            import json
+            raw_data_str = json.dumps(raw_data, ensure_ascii=False, sort_keys=True) if raw_data else ''
             meta_record = WorkOrderMeta.objects.create(
-                version=CryptoUtils.md5(raw_data.encode('utf-8')).hexdigest(),
+                version=CryptoUtils.md5(raw_data_str.encode('utf-8')).hexdigest(),
                 source_system=platform_sign,
                 sync_task_id=str(sync_task_id),
                 raw_data=raw_data,

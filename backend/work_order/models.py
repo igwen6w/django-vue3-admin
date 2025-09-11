@@ -31,7 +31,7 @@ class Common(CoreModel):
         verbose_name_plural = verbose_name
 
     version = models.CharField(max_length=32, db_comment='版本', verbose_name='版本')
-    source_system = models.CharField(max_length=20, db_comment='来源标识', verbose_name='来源标识')
+    source_system = models.CharField(max_length=36, db_comment='来源标识', verbose_name='来源标识')
     sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID')
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
