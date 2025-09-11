@@ -20,11 +20,32 @@ logger = logging.getLogger(__name__)
 def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
     """将work_order_meta中的数据同步到work_order_base中
     
+    从work_order_meta表的raw_data字段（JSON数组格式）中提取数据，
+    根据字段映射关系转换后同步到work_order_base表中。
+    
+    raw_data格式示例:
+    [
+        {
+            "fd_name": "roll_number",
+            "type": "1", 
+            "name": "工单编号",
+            "choice_value": "250910171327424509",
+            ...
+        },
+        ...
+    ]
+    
     Args:
         work_order_meta_id: work_order_meta记录的ID
         
     Returns:
-        任务执行结果
+        Dict[str, Any]: 任务执行结果，包含以下字段：
+            - success: 是否成功
+            - task_id: 任务ID
+            - work_order_meta_id: 元数据记录ID
+            - action: 执行动作（'created' 或 'updated'）
+            - work_order_base_id: 基础记录ID
+            - error: 错误信息（如果有）
     """
     task_id = self.request.id
     logger.info(f"开始同步工单数据到基础表 - 任务ID: {task_id}, Meta记录ID: {work_order_meta_id}")
@@ -59,9 +80,8 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
             result['error'] = error_msg
             return result
         
-        # 构建字段映射 - external_前缀字段与raw_data键的映射
+        # 构建字段映射 - external_前缀字段与raw_data中fd_name的映射
         field_mapping = {
-            'external_id': 'id',
             'external_roll_number': 'roll_number',
             'external_handle_rel_expire_time': 'handle_rel_expire_time',
             'external_src_way': 'src_way',
@@ -105,32 +125,33 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
             'sync_time': timezone.now(),
         })
         
+        # 添加external_id字段
+        sync_data['external_id'] = int(meta_record.external_id)
+        
+        # 创建字段值映射字典，从raw_data数组中构建
+        raw_data_dict = {}
+        if isinstance(raw_data, list):
+            logger.debug(f"处理raw_data数组，共{len(raw_data)}个字段配置")
+            for item in raw_data:
+                if isinstance(item, dict) and 'fd_name' in item:
+                    fd_name = item.get('fd_name')
+                    choice_value = item.get('choice_value')
+                    # 过滤掉None值，但保留空字符串和0等有效值
+                    if choice_value is not None:
+                        raw_data_dict[fd_name] = choice_value
+            logger.debug(f"成功提取{len(raw_data_dict)}个有效字段值")
+        else:
+            error_msg = f"WorkOrderMeta原始数据格式错误，期望数组格式: {work_order_meta_id}"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
+        
         # 处理字段映射
-        for external_field, raw_field in field_mapping.items():
-            raw_value = raw_data.get(raw_field)
+        for external_field, fd_name in field_mapping.items():
+            raw_value = raw_data_dict.get(fd_name)
             
             # 特殊处理某些字段
-            if external_field == 'external_id' and raw_value:
-                try:
-                    sync_data[external_field] = int(raw_value)
-                except (ValueError, TypeError):
-                    logger.warning(f"无法转换external_id为整数: {raw_value}")
-                    sync_data[external_field] = 0
-            elif external_field == 'external_handle_rel_expire_time' and raw_value:
-                # 处理时间字段
-                try:
-                    from django.utils.dateparse import parse_datetime
-                    parsed_time = parse_datetime(raw_value)
-                    if parsed_time:
-                        sync_data[external_field] = parsed_time
-                    else:
-                        # 尝试其他时间格式
-                        from datetime import datetime
-                        sync_data[external_field] = datetime.strptime(raw_value, '%Y-%m-%d %H:%M:%S')
-                except (ValueError, TypeError) as e:
-                    logger.warning(f"无法解析时间字段 {external_field}: {raw_value}, 错误: {e}")
-                    sync_data[external_field] = None
-            elif external_field == 'external_event_type2_id' and raw_value:
+            if external_field == 'external_event_type2_id' and raw_value:
                 # 处理数组字段，转换为字符串
                 if isinstance(raw_value, list):
                     sync_data[external_field] = ', '.join(str(item) for item in raw_value)
@@ -139,14 +160,17 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
             elif external_field == 'external_attachments' and raw_value:
                 # JSON字段保持原样
                 sync_data[external_field] = raw_value
-            elif raw_value is not None:
-                # 其他字段直接赋值，但确保不是None
-                sync_data[external_field] = str(raw_value) if raw_value != '' else None
+            elif raw_value is not None and raw_value != '':
+                # 其他字段直接赋值，但确保不是None或空字符串
+                sync_data[external_field] = str(raw_value)
+            else:
+                # 空值设置为None
+                sync_data[external_field] = None
         
         # 检查是否已存在相同external_id的记录
         external_id = sync_data.get('external_id', 0)
         if not external_id:
-            error_msg = f"缺少有效的external_id: {raw_data.get('id')}"
+            error_msg = f"缺少有效的external_id: {meta_record.external_id}"
             logger.error(error_msg)
             result['error'] = error_msg
             return result
