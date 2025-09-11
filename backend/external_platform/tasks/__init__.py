@@ -10,6 +10,7 @@ from external_platform.tasks.maintain_auth_status_task import maintain_auth_stat
 from external_platform.tasks.batch_fetch_workorders_task import batch_fetch_workorders_task
 from external_platform.tasks.fetch_single_workorder_task import fetch_single_workorder_task
 from external_platform.tasks.sync_data_2_base_order import sync_data_2_base_order
+from external_platform.tasks.sync_edit_order import sync_edit_order
 from external_platform.tasks.utils import handle_session_expiry
 
 __all__ = [
@@ -18,5 +19,6 @@ __all__ = [
     'batch_fetch_workorders_task',
     'fetch_single_workorder_task',
     'sync_data_2_base_order',
+    'sync_edit_order',
     'handle_session_expiry',
 ]

@@ -606,6 +606,54 @@ class PlatformAPI:
         except Exception as e:
             logger.error(f"获取订单详情失败: {e}")
             raise
+
+    
+    @_ensure_authenticated
+    def edit_order(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """编辑订单
+        
+        Args:
+            params: 编辑数据
+            
+        Returns:
+            编辑结果
+        """
+        try:
+            if not params:
+                raise ValueError("数据不能为空")
+            
+            logger.info(f"编辑订单 - 订单编号: {params.get('roll_number')}")
+
+            # 构建请求参数
+            request_params = {
+                'act': 'save_payroll_edit',
+                **{key: params.get(key) for key in [
+                    'roll_number',
+                    'payroll_result',
+                    'product_ids',
+                    'addr2',
+                    'company_address',
+                    'order_number',
+                    'normal_payroll_title',
+                    'note16',
+                    'note17'
+                ]}
+            }
+            
+            # 执行API请求
+            response = self.session_manager.request(
+                'POST', 
+                '/payroll3/sub_act.php',
+                params=request_params
+            )
+            
+            # 处理响应
+            return self._handle_api_response(response, 'edit_order')
+            
+        except Exception as e:
+            logger.error(f"编辑订单失败: {e}")
+            raise
+
     
     @_ensure_authenticated
     def update_order_status(self, order_id: str, status: str, 
@@ -1074,6 +1122,11 @@ def get_order_detail(order_id: str) -> Dict[str, Any]:
     api = get_api_instance()
     return api.get_order_detail(order_id)
 
+
+def edit_order(params: Dict[str, Any]) -> Dict[str, Any]:
+    """便捷函数：编辑订单"""
+    api = get_api_instance()
+    return api.edit_order(params: Dict[str, Any])
 
 def update_order_status(order_id: str, status: str,
                        note: Optional[str] = None) -> Dict[str, Any]:

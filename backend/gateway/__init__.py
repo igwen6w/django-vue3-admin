@@ -23,6 +23,7 @@ from .api_wrappers import (
     reset_api_instance,
     keepalive,
     get_pending_disposal_order_list,
+    edit_order,
     refresh_session,
     custom_request,
     batch_request,
@@ -59,6 +60,7 @@ __all__ = [
     # 便捷函数
     'keepalive',
     'get_pending_disposal_order_list',
+    'edit_order',
     'refresh_session',
     'custom_request',
     'batch_request',

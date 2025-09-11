@@ -274,26 +274,6 @@ CELERY_TASK_ANNOTATIONS = {
 }
 
 CELERY_BEAT_SCHEDULE = {
-    'every-1-minutes': {
-        'task': 'system.tasks.sync_temu_order',  # 任务路径
-        'schedule': 60,  # 每1分钟执行一次
-    },
-    # 外部平台认证状态维护任务 - 每10分钟执行一次
-    'maintain-auth-status': {
-        'task': 'external_platform.tasks.maintain_auth_status_task',
-        'schedule': 600,  # 每10分钟执行一次
-        'options': {
-            'expires': 300,  # 任务过期时间5分钟
-        }
-    },
-    # 清理过期会话任务 - 每小时执行一次
-    'cleanup-expired-sessions': {
-        'task': 'external_platform.tasks.maintain_auth_status_task',
-        'schedule': 3600,  # 每小时执行一次
-        'options': {
-            'expires': 1800,  # 任务过期时间30分钟
-        }
-    },
     'batch_fetch_workorders': {
         'task': 'external_platform.tasks.batch_fetch_workorders_task',
         'schedule': 300,  # 每 5 分钟执行一次
@@ -393,15 +373,23 @@ GATEWAY_SETTINGS = {
 
 # 外部平台任务配置
 EXTERNAL_PLATFORM_TASK_CONFIG = {
-    'login_task': {
+    'batch_fetch_workorders_task': {
+        'page_size': 50,
+        'max_pages': 10,
+        'retry_delay': 300,
+        'timeout': 30,
+    },
+    'fetch_single_workorder_task': {
+        'retry_delay': 60,
+        'timeout': 30,
+    },
+    'sync_data_2_base_order': {
+        'retry_delay': 30,
+    },
+    'sync_edit_order': {
         'max_retries': 3,
         'retry_delay': 60,  # 重试延迟(秒)
         'timeout': 300  # 任务超时时间(秒)
-    },
-    'maintain_auth_status': {
-        'check_interval_minutes': 10,  # 检查间隔(分钟)
-        'refresh_before_hours': 2,  # 过期前多少小时刷新
-        'batch_size': 50  # 批处理大小
     }
 }
 

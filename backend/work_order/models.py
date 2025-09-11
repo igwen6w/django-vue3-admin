@@ -101,13 +101,12 @@ class BaseEditRecord(CoreModel):
         verbose_name = '工单表编辑记录'
         verbose_name_plural = verbose_name
         ordering = ['-update_time']
+        indexes = [
+            models.Index(fields=['external_id']),
+        ]
     
-    # api_endpoint = '/payroll3/sub_act.php'
-    # act = 'save_payroll_edit'
-    # payroll_result = '待处置'
-    api_endpoint = models.JSONField(default=ApiEndpoint.EDIT, blank=True, null=True, db_comment='API_ENDPOINT', verbose_name='API_ENDPOINT')
-    act = models.CharField(max_length=50, default='save_payroll_edit', verbose_name='动作标识', db_comment='动作标识')
     external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
+    act = models.CharField(max_length=50, default='save_payroll_edit', verbose_name='动作标识', db_comment='动作标识')
     external_payroll_result = models.CharField(max_length=50, default='待处置', db_comment='工单状态', verbose_name='工单状态')
     external_roll_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
     external_product_ids = models.CharField(max_length=50, choices=ExternalProductIdsChoices.choices, blank=True, null=True, db_comment='三级复核', verbose_name='三级复核')
@@ -115,6 +114,12 @@ class BaseEditRecord(CoreModel):
     external_company_address = models.CharField(max_length=50, choices=ExternalCompanyAddressChoices.choices, blank=True, null=True, db_comment='满意研判', verbose_name='满意研判')
     external_order_number = models.CharField(max_length=50, choices=ExternalOrderNumberChoices.choices, blank=True, null=True, db_comment='解决研判', verbose_name='解决研判')
     external_normal_payroll_title = models.TextField(blank=True, null=True, db_comment='复核原因', verbose_name='复核原因')
+    external_note16 = models.CharField(max_length=50, choices=ExternalNote16Choices.choices, blank=True, null=True, db_comment='自主研判', verbose_name='自主研判')
+    external_note17 = models.TextField(blank=True, null=True, db_comment='研判原因', verbose_name='研判原因')
+
+    sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID', null=True, blank=True)
+    sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
+    sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
 
 
 # 办理单位
