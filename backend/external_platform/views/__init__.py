@@ -6,7 +6,8 @@ __all__ = [
     'PlatformLogin',
     'AuthSessionViewSet',
     'PlatformEndpointViewSet',
-    'PlatformConfigViewSet'
+    'PlatformConfigViewSet',
+    'ExternalDistrictNodeViewSet'
 ]
 
 from external_platform.views.request_log import RequestLogViewSet
@@ -15,3 +16,4 @@ from external_platform.views.platform import PlatformViewSet
 from external_platform.views.auth_session import AuthSessionViewSet
 from external_platform.views.platform_endpoint import PlatformEndpointViewSet
 from external_platform.views.platform_config import PlatformConfigViewSet
+from external_platform.views.external_district_node import ExternalDistrictNodeViewSet

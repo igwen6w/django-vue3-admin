@@ -10,6 +10,7 @@ router.register(r'platform', views.PlatformViewSet)
 router.register(r'auth_session', views.AuthSessionViewSet)
 router.register(r'platform_endpoint', views.PlatformEndpointViewSet)
 router.register(r'platform_config', views.PlatformConfigViewSet)
+router.register(r'external_district_node', views.ExternalDistrictNodeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
