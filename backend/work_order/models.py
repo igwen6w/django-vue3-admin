@@ -32,6 +32,7 @@ class Common(CoreModel):
 
     version = models.CharField(max_length=32, db_comment='版本', verbose_name='版本')
     source_system = models.CharField(max_length=36, db_comment='来源标识', verbose_name='来源标识')
+    sync_task_name = models.CharField(max_length=100, db_comment='同步任务名称', verbose_name='同步任务名称', null=True, blank=True)
     sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID')
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
@@ -95,6 +96,16 @@ class Base(Common):
     external_note16 = models.CharField(max_length=10, choices=ExternalNote16Choices.choices, blank=True, null=True, db_comment='自主研判', verbose_name='自主研判')
     external_note17 = models.TextField(blank=True, null=True, db_comment='研判原因', verbose_name='研判原因')
 
+    # 所属分类
+    category = models.ManyToManyField('Category', blank=True, db_comment='所属分类', verbose_name='所属分类', related_name='base_work_orders')
+
+    # 所属部门
+    department = models.ManyToManyField('system.Dept', blank=True, db_comment='所属部门', verbose_name='所属部门', related_name='base_work_orders')
+
+    # 当前节点
+    current_node = models.CharField(max_length=100, blank=True, null=True, db_comment='当前节点', verbose_name='当前节点')
+    work_flow = models.JSONField(blank=True, null=True, db_comment='工单流程', verbose_name='工单流程', default=list)
+
 class BaseEditRecord(CoreModel):
     class Meta:
         db_table = 'work_order_base_edit_record'
@@ -122,6 +133,18 @@ class BaseEditRecord(CoreModel):
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
 
 
+class Category(CoreModel):
+    class Meta:
+        db_table = 'work_order_category'
+        verbose_name = '工单分类'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+    
+    name = models.CharField(max_length=100, db_comment='分类名称', verbose_name='分类名称')
+    description = models.TextField(blank=True, null=True, db_comment='分类描述', verbose_name='分类描述')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, db_comment='父分类', verbose_name='父分类')
+
+
 # 办理单位
 
 # 关联记录
@@ -130,9 +153,49 @@ class BaseEditRecord(CoreModel):
 
 # 附件列表
 
-# 工作流程
 
 # 处置
+class Disposal(Common):
+    class Meta:
+        db_table = 'work_order_disposal'
+        verbose_name = '处置工单'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+    
+    base = models.ForeignKey('Base', on_delete=models.CASCADE, db_comment='工单', verbose_name='工单')
+
+    # 默认项
+    external_ps_caption = models.CharField(max_length=100, db_comment='ps_caption', verbose_name='ps_caption', default='处置')
+    external_record_number = models.CharField(max_length=100, db_comment='工单编号', verbose_name='工单编号')
+    external_public_record = models.IntegerField(default=2, db_comment='public_record', verbose_name='public_record')
+    external_user_id_hide = models.CharField(max_length=100, db_comment='user_id_hide', verbose_name='user_id_hide', null=True, blank=True)
+    external_co_di_ids = models.CharField(max_length=100, db_comment='co_di_ids', verbose_name='co_di_ids', null=True, blank=True)
+    external_co_di_ids_hide = models.CharField(max_length=100, db_comment='co_di_ids_hide', verbose_name='co_di_ids_hide', null=True, blank=True)
+    external_pss_status_attr = models.CharField(max_length=100, db_comment='pss_status_attr', verbose_name='pss_status_attr', default='待处置')
+    external_di_ids = models.CharField(max_length=100, db_comment='di_ids', verbose_name='di_ids', null=True, blank=True)
+    external_di_ids_hide = models.CharField(max_length=100, db_comment='di_ids_hide', verbose_name='di_ids_hide', null=True, blank=True)
+    external_psot_name = models.CharField(max_length=100, db_comment='psot_name', verbose_name='psot_name', default='处置')
+    external_psot_attr = models.CharField(max_length=100, db_comment='psot_attr', verbose_name='psot_attr', default='处置')
+    external_pso_caption = models.CharField(max_length=100, db_comment='pso_caption', verbose_name='pso_caption', default='确定')
+
+    # 用户填写项
+    external_note1 = models.CharField(max_length=100, db_comment='诉求属实', verbose_name='诉求属实', null=True, blank=True)
+    external_distribute_way = models.CharField(max_length=100, db_comment='超职责诉求', verbose_name='超职责诉求', null=True, blank=True)
+    external_note8 = models.CharField(max_length=100, db_comment='申请类型', verbose_name='申请类型', null=True, blank=True)
+    external_d_attachments = models.JSONField(blank=True, null=True, db_comment='附件', verbose_name='附件', default=list)
+    external_note3 = models.CharField(max_length=100, db_comment='联系群众', verbose_name='联系群众', null=True, blank=True)
+    external_note4 = models.CharField(max_length=100, db_comment='联系号码', verbose_name='联系号码', null=True, blank=True)
+    external_note5 = models.CharField(max_length=100, db_comment='联系时间', verbose_name='联系时间', null=True, blank=True)
+    external_note6 = models.CharField(max_length=100, db_comment='是否解决', verbose_name='是否解决', null=True, blank=True)
+    external_note11 = models.CharField(max_length=100, db_comment='未解决原因', verbose_name='未解决原因', null=True, blank=True)
+    external_note = models.CharField(max_length=100, db_comment='办理情况', verbose_name='办理情况', null=True, blank=True)
+    external_note10 = models.CharField(max_length=100, db_comment='公开答复内容', verbose_name='公开答复内容', null=True, blank=True)
+
+    # 附件
+    attachments_credentials = models.JSONField(blank=True, null=True, db_comment='证件附件', verbose_name='证件附件', default=list)
+    attachments_contact = models.JSONField(blank=True, null=True, db_comment='联系证据', verbose_name='联系证据', default=list)
+    attachments_handle = models.JSONField(blank=True, null=True, db_comment='办理附件', verbose_name='办理附件', default=list)
+
 
 # 下派
 
