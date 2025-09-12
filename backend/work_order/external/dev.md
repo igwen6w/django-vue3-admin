@@ -132,4 +132,63 @@ GET /payroll3/sub_act.php
   "note10": "123123123123123123123",
   "pso_caption": "确定"
 }
+```
 
+## 下派工单
+
+### 发起下派
+
+#### URL
+
+```API
+POST /payroll3/sub_act.php?act=submit&flag=9&module_name=处置
+```
+
+#### Payload
+
+```json
+{
+  "ps_caption": "处置",
+  "record_number": "250912101108115409",
+  "public_record": 2,
+  "user_id_hide": null,
+  "co_di_ids": null,
+  "co_di_ids_hide": null,
+  "pss_status_attr": "待处置",
+  "pso_caption": "确定",
+  "di_ids": "泰山区委政研室,泰山区委组织部",
+  "di_ids_hide": "533,529",
+  "psot_name": "加派",
+  "psot_attr": "加派",
+  "expires": 5,
+  "note": "嗯杜甫草堂个疑惑不解那么快",
+  "dept_send_msg": "533,529"
+}
+```
+
+## 督办工单
+
+### 请求
+
+```API
+POST /payroll3/sub_act.php?act=self_submit&flag=99&module_name=处置
+```
+
+```json
+{
+  "ps_caption": "处置",
+  "record_number": "250912101108115409",
+  "public_record": 2,
+  "user_id_hide": null,
+  "co_di_ids": null,
+  "co_di_ids_hide": null,
+  "pss_status_attr": "待处置",
+  "di_ids": null,
+  "di_ids_hide": null,
+  "refuse_di_ids": "泰山区住建局",
+  "refuse_di_ids_hide": "556",
+  "psot_name": "督办",
+  "psot_attr": "督办",
+  "note": "123123",
+  "pso_caption": "确定"
+}

@@ -9,6 +9,9 @@ router.register(r'meta', views.MetaViewSet)
 router.register(r'disposal', views.DisposalViewSet)
 router.register(r'category', views.CategoryViewSet)
 router.register(r'base', views.BaseViewSet)
+router.register(r'distribute_opinion_preset', views.DistributeOpinionPresetViewSet)
+router.register(r'distribute', views.DistributeViewSet)
+router.register(r'supervise', views.SuperviseViewSet)
 
 
 urlpatterns = [

@@ -208,3 +208,24 @@ class ExternalAuthCaptchaLog(CoreModel):
         on_delete=models.CASCADE,
         db_column='external_request_log_id'
     )
+
+class ExternalDistrictNode(CoreModel):
+    class Meta:
+        db_table = 'external_district_node'
+        verbose_name = '区县节点'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+        indexes = [
+            models.Index(fields=['code'], name='code_idx')
+        ]
+    
+    name = models.CharField(max_length=100, db_comment='名称', verbose_name='名称')
+    code = models.CharField(max_length=10, db_comment='编码', verbose_name='编码', unique=True)
+    parent = models.ForeignKey(
+        'self', 
+        to_field='code', 
+        on_delete=models.CASCADE, 
+        db_comment='父节点', 
+        verbose_name='父节点', 
+        related_name='children'
+    )

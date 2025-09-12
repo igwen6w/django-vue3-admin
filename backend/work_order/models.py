@@ -172,8 +172,8 @@ class Disposal(Common):
     external_co_di_ids = models.CharField(max_length=100, db_comment='co_di_ids', verbose_name='co_di_ids', null=True, blank=True)
     external_co_di_ids_hide = models.CharField(max_length=100, db_comment='co_di_ids_hide', verbose_name='co_di_ids_hide', null=True, blank=True)
     external_pss_status_attr = models.CharField(max_length=100, db_comment='pss_status_attr', verbose_name='pss_status_attr', default='待处置')
-    external_di_ids = models.CharField(max_length=100, db_comment='di_ids', verbose_name='di_ids', null=True, blank=True)
-    external_di_ids_hide = models.CharField(max_length=100, db_comment='di_ids_hide', verbose_name='di_ids_hide', null=True, blank=True)
+    external_di_ids = models.JSONField(blank=True, null=True, db_comment='单位名称', verbose_name='单位名称', default=list)
+    external_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='单位ID', verbose_name='单位ID', default=list)
     external_psot_name = models.CharField(max_length=100, db_comment='psot_name', verbose_name='psot_name', default='处置')
     external_psot_attr = models.CharField(max_length=100, db_comment='psot_attr', verbose_name='psot_attr', default='处置')
     external_pso_caption = models.CharField(max_length=100, db_comment='pso_caption', verbose_name='pso_caption', default='确定')
@@ -198,12 +198,82 @@ class Disposal(Common):
 
 
 # 下派
+class Distribute(CoreModel):
+    class Meta:
+        db_table = 'work_order_distribute'
+        verbose_name = '下派工单'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+    
+    base = models.ForeignKey('Base', on_delete=models.CASCADE, db_comment='工单', verbose_name='工单')
+
+    # 默认项
+    external_ps_caption = models.CharField(max_length=100, db_comment='ps_caption', verbose_name='ps_caption', default='处置')
+    external_record_number = models.CharField(max_length=100, db_comment='工单编号', verbose_name='工单编号')
+    external_public_record = models.IntegerField(default=2, db_comment='public_record', verbose_name='public_record')
+    external_user_id_hide = models.CharField(max_length=100, db_comment='user_id_hide', verbose_name='user_id_hide', null=True, blank=True)
+    external_co_di_ids = models.JSONField(blank=True, null=True, db_comment='co_di_ids', verbose_name='co_di_ids', default=list)
+    external_co_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='co_di_ids_hide', verbose_name='co_di_ids_hide', default=list)
+    external_pss_status_attr = models.CharField(max_length=100, db_comment='pss_status_attr', verbose_name='pss_status_attr', default='待处置')
+    external_di_ids = models.JSONField(blank=True, null=True, db_comment='单位名称', verbose_name='单位名称', default=list)
+    external_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='单位ID', verbose_name='单位ID', default=list)
+    external_psot_name = models.CharField(max_length=100, db_comment='psot_name', verbose_name='psot_name', default='加派')
+    external_psot_attr = models.CharField(max_length=100, db_comment='psot_attr', verbose_name='psot_attr', default='加派')
+    external_pso_caption = models.CharField(max_length=100, db_comment='pso_caption', verbose_name='pso_caption', default='确定')
+
+    # 用户填写项
+    external_dept_send_msg = models.CharField(max_length=100, db_comment='单位ID(发短信)', verbose_name='单位ID', null=True, blank=True)
+    external_note = models.CharField(max_length=100, db_comment='办理情况', verbose_name='办理情况', null=True, blank=True)
+    external_expires = models.IntegerField(default=5, db_comment='办理期限', verbose_name='办理期限')
 
 # 延期
 
 # 退回
 
 # 督办
+class Supervise(CoreModel):
+    class Meta:
+        db_table = 'work_order_supervise'
+        verbose_name = '督办工单'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+    
+    base = models.ForeignKey('Base', on_delete=models.CASCADE, db_comment='工单', verbose_name='工单')
+
+    # 默认项
+    external_ps_caption = models.CharField(max_length=100, db_comment='ps_caption', verbose_name='ps_caption', default='处置')
+    external_record_number = models.CharField(max_length=100, db_comment='工单编号', verbose_name='工单编号')
+    external_public_record = models.IntegerField(default=2, db_comment='public_record', verbose_name='public_record')
+    external_user_id_hide = models.CharField(max_length=100, db_comment='user_id_hide', verbose_name='user_id_hide', null=True, blank=True)
+    external_co_di_ids = models.JSONField(blank=True, null=True, db_comment='co_di_ids', verbose_name='co_di_ids', default=list)
+    external_co_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='co_di_ids_hide', verbose_name='co_di_ids_hide', default=list)
+    external_pss_status_attr = models.CharField(max_length=100, db_comment='pss_status_attr', verbose_name='pss_status_attr', default='待处置')
+    external_di_ids = models.JSONField(blank=True, null=True, db_comment='单位名称', verbose_name='单位名称', default=list)
+    external_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='单位ID', verbose_name='单位ID', default=list)
+    external_psot_name = models.CharField(max_length=100, db_comment='psot_name', verbose_name='psot_name', default='督办')
+    external_psot_attr = models.CharField(max_length=100, db_comment='psot_attr', verbose_name='psot_attr', default='督办')
+    external_pso_caption = models.CharField(max_length=100, db_comment='pso_caption', verbose_name='pso_caption', default='确定')
+
+    # 用户填写项
+    external_note = models.CharField(max_length=100, db_comment='督办意见', verbose_name='督办意见', null=True, blank=True)
+    external_refuse_di_ids = models.JSONField(blank=True, null=True, db_comment='督办单位名称', verbose_name='督办单位名称', default=list)
+    external_refuse_di_ids_hide = models.JSONField(blank=True, null=True, db_comment='督办单位ID', verbose_name='督办单位ID', default=list)
+
+
+class DistributeOpinionPreset(CoreModel):
+    class Meta:
+        db_table = 'work_order_distribute_opinion_preset'
+        verbose_name = '下派意见预设'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+        indexes = [
+            models.Index(fields=['dept', 'category'], name='dept_category_idx')
+        ]
+    
+    dept = models.ForeignKey('system.Dept', on_delete=models.CASCADE, db_comment='部门', verbose_name='部门')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, db_comment='分类', verbose_name='分类')
+    description = models.TextField(blank=True, null=True, db_comment='下派意见预设', verbose_name='下派意见预设')
+    title = models.CharField(max_length=100, db_comment='标题', verbose_name='标题', null=True, blank=True)
 
 
 class Demo(CoreModel):
