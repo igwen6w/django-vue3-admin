@@ -30,10 +30,10 @@ class Common(CoreModel):
         verbose_name = '工单公共部分'
         verbose_name_plural = verbose_name
 
-    version = models.CharField(max_length=32, db_comment='版本', verbose_name='版本')
-    source_system = models.CharField(max_length=36, db_comment='来源标识', verbose_name='来源标识')
-    sync_task_name = models.CharField(max_length=100, db_comment='同步任务名称', verbose_name='同步任务名称', null=True, blank=True)
-    sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID')
+    version = models.CharField(max_length=32, db_comment='版本', verbose_name='版本', null=True, blank=True, default=None)
+    source_system = models.CharField(max_length=36, db_comment='来源标识', verbose_name='来源标识', null=True, blank=True, default=None)
+    sync_task_name = models.CharField(max_length=100, db_comment='同步任务名称', verbose_name='同步任务名称', null=True, blank=True, default=None)
+    sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID', null=True, blank=True, default=None)
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
     sync_response = models.JSONField(blank=True, null=True, db_comment='同步响应', verbose_name='同步响应', default=dict)
