@@ -632,7 +632,7 @@ class PlatformAPI:
             logger.info(f"编辑订单 - 订单编号: {params.get('roll_number')}")
 
             # 构建请求参数
-            request_params = {
+            payload = {
                 'act': 'save_payroll_edit',
                 **{key: params.get(key) for key in [
                     'roll_number',
@@ -651,7 +651,7 @@ class PlatformAPI:
             response = self.session_manager.request(
                 'POST', 
                 '/payroll3/sub_act.php',
-                params=request_params
+                data=payload
             )
             
             # 实际预期的响应格式
@@ -707,6 +707,81 @@ class PlatformAPI:
         except Exception as e:
             logger.error(f"更新订单状态失败: {e}")
             raise
+
+    
+    @_ensure_authenticated
+    def disposal_order(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """处置订单
+        
+        Args:
+            data: 处置数据
+            
+        Returns:
+            处置结果
+        """
+        try:
+            if not data:
+                raise ValueError("数据不能为空")
+            
+            logger.info(f"处置订单 - 订单编号: {data.get('record_number')}")
+
+            params = {
+                'act': 'self_submit',
+                'flag': 99,
+                'module_name': '处置'
+            }
+
+            payload = {
+                'ps_caption': '处置',
+                'public_record': 2,
+                'user_id_hide': None,
+                'co_di_ids': None,
+                'co_di_ids_hide': None,
+                'pss_status_attr': '待处置',
+                'di_ids': None,
+                'di_ids_hide': None,
+                'psot_name': '处置',
+                'psot_attr': '处置',
+                'pso_caption': '确定',
+                **{key: data.get(key) for key in [
+                    'record_number',
+                    # 诉求属实
+                    'note1',
+                    # 超职责诉求
+                    'distribute_way',
+                    # 申请类型
+                    'note8',
+                    # 附件: 证件附件/联系证据/办理附件
+                    'd_attachments',
+                    # 联系群众
+                    'note3',
+                    'note4',
+                    # 联系时间
+                    'note5',
+                    # 是否解决
+                    'note6',
+                    'note11',
+                    # 办理情况
+                    'note',
+                    # 公开答复内容
+                    'note10'
+                ]}
+            }
+                        
+            # 执行API请求
+            response = self.session_manager.request(
+                'POST', 
+                '/payroll3/sub_act.php',
+                params=params,
+                data=payload
+            )
+
+            return self._handle_api_response(response, 'disposal_order')
+            
+        except Exception as e:
+            logger.error(f"处置订单失败: {e}")
+            raise
+
     
     @_ensure_authenticated
     def custom_request(self, method: str, path: str, **kwargs) -> Dict[str, Any]:
@@ -1153,6 +1228,11 @@ def edit_order(params: Dict[str, Any]) -> Dict[str, Any]:
     """便捷函数：编辑订单"""
     api = get_api_instance()
     return api.edit_order(params)
+
+def disposal_order(data: Dict[str, Any]) -> Dict[str, Any]:
+    """便捷函数：处置订单"""
+    api = get_api_instance()
+    return api.disposal_order(data)
 
 def update_order_status(order_id: str, status: str,
                        note: Optional[str] = None) -> Dict[str, Any]:
