@@ -102,7 +102,7 @@ def sync_edit_order(self, edit_record_id: int) -> Dict[str, Any]:
                     edit_record.sync_status = True
                     edit_record.sync_time = timezone.now()
                     edit_record.sync_response = sync_response
-                    edit_record.save(update_fields=['sync_task_id', 'sync_status', 'sync_time', 'update_time'])
+                    edit_record.save(update_fields=['sync_task_name', 'sync_task_id', 'sync_status', 'sync_time', 'update_time', 'sync_response'])
                 
                 result['success'] = True
                 result['sync_result'] = sync_response

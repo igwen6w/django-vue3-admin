@@ -32,29 +32,6 @@ class BaseEditRecordViewSet(CustomModelViewSet):
     search_fields = ['name']  # 根据实际字段调整
     ordering_fields = ['create_time', 'id']
     ordering = ['-create_time']
-
-
-    def perform_create(self, serializer):
-        # 自动设置创建时间
-        # if 'create_time' not in serializer.validated_data:
-        #     serializer.validated_data['create_time'] = datetime.now()
-        instances = serializer.save()
-
-        if isinstance(instances, list):
-            for instance in instances:
-                self.trigger_sync(instance.pk)
-        else:
-            self.trigger_sync(instances.pk)
-
-
-
-    def trigger_sync(self, pk):
-        """
-        触发同步
-        """
-        from external_platform.tasks.sync_edit_order import trigger_sync_edit_order
-
-        trigger_sync_edit_order(pk)
         
 
 

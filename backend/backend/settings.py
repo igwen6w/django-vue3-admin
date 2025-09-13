@@ -390,6 +390,11 @@ EXTERNAL_PLATFORM_TASK_CONFIG = {
         'max_retries': 3,
         'retry_delay': 60,  # 重试延迟(秒)
         'timeout': 300  # 任务超时时间(秒)
+    },
+    'sync_disposal_order': {
+        'max_retries': 3,
+        'retry_delay': 60,  # 重试延迟(秒)
+        'timeout': 300  # 任务超时时间(秒)
     }
 }
 

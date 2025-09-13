@@ -9,10 +9,12 @@ from external_platform.tasks.batch_fetch_workorders_task import batch_fetch_work
 from external_platform.tasks.fetch_single_workorder_task import fetch_single_workorder_task
 from external_platform.tasks.sync_data_2_base_order import sync_data_2_base_order
 from external_platform.tasks.sync_edit_order import sync_edit_order
+from external_platform.tasks.sync_disposal_order import sync_disposal_order
 
 __all__ = [
     'batch_fetch_workorders_task',
     'fetch_single_workorder_task',
     'sync_data_2_base_order',
     'sync_edit_order',
+    'sync_disposal_order',
 ]
