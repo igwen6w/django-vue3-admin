@@ -117,6 +117,8 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
         'batch_task_id': batch_task_id,
         'meta_record_id': None,
         'sync_task_triggered': False,
+        'skipped': False,
+        'skip_reason': None,
         'error': None,
         'execution_time_ms': 0
     }
@@ -155,30 +157,48 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
             pull_task_id = batch_task_id
 
             raw_data = _extract_order_detail_from_response(response_data)
-            # 创建Meta记录
+            # 计算版本号
             import json
             raw_data_str = json.dumps(raw_data, ensure_ascii=False, sort_keys=True) if raw_data else ''
-            meta_record = WorkOrderMeta.objects.create(
-                version=CryptoUtils.md5(raw_data_str.encode('utf-8')).hexdigest(),
-                source_system=platform_sign,
-                sync_task_id=str(sync_task_id),
-                raw_data=raw_data,
-                pull_task_id=str(pull_task_id),
-                external_id=int(workorder_id) if workorder_id.isdigit() else 0
-            )
+            current_version = CryptoUtils.md5(raw_data_str.encode('utf-8')).hexdigest()
+            external_id_int = int(workorder_id) if workorder_id.isdigit() else 0
             
-            result['meta_record_id'] = meta_record.id
+            # 检查是否已存在相同external_id的最新记录，且version相同
+            existing_record = WorkOrderMeta.objects.filter(
+                external_id=external_id_int
+            ).order_by('-create_time').first()
             
-            logger.info(f"保存原始工单数据成功 - 工单ID: {workorder_id}, Meta记录ID: {meta_record.id}")
-            
-            # 触发同步到Base表的任务
-            try:
-                sync_data_2_base_order.delay(meta_record.id)
-                result['sync_task_triggered'] = True
-                logger.info(f"已触发同步任务 - Meta记录ID: {meta_record.id}")
-            except Exception as e:
-                logger.warning(f"触发同步任务失败 - Meta记录ID: {meta_record.id}, 错误: {e}")
-                # 同步任务触发失败不影响主任务成功
+            if existing_record and existing_record.version == current_version:
+                logger.info(f"工单数据未变化，跳过插入 - 工单ID: {workorder_id}, 版本: {current_version}")
+                result['meta_record_id'] = existing_record.id
+                result['skipped'] = True
+                result['skip_reason'] = 'version_unchanged'
+                
+                # 对于跳过的记录，不触发同步任务
+                logger.info(f"数据未变化，跳过同步任务 - 工单ID: {workorder_id}, Meta记录ID: {existing_record.id}")
+            else:
+                # 创建Meta记录
+                meta_record = WorkOrderMeta.objects.create(
+                    version=current_version,
+                    source_system=platform_sign,
+                    sync_task_id=str(sync_task_id),
+                    raw_data=raw_data,
+                    pull_task_id=str(pull_task_id),
+                    external_id=external_id_int
+                )
+                
+                result['meta_record_id'] = meta_record.id
+                
+                logger.info(f"保存原始工单数据成功 - 工单ID: {workorder_id}, Meta记录ID: {meta_record.id}")
+                
+                # 触发同步到Base表的任务
+                try:
+                    sync_data_2_base_order.delay(meta_record.id)
+                    result['sync_task_triggered'] = True
+                    logger.info(f"已触发同步任务 - Meta记录ID: {meta_record.id}")
+                except Exception as e:
+                    logger.warning(f"触发同步任务失败 - Meta记录ID: {meta_record.id}, 错误: {e}")
+                    # 同步任务触发失败不影响主任务成功
                 
         except Exception as e:
             error_msg = f"保存工单数据到Meta表失败: {str(e)}"
