@@ -616,6 +616,39 @@ class PlatformAPI:
 
     
     @_ensure_authenticated
+    def get_order_step_chart(self, order_number: str) -> Dict[str, Any]:
+        """获取节点状态
+        
+        Args:
+            order_number: 订单编号
+            
+        Returns:
+            节点状态
+        """
+        try:
+            if not order_number:
+                raise ValueError("订单编号不能为空")
+            
+            logger.info(f"获取节点状态 - 订单编号: {order_number}")
+            
+
+            # 执行API请求
+            response = self.session_manager.request(
+                'POST', 
+                '/payroll3/sub_act.php',
+                data={
+                    'act': 'payroll_step_chart', 
+                    'record_number': order_number
+                }
+            )
+
+            return self._handle_api_response(response, 'get_order_step_chart')
+
+        except Exception as e:
+            logger.error(f"获取节点状态失败: {e}")
+            raise
+    
+    @_ensure_authenticated
     def edit_order(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """编辑订单
         
@@ -1286,6 +1319,10 @@ def get_order_detail(order_id: str) -> Dict[str, Any]:
     api = get_api_instance()
     return api.get_order_detail(order_id)
 
+def get_order_step_chart(order_number: str) -> Dict[str, Any]:
+    """便捷函数：获取节点状态"""
+    api = get_api_instance()
+    return api.get_order_step_chart(order_number)
 
 def edit_order(params: Dict[str, Any]) -> Dict[str, Any]:
     """便捷函数：编辑订单"""

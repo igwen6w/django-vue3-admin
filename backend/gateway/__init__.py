@@ -23,6 +23,7 @@ from .api_wrappers import (
     reset_api_instance,
     keepalive,
     get_pending_disposal_order_list,
+    get_order_step_chart,
     edit_order,
     distribute_order,
     disposal_order,
@@ -65,6 +66,8 @@ __all__ = [
     'get_pending_disposal_order_list',
     'edit_order',
     'get_order_detail',
+    # 获取节点状态
+    'get_order_step_chart',
     # 下派工单
     'distribute_order',
     # 处置工单

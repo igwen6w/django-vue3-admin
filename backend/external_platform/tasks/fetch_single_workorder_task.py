@@ -19,6 +19,47 @@ from utils.crypto import CryptoUtils
 
 logger = logging.getLogger(__name__)
 
+def _extract_ps_caption_current_from_order_step_chart(order_step_chart: list[dict[str, Any]]) -> Optional[str]:
+    """从工单节点流程中提取当前节点
+    
+    Args:
+        order_step_chart: 工单节点流程
+        
+    Returns:
+        当前节点
+    """
+    for item in order_step_chart:
+        if item.get('ps_caption_current'):
+            return item.get('ps_caption_current')
+    return None
+
+def _extract_order_step_chart_from_response(response_data: Dict[str, Any]) -> Optional[Any]:
+    """从响应数据中提取工单节点流程
+    
+    Args:
+        response_data: API响应数据
+        
+    Returns:
+        工单节点流程
+    """
+    return response_data.get('data', {})
+
+def _extract_order_number_from_res(res: list[dict[str, Any]]) -> Optional[str]:
+    """从res列表中提取工单编号
+    
+    Args:
+        res: API响应数据
+        
+    Returns:
+        工单编号
+    """
+    if not res or not isinstance(res, list):
+        return None
+    
+    for item in res:
+        if item.get('fd_name') == 'roll_number':
+            return item.get('choice_value')
+    return None
 
 def _extract_order_detail_from_response(response_data: Dict[str, Any]) -> Optional[Any]:
     """从响应数据中提取工单详情
@@ -148,7 +189,25 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
             result['error'] = error_msg
             return result
         
+        # res list
+        raw_data = _extract_order_detail_from_response(response_data)
+        order_number = _extract_order_number_from_res(raw_data)
+
+        # 获取工单节点流程
+        from gateway import get_order_step_chart
+        order_step_chart_response = get_order_step_chart(order_number)
+        order_step_chart = _extract_order_step_chart_from_response(order_step_chart_response)
+        if not order_step_chart:
+            error_msg = "获取工单节点流程失败"
+            logger.error(error_msg)
+            result['error'] = error_msg
+            return result
         
+        # 合并工单节点流程和工单详情
+        raw_data.extend({'order_step_chart': order_step_chart})
+        raw_data.extend({'ps_caption_current': _extract_ps_caption_current_from_order_step_chart(order_step_chart)})
+
+
         # 保存原始工单数据到Meta模型
         from work_order.models import Meta as WorkOrderMeta
         
@@ -156,7 +215,6 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
             sync_task_id = task_id
             pull_task_id = batch_task_id
 
-            raw_data = _extract_order_detail_from_response(response_data)
             # 计算版本号
             import json
             raw_data_str = json.dumps(raw_data, ensure_ascii=False, sort_keys=True) if raw_data else ''
@@ -184,7 +242,8 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
                     sync_task_id=str(sync_task_id),
                     raw_data=raw_data,
                     pull_task_id=str(pull_task_id),
-                    external_id=external_id_int
+                    external_id=external_id_int,
+                    order_number=order_number,
                 )
                 
                 result['meta_record_id'] = meta_record.id

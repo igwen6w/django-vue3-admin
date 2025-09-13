@@ -51,6 +51,7 @@ class Meta(Common):
     raw_data = models.JSONField(db_comment='原始工单数据', verbose_name='工单信息', default=dict)
     pull_task_id = models.CharField(max_length=36, db_comment='拉取任务ID', verbose_name='拉取任务ID')
     external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
+    order_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
 
 
 class Base(Common):

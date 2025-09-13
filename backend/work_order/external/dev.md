@@ -192,3 +192,84 @@ POST /payroll3/sub_act.php?act=self_submit&flag=99&module_name=处置
   "note": "123123",
   "pso_caption": "确定"
 }
+```
+
+## 获取节点状态
+
+请求
+
+```API
+POST /payroll3/sub_act.php
+```
+
+payload
+
+```JSON
+{
+  "act": "payroll_step_chart",
+  "record_number": "250913090841042809"
+}
+```
+
+响应
+
+```JSON
+[
+  {
+    "ps_caption": "受理",
+    "pss_caption_start": "待受理",
+    "pss_caption_end": "待补充",
+    "ps_caption_current": "处置",
+    "p_pss_caption_current": "待处置",
+    "id": "140464035",
+    "opper": "4051",
+    "pso_caption": "提交",
+    "date": "2025-09-13 09:08:41",
+    "di_title_o": "一组",
+    "di_title": "政府服务热线-受理组-一组",
+    "payroll_resulttmp": "已受理"
+  },
+  {
+    "ps_caption": "预审",
+    "pss_caption_start": "待派遣",
+    "pss_caption_end": "已派遣",
+    "ps_caption_current": "处置",
+    "p_pss_caption_current": "待处置",
+    "id": "140475247",
+    "opper": "1053",
+    "pso_caption": "确定",
+    "date": "2025-09-13 11:25:04",
+    "di_title_o": "审核组",
+    "di_title": "政府服务热线-审核组",
+    "payroll_resulttmp": "已派遣"
+  },
+  {
+    "ps_caption": "处置",
+    "pss_caption_start": "待处置",
+    "pss_caption_end": "已处置",
+    "ps_caption_current": "处置",
+    "p_pss_caption_current": "待处置",
+    "id": "140475253",
+    "opper": "1053",
+    "pso_caption": "自动发送短信",
+    "date": "2025-09-13 11:25:05",
+    "di_title_o": "审核组",
+    "di_title": "政府服务热线-审核组",
+    "payroll_resulttmp": "待处置"
+  },
+  {
+    "ps_caption": "回访",
+    "pss_caption_start": "待回访",
+    "pss_caption_end": "待督办",
+    "ps_caption_current": "处置",
+    "p_pss_caption_current": "待处置"
+  },
+  {
+    "ps_caption": "结案",
+    "pss_caption_start": "待结案",
+    "pss_caption_end": "已结案",
+    "ps_caption_current": "处置",
+    "p_pss_caption_current": "待处置"
+  }
+]
+```
