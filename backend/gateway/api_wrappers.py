@@ -784,6 +784,69 @@ class PlatformAPI:
 
     
     @_ensure_authenticated
+    def distribute_order(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """下派订单
+        
+        Args:
+            data: 下派数据
+        
+        Returns:
+            下派结果
+        """
+        try:
+            if not data:
+                raise ValueError("数据不能为空")
+            
+            logger.info(f"下派订单 - 订单编号: {data.get('record_number')}")
+
+            params = {
+                'act': 'submit',
+                'flag': '9',
+                'module_name': '处置'
+            }
+
+            payload = {
+                'ps_caption': '处置',
+                'public_record': 2,
+                'user_id_hide': None,
+                'co_di_ids': None,
+                'co_di_ids_hide': None,
+                'pss_status_attr': '待处置',
+                'pso_caption': '确定',
+                'psot_name': '加派',
+                'psot_attr': '加派',
+                **{key: data.get(key) for key in [
+                    'record_number',
+                    # 单位：住建局,公安分局
+                    'di_ids',
+                    # 单位ID：556,557
+                    'di_ids_hide',
+                    # 办理期限
+                    'expires',
+                    # 办理情况
+                    'note',
+                    # 单位ID(发短信)：556,557
+                    'dept_send_msg'
+                ]}
+            }
+
+            # 执行API请求
+            response = self.session_manager.request(
+                'POST', 
+                '/payroll3/sub_act.php',
+                params=params,
+                data=payload
+            )
+
+            return self._handle_api_response(response, 'distribute_order')
+        except Exception as e:
+            logger.error(f"下派订单失败: {e}")
+            raise
+        
+        
+
+    
+    @_ensure_authenticated
     def custom_request(self, method: str, path: str, **kwargs) -> Dict[str, Any]:
         """自定义API请求，用于调用未封装的API
         
@@ -1233,6 +1296,13 @@ def disposal_order(data: Dict[str, Any]) -> Dict[str, Any]:
     """便捷函数：处置订单"""
     api = get_api_instance()
     return api.disposal_order(data)
+
+
+def distribute_order(data: Dict[str, Any]) -> Dict[str, Any]:
+    """便捷函数：下派订单"""
+    api = get_api_instance()
+    return api.distribute_order(data)
+
 
 def update_order_status(order_id: str, status: str,
                        note: Optional[str] = None) -> Dict[str, Any]:
