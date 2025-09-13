@@ -654,6 +654,12 @@ class PlatformAPI:
                 params=request_params
             )
             
+            # 实际预期的响应格式
+            # {
+            #     "status": "success",
+            #     "des": "修改成功",
+            #     "res": []
+            # }
             # 处理响应
             return self._handle_api_response(response, 'edit_order')
             

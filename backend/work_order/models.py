@@ -128,6 +128,8 @@ class BaseEditRecord(CoreModel):
     external_note16 = models.CharField(max_length=50, choices=ExternalNote16Choices.choices, blank=True, null=True, db_comment='自主研判', verbose_name='自主研判')
     external_note17 = models.TextField(blank=True, null=True, db_comment='研判原因', verbose_name='研判原因')
 
+    sync_response = models.JSONField(blank=True, null=True, db_comment='同步响应', verbose_name='同步响应', default=dict)
+    sync_task_name = models.CharField(max_length=100, db_comment='同步任务名称', verbose_name='同步任务名称', null=True, blank=True)
     sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID', null=True, blank=True)
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')

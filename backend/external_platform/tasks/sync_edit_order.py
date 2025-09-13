@@ -97,9 +97,11 @@ def sync_edit_order(self, edit_record_id: int) -> Dict[str, Any]:
             if sync_response.get('success', False):
                 # 同步成功，更新编辑记录状态
                 with transaction.atomic():
+                    edit_record.sync_task_name = 'sync_edit_order'
                     edit_record.sync_task_id = task_id
                     edit_record.sync_status = True
                     edit_record.sync_time = timezone.now()
+                    edit_record.sync_response = sync_response
                     edit_record.save(update_fields=['sync_task_id', 'sync_status', 'sync_time', 'update_time'])
                 
                 result['success'] = True
