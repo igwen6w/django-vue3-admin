@@ -73,6 +73,8 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
             return result
         
         # 获取原始数据
+        ps_caption_current = meta_record.ps_caption_current
+        order_step_chart = meta_record.order_step_chart
         raw_data = meta_record.raw_data
         if not raw_data:
             error_msg = f"WorkOrderMeta记录缺少原始数据: {work_order_meta_id}"
@@ -166,7 +168,12 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
             else:
                 # 空值设置为None
                 sync_data[external_field] = None
-        
+
+        # 当前节点
+        sync_data['current_node'] = ps_caption_current
+        # 节点流程
+        sync_data['work_flow'] = order_step_chart
+
         # 检查是否已存在相同external_id的记录
         external_id = sync_data.get('external_id', 0)
         if not external_id:
@@ -183,7 +190,7 @@ def sync_data_2_base_order(self, work_order_meta_id: int) -> Dict[str, Any]:
                 # 更新现有记录
                 for field, value in sync_data.items():
                     setattr(existing_record, field, value)
-                
+                    
                 existing_record.save()
                 
                 result['action'] = 'updated'

@@ -202,11 +202,6 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
             logger.error(error_msg)
             result['error'] = error_msg
             return result
-        
-        # 合并工单节点流程和工单详情
-        raw_data.extend({'order_step_chart': order_step_chart})
-        raw_data.extend({'ps_caption_current': _extract_ps_caption_current_from_order_step_chart(order_step_chart)})
-
 
         # 保存原始工单数据到Meta模型
         from work_order.models import Meta as WorkOrderMeta
@@ -244,6 +239,8 @@ def fetch_single_workorder_task(self, platform_sign: str, workorder_id: str, bat
                     pull_task_id=str(pull_task_id),
                     external_id=external_id_int,
                     order_number=order_number,
+                    ps_caption_current=_extract_ps_caption_current_from_order_step_chart(order_step_chart),
+                    order_step_chart=order_step_chart,
                 )
                 
                 result['meta_record_id'] = meta_record.id

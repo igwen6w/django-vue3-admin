@@ -52,6 +52,8 @@ class Meta(Common):
     pull_task_id = models.CharField(max_length=36, db_comment='拉取任务ID', verbose_name='拉取任务ID')
     external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     order_number = models.CharField(max_length=100, blank=True, null=True, db_comment='工单编号', verbose_name='工单编号')
+    ps_caption_current = models.CharField(max_length=100, blank=True, null=True, db_comment='当前节点', verbose_name='当前节点')
+    order_step_chart = models.JSONField(blank=True, null=True, db_comment='工单节点流程', verbose_name='工单节点流程', default=list)
 
 
 class Base(Common):
