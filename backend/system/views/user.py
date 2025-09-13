@@ -1,3 +1,4 @@
+import requests
 from django.db.models import Prefetch, F
 from django.utils import timezone
 from rest_framework import serializers
@@ -62,8 +63,8 @@ class UserLogin(ObtainAuthToken):
         client_ip = get_client_ip(request)
 
         # 获取IP地址的地理位置信息
-        # location_info = self.get_location_from_ip(client_ip)
-        location_info = ''
+        location_info = self.get_location_from_ip(client_ip)
+        # location_info = ''
 
         # 更新登录IP和登录时间
         user.login_ip = client_ip
@@ -87,27 +88,27 @@ class UserLogin(ObtainAuthToken):
             "message": "ok"
         })
 
-    def get_location_from_ip(self, ip_address):
+    def get_location_from_ip(self, ip):
         """根据IP地址获取地理位置信息"""
         try:
             # 对于本地IP地址，返回默认值
-            if ip_address in ['127.0.0.1', 'localhost']:
+            if ip in ['127.0.0.1', 'localhost']:
                 return "本地网络"
 
             # 查询IP地址信息
-            response = DbIpCity.get(ip_address, api_key='free')
-
-            # 构建地区信息字符串
-            location_parts = []
-            if response.city:
-                location_parts.append(response.city)
-            if response.region:
-                location_parts.append(response.region)
-            if response.country:
-                location_parts.append(response.country)
-
-            return ', '.join(location_parts) if location_parts else "未知位置"
-
+            # 免费接口，无需密钥，返回JSON格式数据
+            url = f"http://ip-api.com/json/{ip}?lang=zh-CN"  # lang=zh-CN 确保返回中文
+            try:
+                response = requests.get(url, timeout=5)
+                data = response.json()
+                if data["status"] == "success":  # 接口返回成功
+                    # 构建地区信息字符串
+                    location_parts = [data["city"], data["regionName"],data["country"]]
+                    return ', '.join(location_parts) if location_parts else "未知位置"
+                else:
+                    return f"IP {ip} 查询失败：{data['message']}"
+            except Exception as e:
+                return f"IP {ip} 连接错误：{str(e)}"
         except Exception as e:
             # 记录错误日志
             import logging
