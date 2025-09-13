@@ -24,6 +24,7 @@ from .api_wrappers import (
     keepalive,
     get_pending_disposal_order_list,
     edit_order,
+    distribute_order,
     disposal_order,
     get_order_detail,
     refresh_session,
@@ -64,6 +65,8 @@ __all__ = [
     'get_pending_disposal_order_list',
     'edit_order',
     'get_order_detail',
+    # 下派工单
+    'distribute_order',
     # 处置工单
     'disposal_order',
     'refresh_session',

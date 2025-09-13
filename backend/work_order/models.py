@@ -36,6 +36,7 @@ class Common(CoreModel):
     sync_task_id = models.CharField(max_length=36, db_comment='同步任务ID', verbose_name='同步任务ID')
     sync_status = models.BooleanField(default=False, db_comment='同步状态', verbose_name='同步状态')
     sync_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True, db_comment='同步时间', verbose_name='同步时间')
+    sync_response = models.JSONField(blank=True, null=True, db_comment='同步响应', verbose_name='同步响应', default=dict)
 
 
 
@@ -166,6 +167,7 @@ class Disposal(Common):
     
     base = models.ForeignKey('Base', on_delete=models.CASCADE, db_comment='工单', verbose_name='工单')
 
+    external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     # 默认项
     external_ps_caption = models.CharField(max_length=100, db_comment='ps_caption', verbose_name='ps_caption', default='处置')
     external_record_number = models.CharField(max_length=100, db_comment='工单编号', verbose_name='工单编号')
@@ -200,7 +202,7 @@ class Disposal(Common):
 
 
 # 下派
-class Distribute(CoreModel):
+class Distribute(Common):
     class Meta:
         db_table = 'work_order_distribute'
         verbose_name = '下派工单'
@@ -209,6 +211,7 @@ class Distribute(CoreModel):
     
     base = models.ForeignKey('Base', on_delete=models.CASCADE, db_comment='工单', verbose_name='工单')
 
+    external_id = models.BigIntegerField(default=0, db_comment='工单ID', verbose_name='工单ID')
     # 默认项
     external_ps_caption = models.CharField(max_length=100, db_comment='ps_caption', verbose_name='ps_caption', default='处置')
     external_record_number = models.CharField(max_length=100, db_comment='工单编号', verbose_name='工单编号')
