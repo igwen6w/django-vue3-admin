@@ -9,7 +9,6 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import IsAuthenticated
 from django_filters import rest_framework as filters
-from ip2geotools.databases.noncommercial import DbIpCity
 
 from system.models import User, Menu, LoginLog, Dept
 from utils.ip_utils import get_client_ip
