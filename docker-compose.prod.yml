@@ -26,7 +26,7 @@ services:
     env_file:
       - ./docker/.env.prod
       - ./docker/.env.local
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD:+--requirepass "${REDIS_PASSWORD}"}
     volumes:
       - ./docker/redis/prod/data:/data
       # - ./docker/redis/conf/redis.conf:/etc/redis/redis.conf
