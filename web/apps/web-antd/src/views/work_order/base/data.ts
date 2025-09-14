@@ -16,6 +16,43 @@ export function useSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
+      fieldName: 'work_order_no',
+      label: '工单编号',
+      componentProps: { style: { width: '100px', marginRight: '10px' } },
+      rules: z.string().min(1, $t('ui.formRules.required', ['工单编号'])),
+    },
+    {
+      component: 'Input',
+      fieldName: 'contact_method',
+      label: '联系方式',
+      componentProps: { style: { width: '100px', marginRight: '10px' } },
+      rules: z.string().min(1, $t('ui.formRules.required', ['联系方式'])),
+    },
+    {
+      component: 'Select',
+      fieldName: 'business_type',
+      label: '业务类型',
+      componentProps: { style: { width: '100px', marginRight: '10px' } },
+      rules: z.string().min(1, $t('ui.formRules.required', ['业务类型'])),
+      options: [
+        { label: '类型A', value: 'A' },
+        { label: '类型B', value: 'B' },
+      ],
+    },
+    {
+      component: 'Select',
+      fieldName: 'accept_method',
+      label: '受理方式',
+      componentProps: { style: { width: '100px', marginRight: '10px' }, mode: 'multiple' },
+      rules: z.array(z.string()).min(1, $t('ui.formRules.required', ['受理方式'])),
+      options: [
+        { label: '电话', value: 'phone' },
+        { label: '邮件', value: 'email' },
+        { label: '现场', value: 'onsite' },
+      ],
+    },
+    {
+      component: 'Input',
       fieldName: 'version',
       label: '版本',
       rules: z.string().min(1, $t('ui.formRules.required', ['版本'])).max(100, $t('ui.formRules.maxLength', ['版本', 100])),
@@ -66,6 +103,7 @@ export function useSchema(): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'external_roll_number',
       label: '工单编号',
+      componentProps: { style: { width: '100px' } },
       rules: z.string().min(1, $t('ui.formRules.required', ['工单编号'])).max(100, $t('ui.formRules.maxLength', ['工单编号', 100])),
     },
     {
@@ -267,193 +305,117 @@ export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'version',
-      label: '版本',
-    },
-    {
-      component: 'Input',
-      fieldName: 'source_system',
-      label: '来源标识',
-    },
-    {
-      component: 'Input',
-      fieldName: 'sync_task_name',
-      label: '同步任务名称',
-    },
-    {
-      component: 'Input',
-      fieldName: 'sync_task_id',
-      label: '同步任务ID',
-    },
-    {
-      component: 'Input',
-      fieldName: 'sync_status',
-      label: '同步状态',
-    },
-    {
-      component: 'Input',
-      fieldName: 'sync_time',
-      label: '同步时间',
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'external_id',
-      label: '工单ID',
-    },
-    {
-      component: 'Input',
       fieldName: 'external_roll_number',
       label: '工单编号',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
-      fieldName: 'external_handle_rel_expire_time',
-      label: '处置实际到期时间',
-    },
-    {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_src_way',
       label: '受理方式',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_payroll_name',
-      label: '姓名',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
       component: 'Input',
       fieldName: 'external_company_tel',
       label: '联系方式',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
+    // {
+    //   component: 'Input',
+    //   fieldName: 'external_note14',
+    //   label: '是否回访',
+    //   componentProps: { style: { minWidth: '120px', width: 'auto' } }
+    // },
     {
-      component: 'Input',
-      fieldName: 'external_addr',
-      label: '地址',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_region_district_id',
-      label: '区域',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_note14',
-      label: '是否回访',
-    },
-    {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_distribute_way',
       label: '企业名称',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_payroll_type',
       label: '业务类别',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_event_type2_id',
       label: '事件类型',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
-      fieldName: 'external_roll_content',
-      label: '事件描述',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_note',
-      label: '备注',
-    },
-    {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_product_ids',
       label: '三级复核',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_addr2',
       label: '区县复核',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_company_address',
       label: '满意研判',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_order_number',
       label: '解决研判',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
-      fieldName: 'external_normal_payroll_title',
-      label: '复核原因',
-    },
-    {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_addr3',
       label: '满意复核',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note1',
       label: '解决复核',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
-      fieldName: 'external_note15',
-      label: '市复核意见',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_attachments',
-      label: '附件',
-    },
-    {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note4',
       label: '是否考核',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_handling_quality',
       label: '办理满意',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note12',
       label: '过程满意',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note2',
       label: '是否解决',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note3',
       label: '办理回复',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
     {
-      component: 'Input',
+      component: 'Select',
       fieldName: 'external_note16',
       label: '自主研判',
-    },
-    {
-      component: 'Input',
-      fieldName: 'external_note17',
-      label: '研判原因',
-    },
-    {
-      component: 'Input',
-      fieldName: 'current_node',
-      label: '当前节点',
-    },
-    {
-      component: 'Input',
-      fieldName: 'work_flow',
-      label: '工单流程',
+      componentProps: { style: { minWidth: '120px', width: 'auto' } }
     },
   ];
 }
@@ -471,36 +433,36 @@ export function useColumns(
       field: 'id',
       title: 'ID',
     },
-    {
-      field: 'version',
-      title: '版本',
-    },
-    {
-      field: 'source_system',
-      title: '来源标识',
-    },
-    {
-      field: 'sync_task_name',
-      title: '同步任务名称',
-    },
-    {
-      field: 'sync_task_id',
-      title: '同步任务ID',
-    },
-    {
-      field: 'sync_status',
-      title: '同步状态',
-    },
-    {
-      field: 'sync_time',
-      title: '同步时间',
-      width: 150,
-      formatter: ({ cellValue }) => format_datetime(cellValue),
-    },
-    {
-      field: 'external_id',
-      title: '工单ID',
-    },
+    // {
+    //   field: 'version',
+    //   title: '版本',
+    // },
+    // {
+    //   field: 'source_system',
+    //   title: '来源标识',
+    // },
+    // {
+    //   field: 'sync_task_name',
+    //   title: '同步任务名称',
+    // },
+    // {
+    //   field: 'sync_task_id',
+    //   title: '同步任务ID',
+    // },
+    // {
+    //   field: 'sync_status',
+    //   title: '同步状态',
+    // },
+    // {
+    //   field: 'sync_time',
+    //   title: '同步时间',
+    //   width: 150,
+    //   formatter: ({ cellValue }) => format_datetime(cellValue),
+    // },
+    // {
+    //   field: 'external_id',
+    //   title: '工单ID',
+    // },
     {
       field: 'external_roll_number',
       title: '工单编号',
@@ -521,10 +483,10 @@ export function useColumns(
       field: 'external_company_tel',
       title: '联系方式',
     },
-    {
-      field: 'external_addr',
-      title: '地址',
-    },
+    // {
+    //   field: 'external_addr',
+    //   title: '地址',
+    // },
     {
       field: 'external_region_district_id',
       title: '区域',
@@ -533,10 +495,10 @@ export function useColumns(
       field: 'external_note14',
       title: '是否回访',
     },
-    {
-      field: 'external_distribute_way',
-      title: '企业名称',
-    },
+    // {
+    //   field: 'external_distribute_way',
+    //   title: '企业名称',
+    // },
     {
       field: 'external_payroll_type',
       title: '业务类别',
@@ -549,18 +511,18 @@ export function useColumns(
       field: 'external_roll_content',
       title: '事件描述',
     },
-    {
-      field: 'external_note',
-      title: '备注',
-    },
-    {
-      field: 'external_product_ids',
-      title: '三级复核',
-    },
-    {
-      field: 'external_addr2',
-      title: '区县复核',
-    },
+    // {
+    //   field: 'external_note',
+    //   title: '备注',
+    // },
+    // {
+    //   field: 'external_product_ids',
+    //   title: '三级复核',
+    // },
+    // {
+    //   field: 'external_addr2',
+    //   title: '区县复核',
+    // },
     {
       field: 'external_company_address',
       title: '满意研判',
@@ -569,10 +531,10 @@ export function useColumns(
       field: 'external_order_number',
       title: '解决研判',
     },
-    {
-      field: 'external_normal_payroll_title',
-      title: '复核原因',
-    },
+    // {
+    //   field: 'external_normal_payroll_title',
+    //   title: '复核原因',
+    // },
     {
       field: 'external_addr3',
       title: '满意复核',
@@ -585,10 +547,10 @@ export function useColumns(
       field: 'external_note15',
       title: '市复核意见',
     },
-    {
-      field: 'external_attachments',
-      title: '附件',
-    },
+    // {
+    //   field: 'external_attachments',
+    //   title: '附件',
+    // },
     {
       field: 'external_note4',
       title: '是否考核',
@@ -617,42 +579,42 @@ export function useColumns(
       field: 'external_note17',
       title: '研判原因',
     },
-    {
-      field: 'current_node',
-      title: '当前节点',
-    },
-    {
-      field: 'work_flow',
-      title: '工单流程',
-    },
-    {
-      field: 'remark',
-      title: '备注',
-    },
-    {
-      field: 'creator',
-      title: '创建人',
-    },
-    {
-      field: 'modifier',
-      title: '修改人',
-    },
-    {
-      field: 'update_time',
-      title: '修改时间',
-      width: 150,
-      formatter: ({ cellValue }) => format_datetime(cellValue),
-    },
-    {
-      field: 'create_time',
-      title: '创建时间',
-      width: 150,
-      formatter: ({ cellValue }) => format_datetime(cellValue),
-    },
-    {
-      field: 'is_deleted',
-      title: '是否软删除',
-    },
+    // {
+    //   field: 'current_node',
+    //   title: '当前节点',
+    // },
+    // {
+    //   field: 'work_flow',
+    //   title: '工单流程',
+    // },
+    // {
+    //   field: 'remark',
+    //   title: '备注',
+    // },
+    // {
+    //   field: 'creator',
+    //   title: '创建人',
+    // },
+    // {
+    //   field: 'modifier',
+    //   title: '修改人',
+    // },
+    // {
+    //   field: 'update_time',
+    //   title: '修改时间',
+    //   width: 150,
+    //   formatter: ({ cellValue }) => format_datetime(cellValue),
+    // },
+    // {
+    //   field: 'create_time',
+    //   title: '创建时间',
+    //   width: 150,
+    //   formatter: ({ cellValue }) => format_datetime(cellValue),
+    // },
+    // {
+    //   field: 'is_deleted',
+    //   title: '是否软删除',
+    // },
     {
       align: 'center',
       cellRender: {
