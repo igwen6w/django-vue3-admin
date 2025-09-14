@@ -11,7 +11,7 @@ services:
       - "33306:3306"
     volumes:
       - ./sql/django_vue.sql:/docker-entrypoint-initdb.d/django_vue.sql
-      - ./data/mysql_prod:/var/lib/mysql   # <-- 加这一行
+      - ./docker/mysql/prod/data:/var/lib/mysql   # <-- 加这一行
     networks:
       - app_net
 
@@ -26,6 +26,11 @@ services:
     env_file:
       - ./docker/.env.prod
       - ./docker/.env.local
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./docker/redis/prod/data:/data
+      # - ./docker/redis/conf/redis.conf:/etc/redis/redis.conf
+      - ./docker/redis/prod/logs:/logs
 
   backend:
     restart: always
