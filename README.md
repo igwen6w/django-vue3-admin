@@ -1,20 +1,8 @@
-## 如果这个项目让你有所收获，记得 Star 关注哦，这对我是非常不错的鼓励与支持。
-
-
 # 项目简介
 
 本项目为基于 Django5 + Vue3（vben-admin）全栈开发的企业级中后台管理系统，支持动态菜单、按钮权限、自动化代码生成、前后端权限联动等功能，适用于多角色、多权限场景的管理后台。
 
 新增 ai_service 子项目，基于 FastAPI 实现，集成了 AI 对话能力，支持接入 DeepSeek 等大模型，实现智能对话、知识问答等功能，可灵活扩展多种 AI 场景。
-
-## 在线体验
-
-- admin/admin123  
-- chenze/admin123
-
-体验地址：https://demo.ywwuzi.cn
-
-文档地址：https://docs.ywwuzi.cn
 
 ## 功能截图
 
@@ -41,10 +29,6 @@
   </tr>
 </table>
 
-# 许可证
-
-本项目遵循 MIT License。
-它是一个完全开源的快速开发平台，个人、团体使用免费，Django-Vue3-Admin 是一个基于 RBAC（基于角色的访问控制）模型进行权限控制的全面基础开发平台，权限控制粒度达到列级。它遵循前后端分离的架构，后端使用 Django 和 Django Rest Framework，前端使用 Vue3、Composition API、TypeScript、Vite 和 vben-admin（Ant Design Vue）。
 
 # 启动说明
 python 版本 3.12
