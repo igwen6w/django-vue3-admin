@@ -161,6 +161,8 @@ def _build_distribute_order_params(distribute) -> Dict[str, Any]:
     # 基于gateway/api_wrappers.py中distribute_order方法的参数要求构建
     params = {
         'record_number': distribute.external_record_number,
+        'co_di_ids': ','.join(map(str, distribute.co_di_ids)),
+        'co_di_ids_hide': ','.join(map(str, distribute.co_di_ids_hide)),
         'di_ids': ','.join(map(str, distribute.di_ids)),
         'di_ids_hide': ','.join(map(str, distribute.di_ids_hide)),
         'expires': distribute.expires,

@@ -842,14 +842,14 @@ class PlatformAPI:
                 'ps_caption': '处置',
                 'public_record': 2,
                 'user_id_hide': None,
-                'co_di_ids': None,
-                'co_di_ids_hide': None,
                 'pss_status_attr': '待处置',
                 'pso_caption': '确定',
-                'psot_name': '加派',
-                'psot_attr': '加派',
+                'psot_name': '下派',
+                'psot_attr': '下派',
                 **{key: data.get(key) for key in [
                     'record_number',
+                    'co_di_ids',
+                    'co_di_ids_hide',
                     # 单位：住建局,公安分局
                     'di_ids',
                     # 单位ID：556,557
