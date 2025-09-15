@@ -2,9 +2,6 @@ services:
   db:
     image: mysql:8
     restart: always
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
     environment:
       TZ: Asia/Shanghai
     ports:
@@ -23,10 +20,7 @@ services:
       - "36379:6379"
     networks:
       - app_net
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    command: redis-server ${REDIS_PASSWORD:+--requirepass "${REDIS_PASSWORD}"}
     volumes:
       - ./docker/redis/prod/data:/data
       # - ./docker/redis/conf/redis.conf:/etc/redis/redis.conf
@@ -39,9 +33,6 @@ services:
       dockerfile: Dockerfile
       target: prod
     command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
     depends_on:
       - db
       - redis
@@ -59,9 +50,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     command: celery -A backend worker -l info
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
     depends_on:
       - backend
       - redis
@@ -74,9 +62,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     command: celery -A backend beat -l info
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
     depends_on:
       - backend
       - redis
@@ -89,9 +74,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     command: celery -A backend flower --port=5555
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
     depends_on:
       - backend
       - redis
@@ -115,9 +97,6 @@ services:
       - redis
     networks:
       - app_net
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
 
   frontend:
     restart: always
@@ -132,9 +111,6 @@ services:
       - "35678:80"
     networks:
       - app_net
-    env_file:
-      - ./docker/.env.prod
-      - ./docker/.env.local
 
 volumes:
   db_data:

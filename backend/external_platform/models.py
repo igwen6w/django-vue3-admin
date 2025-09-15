@@ -227,5 +227,7 @@ class ExternalDistrictNode(CoreModel):
         on_delete=models.CASCADE, 
         db_comment='父节点', 
         verbose_name='父节点', 
-        related_name='children'
+        related_name='children',
+        null=True,
+        blank=True
     )

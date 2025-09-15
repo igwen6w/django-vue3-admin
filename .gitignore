@@ -72,3 +72,7 @@ celerybeat-schedule.db
 data/mysql
 data/mysql_prod
 web/node-compile-cache
+
+# docker data
+docker/mysql/*
+docker/redis/*
