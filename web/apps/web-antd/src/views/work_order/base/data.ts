@@ -625,6 +625,7 @@ export function useColumns(
         },
         name: 'CellOperation',
         options: [
+			op('work_order:base:detail', 'detail'),
           op('work_order:base:edit', 'edit'),
           op('work_order:base:delete', 'delete'),
         ],

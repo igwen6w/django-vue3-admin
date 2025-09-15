@@ -3,6 +3,11 @@ import { unmountGlobalLoading } from '@vben/utils';
 
 import { overridesPreferences } from './preferences';
 
+// import { createApp } from 'vue';
+// import App from './app.vue';
+// import Antd from 'ant-design-vue';
+// import 'ant-design-vue/dist/reset.css';  
+
 /**
  * 应用初始化完成之后再进行页面加载渲染
  */
@@ -19,7 +24,11 @@ async function initApplication() {
     overrides: overridesPreferences,
   });
 
-  // 启动应用并挂载
+  // 启动应用并挂载到dom节点
+  // const app = createApp(App);
+  // app.use(Antd);          // 全局注册
+  // app.mount('#app')
+
   // vue应用主要逻辑及视图
   const { bootstrap } = await import('./bootstrap');
   await bootstrap(namespace);

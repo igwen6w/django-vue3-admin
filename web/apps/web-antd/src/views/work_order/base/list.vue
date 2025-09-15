@@ -16,6 +16,8 @@ import { WorkOrderBaseModel } from '#/models/work_order/base';
 
 import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const formModel = new WorkOrderBaseModel();
 
@@ -60,6 +62,14 @@ function onDelete(row: WorkOrderBaseApi.WorkOrderBase) {
       hideLoading();
     });
 }
+function onDetail(row: WorkOrderBaseApi.WorkOrderBase){
+  console.log('row:'+row.id);
+  router.push(`/work_order/base/detail/${row.id}`);
+	// router.push({
+  //   name: 'work_order_base_detail',
+  //   params: { id: row.id },
+  // });
+}
 
 /**
  * 表格操作按钮的回调函数
@@ -69,6 +79,10 @@ function onActionClick({
   row,
 }: OnActionClickParams<WorkOrderBaseApi.WorkOrderBase>) {
   switch (code) {
+	case 'detail': {
+	  onDetail(row);
+	  break;
+	}
     case 'delete': {
       onDelete(row);
       break;
