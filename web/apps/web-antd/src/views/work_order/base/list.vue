@@ -96,8 +96,21 @@ function onActionClick({
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
+    // 默认折叠搜索表单
+    collapsed: true,
+    // 紧凑样式
+    compact: true,
     schema: useGridFormSchema(),
+    // 在表单值改变时提交
     submitOnChange: true,
+    commonConfig: {
+      // 所有表单项
+      componentProps: {
+        class: 'w-full',
+      },
+    },
+    // 小屏显示1列，中屏显示4列，大屏显示6列
+    wrapperClass: 'grid-cols-1 md:grid-cols-4 lg:grid-cols-6',
   },
   gridEvents: {},
   gridOptions: {
